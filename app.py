@@ -6,32 +6,21 @@ from google.cloud import bigquery
 from dotenv import load_dotenv
 import streamlit.components.v1 as components
 import tempfile
-import json
 
 # Leer credenciales desde Streamlit Secrets
 credentials = st.secrets["GOOGLE_APPLICATION_CREDENTIALS"]
 
-# Asegurarse de que los saltos de línea en la clave privada sean correctos
-credentials = credentials.replace("\\n", "\n")
+# Crear un archivo temporal para las credenciales
+with tempfile.NamedTemporaryFile(delete=False, mode="w") as temp_file:
+    temp_file.write(credentials)
+    temp_file_path = temp_file.name
 
-try:
-    # Convertir la cadena a un diccionario JSON
-    credentials_dict = json.loads(credentials)
+# Establecer la variable de entorno con la ruta al archivo temporal
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = temp_file_path
 
-    # Crear un archivo temporal
-    with tempfile.NamedTemporaryFile(delete=False, mode="w") as temp_file:
-        json.dump(credentials_dict, temp_file)  # Guardar JSON correctamente
-        temp_file_path = temp_file.name
 
-    # Establecer la variable de entorno con la ruta al archivo temporal
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = temp_file_path
-
-    st.write(f"Archivo de credenciales creado en: {temp_file_path}")
-
-except json.JSONDecodeError as e:
-    st.error(f"Error al decodificar JSON: {e}")
-    st.write("Contenido de las credenciales (puede contener errores):", credentials)
-
+# Cargar variables de entorno desde .env
+load_dotenv()
 
 # Configurar logger
 logger = logging.getLogger("flight_report_logger")
