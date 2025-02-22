@@ -11,6 +11,9 @@ import json
 # Leer credenciales desde Streamlit Secrets
 credentials = st.secrets["GOOGLE_APPLICATION_CREDENTIALS"]
 
+# Asegurarse de que los saltos de línea en la clave privada sean correctos
+credentials = credentials.replace("\\n", "\n")
+
 try:
     # Convertir la cadena a un diccionario JSON
     credentials_dict = json.loads(credentials)
