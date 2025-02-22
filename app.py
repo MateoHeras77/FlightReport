@@ -38,8 +38,9 @@ if not logger.handlers:
     logger.addHandler(stream_handler)
 
 # Tabla en BigQuery
-table_id = "unfc-439001.avianca2000.Reportes"
+table_id = "unfc-439001.avianca2000.ReporteVuelo"
 # `Para pruebas unfc-439001.avianca2000.ReporteVuelo`
+# "unfc-439001.avianca2000.Reportes"
 
 # Inicializar el cliente de BigQuery
 try:
@@ -47,6 +48,9 @@ try:
     logger.info("BigQuery client initialized successfully.")
 except Exception as e:
     logger.exception("Error initializing BigQuery client:")
+    st.error(f"Error al inicializar BigQuery: {e}")
+    client = None  # Evita que el código siga si no hay cliente
+
 
 def create_copy_button(text):
     """Crea un botón personalizado para copiar usando HTML y JavaScript"""
