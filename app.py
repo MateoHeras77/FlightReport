@@ -5,6 +5,19 @@ import streamlit as st
 from google.cloud import bigquery
 from dotenv import load_dotenv
 import streamlit.components.v1 as components
+import tempfile
+
+# Leer credenciales desde Streamlit Secrets
+credentials = st.secrets["GOOGLE_APPLICATION_CREDENTIALS"]
+
+# Crear un archivo temporal para las credenciales
+with tempfile.NamedTemporaryFile(delete=False, mode="w") as temp_file:
+    temp_file.write(credentials)
+    temp_file_path = temp_file.name
+
+# Establecer la variable de entorno con la ruta al archivo temporal
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = temp_file_path
+
 
 # Cargar variables de entorno desde .env
 load_dotenv()
