@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 import streamlit.components.v1 as components
 import tempfile
 
+print("Cargando app.py...")
 # Leer credenciales desde Streamlit Secrets
 credentials = st.secrets["GOOGLE_APPLICATION_CREDENTIALS"]
 
