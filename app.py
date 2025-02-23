@@ -7,18 +7,13 @@ from dotenv import load_dotenv
 import streamlit.components.v1 as components
 import tempfile
 
+import streamlit as st
+import logging
+from google.cloud import bigquery
+from google.oauth2 import service_account
+from dotenv import load_dotenv
+
 print("Cargando app.py...")
-# Leer credenciales desde Streamlit Secrets
-credentials = st.secrets["GOOGLE_APPLICATION_CREDENTIALS"]
-
-# Crear un archivo temporal para las credenciales
-with tempfile.NamedTemporaryFile(delete=False, mode="w") as temp_file:
-    temp_file.write(credentials)
-    temp_file_path = temp_file.name
-
-# Establecer la variable de entorno con la ruta al archivo temporal
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = temp_file_path
-
 
 # Cargar variables de entorno desde .env
 load_dotenv()
@@ -38,19 +33,32 @@ if not logger.handlers:
     stream_handler.setFormatter(formatter)
     logger.addHandler(stream_handler)
 
-# Tabla en BigQuery
-table_id = "unfc-439001.avianca2000.ReporteVuelo"
-# `Para pruebas unfc-439001.avianca2000.ReporteVuelo`
-# "unfc-439001.avianca2000.Reportes"
-
-# Inicializar el cliente de BigQuery
+# Leer credenciales desde Streamlit Secrets
 try:
-    client = bigquery.Client()
-    logger.info("BigQuery client initialized successfully.")
+    credentials = service_account.Credentials.from_service_account_info(
+        st.secrets["gcp_service_account"]
+    )
+    project_id = st.secrets["gcp_service_account"]["project_id"]
+    logger.info("Credenciales cargadas correctamente desde Streamlit Secrets.")
 except Exception as e:
-    logger.exception("Error initializing BigQuery client:")
-    st.error(f"Error al inicializar BigQuery: {e}")
-    client = None  # Evita que el código siga si no hay cliente
+    logger.exception("Error al cargar credenciales de Streamlit Secrets:")
+    st.error(f"Error al cargar credenciales: {e}")
+    credentials = None
+
+# Inicializar el cliente de BigQuery solo si las credenciales se cargaron correctamente
+if credentials:
+    try:
+        client = bigquery.Client(credentials=credentials, project=project_id)
+        logger.info("BigQuery client initialized successfully.")
+    except Exception as e:
+        logger.exception("Error initializing BigQuery client:")
+        st.error(f"Error al inicializar BigQuery: {e}")
+        client = None  # Evita que el código siga si no hay cliente
+else:
+    client = None
+
+# Tabla en BigQuery
+table_id = "unfc-439001.avianca2000.ReporteVuelo"  # Cambiar si es necesario
 
 
 def create_copy_button(text):
