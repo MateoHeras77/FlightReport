@@ -40,4 +40,4 @@ def initialize_bigquery_client():
         return None, None, error_msg
 
 # Tabla predeterminada en BigQuery
-DEFAULT_TABLE_ID = "unfc-439001.avianca2000.ReporteVuelo"
+DEFAULT_TABLE_ID = "unfc-439001.avianca2000.Reportes"

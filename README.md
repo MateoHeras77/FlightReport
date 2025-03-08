@@ -56,4 +56,4 @@ Los logs se almacenan en el directorio `logs/` con archivos diarios con formato 
 
 ## BigQuery
 
-La aplicación envía datos a la tabla `unfc-439001.avianca2000.ReporteVuelo` en BigQuery. Esta tabla debe estar configurada con las columnas apropiadas para recibir los datos del formulario.
+La aplicación envía datos a la tabla `unfc-439001.avianca2000.Reportes` en BigQuery. Esta tabla debe estar configurada con las columnas apropiadas para recibir los datos del formulario.
