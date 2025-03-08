@@ -1,0 +1,799 @@
+import streamlit as st
+import pandas as pd
+import plotly.graph_objects as go
+import plotly.express as px
+from datetime import datetime, timedelta, time
+import numpy as np
+from typing import Dict, List, Any, Optional
+import json
+
+from src.config.logging_config import setup_logger
+from src.config.bigquery_config import DEFAULT_TABLE_ID
+
+# Configurar logger
+logger = setup_logger()
+
+# Clase para manejar la serialización de timedelta a JSON
+class TimeEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, timedelta):
+            return (obj.days * 24 * 60 * 60 + obj.seconds) * 1000  # Convertir a milisegundos
+        return super().default(obj)
+
+def convert_time_string_to_datetime(date_str: str, time_obj) -> datetime:
+    """
+    Convierte una cadena de fecha y un objeto time a un objeto datetime.
+    
+    Args:
+        date_str: Fecha en formato 'YYYY-MM-DD'
+        time_obj: Objeto time de Python o cadena en formato 'HH:MM:SS'
+        
+    Returns:
+        datetime: Objeto datetime combinado o None si hay error
+    """
+    try:
+        # Manejar caso donde time_obj es None
+        if time_obj is None:
+            return None
+            
+        # Si time_obj ya es un objeto time, usarlo directamente
+        if isinstance(time_obj, time):
+            return datetime.combine(datetime.strptime(date_str, "%Y-%m-%d").date(), time_obj)
+            
+        # Si es string, procesar como antes
+        time_str = time_obj
+        # Eliminar segundos si están presentes
+        if isinstance(time_str, str) and len(time_str) > 5:
+            time_str = time_str[:5]
+            
+        # Combinar fecha y hora
+        dt_str = f"{date_str} {time_str}"
+        return datetime.strptime(dt_str, "%Y-%m-%d %H:%M")
+    except Exception as e:
+        logger.warning(f"Error al convertir {date_str} {time_obj} a datetime: {e}")
+        return None
+
+def handle_midnight_crossover(events_dict: Dict[str, datetime], flight_date: datetime.date) -> Dict[str, datetime]:
+    """
+    Maneja los casos donde los eventos pueden cruzar la medianoche.
+    
+    Args:
+        events_dict: Diccionario con eventos y sus timestamps
+        flight_date: Fecha del vuelo
+        
+    Returns:
+        Dict: Diccionario con eventos y timestamps ajustados
+    """
+    # Encontrar la hora mínima y máxima
+    valid_times = [t for t in events_dict.values() if t is not None]
+    if not valid_times:
+        return events_dict
+        
+    min_time = min(valid_times)
+    adjusted_dict = {}
+    
+    for event, event_time in events_dict.items():
+        if event_time is None:
+            adjusted_dict[event] = None
+            continue
+            
+        # Si hay una diferencia de más de 12 horas con la hora mínima
+        # asumimos que el evento ocurrió el día anterior o siguiente
+        hours_diff = (event_time - min_time).total_seconds() / 3600
+        if hours_diff > 12:
+            adjusted_dict[event] = event_time - timedelta(days=1)
+        elif hours_diff < -12:
+            adjusted_dict[event] = event_time + timedelta(days=1)
+        else:
+            adjusted_dict[event] = event_time
+            
+    return adjusted_dict
+
+def create_cascade_timeline_chart(flight_data: Dict[str, Any]) -> Optional[go.Figure]:
+    """
+    Crea una gráfica de cascada con los eventos del vuelo.
+    
+    Args:
+        flight_data: Diccionario con los datos del vuelo
+        
+    Returns:
+        go.Figure: Gráfica de línea de tiempo
+    """
+    try:
+        # Eventos a mostrar en el orden correcto
+        events = [
+            "groomers_in", "groomers_out", "crew_at_gate", "ok_to_board", 
+            "flight_secure", "cierre_de_puerta", "push_back", "std", "atd"
+        ]
+        
+        # Nombres de eventos para mostrar
+        event_labels = {
+            "std": "STD (Salida Programada)",
+            "atd": "ATD (Salida Real)",
+            "groomers_in": "Groomers In",
+            "groomers_out": "Groomers Out",
+            "crew_at_gate": "Crew at Gate",
+            "ok_to_board": "OK to Board",
+            "flight_secure": "Flight Secure",
+            "cierre_de_puerta": "Cierre de Puerta",
+            "push_back": "Push Back"
+        }
+        
+        # Convertir fechas y horas a objetos datetime
+        flight_date = flight_data.get("flight_date")
+        if not flight_date:
+            st.error("No hay fecha de vuelo disponible")
+            return None
+            
+        # Convertir a string si es un objeto datetime.date
+        if hasattr(flight_date, 'isoformat'):
+            flight_date = flight_date.isoformat()
+            
+        events_dict = {}
+        for event in events:
+            time_obj = flight_data.get(event)
+            if time_obj:
+                events_dict[event] = convert_time_string_to_datetime(flight_date, time_obj)
+            else:
+                events_dict[event] = None
+                
+        # Manejar eventos que cruzan la medianoche
+        events_dict = handle_midnight_crossover(events_dict, flight_date)
+        
+        # Filtrar eventos nulos
+        events_dict = {k: v for k, v in events_dict.items() if v is not None}
+        
+        if not events_dict:
+            st.warning("No hay datos de eventos para mostrar")
+            return None
+            
+        # Ordenar los eventos por su tiempo (ascendente)
+        sorted_events = sorted(
+            [(event, time) for event, time in events_dict.items()],
+            key=lambda x: x[1]
+        )
+        
+        # Verificar eventos con la misma hora de inicio
+        modified_sorted_events = []
+        i = 0
+        while i < len(sorted_events):
+            current_event, current_time = sorted_events[i]
+            
+            # Si es el último evento o el siguiente evento tiene tiempo diferente, no hay problema
+            if i == len(sorted_events) - 1 or sorted_events[i+1][1] != current_time:
+                modified_sorted_events.append((current_event, current_time))
+                i += 1
+                continue
+            
+            # Grupo de eventos con la misma hora de inicio
+            same_time_events = [(current_event, current_time)]
+            
+            # Encuentra todos los eventos que ocurren al mismo tiempo
+            j = i + 1
+            while j < len(sorted_events) and sorted_events[j][1] == current_time:
+                same_time_events.append(sorted_events[j])
+                j += 1
+            
+            # Determinar la hora de fin para estos eventos
+            end_time = None
+            if j < len(sorted_events):
+                end_time = sorted_events[j][1]  # El siguiente evento con diferente hora
+            else:
+                # Si todos los eventos restantes tienen la misma hora, añadir un pequeño incremento
+                end_time = current_time + timedelta(minutes=5)
+            
+            # Distribuir los eventos uniformemente en el intervalo
+            interval = (end_time - current_time) / len(same_time_events)
+            
+            for k, (event, _) in enumerate(same_time_events):
+                if k == len(same_time_events) - 1:
+                    # El último evento de este grupo termina en el tiempo final
+                    modified_sorted_events.append((event, current_time + k * interval))
+                else:
+                    # Los demás eventos tienen duración uniforme
+                    modified_sorted_events.append((event, current_time + k * interval))
+            
+            i = j  # Saltar al siguiente grupo de eventos
+        
+        sorted_events = modified_sorted_events
+        
+        # Crear la figura
+        fig = go.Figure()
+        
+        # Colores para los eventos
+        colors = {
+            "groomers_in": "#1f77b4",
+            "groomers_out": "#ff7f0e",
+            "crew_at_gate": "#2ca02c",
+            "ok_to_board": "#d62728",
+            "flight_secure": "#9467bd",
+            "cierre_de_puerta": "#8c564b",
+            "push_back": "#e377c2",
+            "std": "#7f7f7f",
+            "atd": "#bcbd22"
+        }
+        
+        # Para cada evento, crear una barra horizontal que va desde su tiempo hasta el tiempo del siguiente evento
+        for i in range(len(sorted_events) - 1):
+            current_event, current_time = sorted_events[i]
+            next_event, next_time = sorted_events[i + 1]
+            
+            # Asegurarse de que los tiempos sean diferentes para evitar duración cero
+            if current_time == next_time:
+                next_time = current_time + timedelta(minutes=1)  # Añadir 1 minuto si son iguales
+            
+            # Calcular la duración en minutos
+            duration_minutes = max(1, (next_time - current_time).total_seconds() / 60)  # Mínimo 1 minuto
+            
+            # Crear barra para el evento actual (ahora el eje Y tiene los tiempos y el eje X los eventos)
+            fig.add_trace(go.Bar(
+                y=[duration_minutes],  # Duración en minutos como valor numérico para el eje Y
+                x=[event_labels[current_event]],  # Evento en el eje X
+                orientation='v',  # Barras verticales
+                name=event_labels[current_event],
+                marker=dict(color=colors.get(current_event, "#636363")),
+                text=[f"{int(duration_minutes)} min"],  # Mostrar duración en minutos
+                textposition="inside",  # Texto dentro de la barra
+                insidetextanchor="middle",  # Alinear en el medio
+                hoverinfo="text",
+                hovertext=[f"{current_event}: {current_time.strftime('%H:%M')} - Duración: {int(duration_minutes)} min"],
+                base=[current_time],  # Punto de inicio de la barra
+                showlegend=False
+            ))
+            
+        # Para el último evento, mostrar solo un punto 
+        last_event, last_time = sorted_events[-1]
+        fig.add_trace(go.Scatter(
+            y=[last_time],
+            x=[event_labels[last_event]],
+            mode='markers+text',
+            name=event_labels[last_event],
+            marker=dict(size=14, symbol='circle', color=colors.get(last_event, "#636363")),
+            text=[last_time.strftime('%H:%M')],
+            textposition="top center",
+            hoverinfo="text",
+            hovertext=[f"{event_labels[last_event]}: {last_time.strftime('%H:%M')}"]
+        ))
+        
+        # Determinar el rango de tiempo para el eje Y
+        all_times = [time for _, time in sorted_events]
+        min_time = min(all_times)
+        max_time = max(all_times)
+        
+        # Añadir un margen de tiempo
+        time_margin = timedelta(minutes=30)
+        plot_min_time = min_time - time_margin
+        plot_max_time = max_time + time_margin
+        
+        # Crear rangos de tiempo para el eje Y
+        time_range = pd.date_range(plot_min_time, plot_max_time, freq='15min')
+        
+        # Ordenar los nombres de los eventos según su secuencia operativa, no por tiempo
+        operational_order = [
+            "groomers_in", "groomers_out", "crew_at_gate", "ok_to_board", 
+            "flight_secure", "cierre_de_puerta", "push_back", "std", "atd"
+        ]
+        
+        # Filtrar para incluir solo eventos presentes
+        operational_order = [e for e in operational_order if e in events_dict]
+        
+        # Formato del gráfico
+        fig.update_layout(
+            title=f"Secuencia de Eventos - Vuelo {flight_data.get('flight_number', 'N/A')} ({flight_date})",
+            yaxis=dict(  # Ahora el eje Y es el tiempo
+                title='Hora',
+                tickformat='%H:%M',
+                tickmode='array',
+                tickvals=time_range,
+                ticktext=[t.strftime('%H:%M') for t in time_range]
+            ),
+            xaxis=dict(  # Ahora el eje X son los eventos
+                title='Eventos',
+                categoryorder='array',
+                categoryarray=[event_labels[e] for e in operational_order]
+            ),
+            height=500,
+            barmode='overlay',
+            bargap=0.2,
+            margin=dict(l=20, r=20, t=60, b=60)
+        )
+        
+        # Añadir anotaciones para cada barra con su tiempo y duración
+        for i, (event, event_time) in enumerate(sorted_events[:-1]):  # Excluir el último evento
+            next_event, next_time = sorted_events[i + 1]
+            duration_minutes = int((next_time - event_time).total_seconds() / 60)
+            
+            fig.add_annotation(
+                x=event_labels[event],
+                y=event_time + (next_time - event_time)/2,  # Punto medio de la barra
+                text=f"{duration_minutes} min",
+                showarrow=False,
+                font=dict(size=12, color="white"),
+                xanchor='center',
+                yanchor='middle'
+            )
+        
+        return fig
+    except Exception as e:
+        logger.exception(f"Error al crear gráfico de cascada: {e}")
+        st.error(f"Error al crear gráfico: {str(e)}")
+        return None
+
+def create_gantt_chart(flight_data: Dict[str, Any]) -> Optional[go.Figure]:
+    """
+    Crea un diagrama de Gantt con los eventos del vuelo.
+    
+    Args:
+        flight_data: Diccionario con los datos del vuelo
+        
+    Returns:
+        go.Figure: Gráfica de línea de tiempo tipo Gantt
+    """
+    try:
+        # Eventos a mostrar en el orden correcto
+        events = [
+            "groomers_in", "groomers_out", "crew_at_gate", "ok_to_board", 
+            "flight_secure", "cierre_de_puerta", "push_back", "std", "atd"
+        ]
+        
+        # Nombres de eventos para mostrar
+        event_labels = {
+            "std": "STD (Salida Programada)",
+            "atd": "ATD (Salida Real)",
+            "groomers_in": "Groomers In",
+            "groomers_out": "Groomers Out",
+            "crew_at_gate": "Crew at Gate",
+            "ok_to_board": "OK to Board",
+            "flight_secure": "Flight Secure",
+            "cierre_de_puerta": "Cierre de Puerta",
+            "push_back": "Push Back"
+        }
+        
+        # Convertir fechas y horas a objetos datetime
+        flight_date = flight_data.get("flight_date")
+        if not flight_date:
+            st.error("No hay fecha de vuelo disponible")
+            return None
+            
+        # Convertir a string si es un objeto datetime.date
+        if hasattr(flight_date, 'isoformat'):
+            flight_date = flight_date.isoformat()
+            
+        events_dict = {}
+        for event in events:
+            time_obj = flight_data.get(event)
+            if time_obj:
+                events_dict[event] = convert_time_string_to_datetime(flight_date, time_obj)
+            else:
+                events_dict[event] = None
+                
+        # Manejar eventos que cruzan la medianoche
+        events_dict = handle_midnight_crossover(events_dict, flight_date)
+        
+        # Filtrar eventos nulos
+        events_dict = {k: v for k, v in events_dict.items() if v is not None}
+        
+        if not events_dict:
+            st.warning("No hay datos de eventos para mostrar")
+            return None
+            
+        # Ordenar los eventos por su tiempo (ascendente)
+        sorted_events = sorted(
+            [(event, time) for event, time in events_dict.items()],
+            key=lambda x: x[1]
+        )
+        
+        # Verificar eventos con la misma hora de inicio
+        modified_sorted_events = []
+        i = 0
+        while i < len(sorted_events):
+            current_event, current_time = sorted_events[i]
+            
+            # Si es el último evento o el siguiente evento tiene tiempo diferente, no hay problema
+            if i == len(sorted_events) - 1 or sorted_events[i+1][1] != current_time:
+                modified_sorted_events.append((current_event, current_time))
+                i += 1
+                continue
+            
+            # Grupo de eventos con la misma hora de inicio
+            same_time_events = [(current_event, current_time)]
+            
+            # Encuentra todos los eventos que ocurren al mismo tiempo
+            j = i + 1
+            while j < len(sorted_events) and sorted_events[j][1] == current_time:
+                same_time_events.append(sorted_events[j])
+                j += 1
+            
+            # Determinar la hora de fin para estos eventos
+            end_time = None
+            if j < len(sorted_events):
+                end_time = sorted_events[j][1]  # El siguiente evento con diferente hora
+            else:
+                # Si todos los eventos restantes tienen la misma hora, añadir un pequeño incremento
+                end_time = current_time + timedelta(minutes=5)
+            
+            # Distribuir los eventos uniformemente en el intervalo
+            interval = (end_time - current_time) / len(same_time_events)
+            
+            for k, (event, _) in enumerate(same_time_events):
+                if k == len(same_time_events) - 1:
+                    # El último evento de este grupo termina en el tiempo final
+                    modified_sorted_events.append((event, current_time + k * interval))
+                else:
+                    # Los demás eventos tienen duración uniforme
+                    modified_sorted_events.append((event, current_time + k * interval))
+            
+            i = j  # Saltar al siguiente grupo de eventos
+        
+        sorted_events = modified_sorted_events
+        
+        # Preparar datos para el diagrama de Gantt usando plotly.express
+        gantt_data = []
+        
+        for i in range(len(sorted_events) - 1):
+            current_event, current_time = sorted_events[i]
+            next_event, next_time = sorted_events[i + 1]
+            
+            # Asegurarse de que los tiempos sean diferentes para evitar duración cero
+            if current_time == next_time:
+                next_time = current_time + timedelta(minutes=1)  # Añadir 1 minuto si son iguales
+            
+            # Calcular la duración en segundos (asegurar que sea positiva)
+            duration_seconds = max(60, (next_time - current_time).total_seconds())  # Mínimo 60 segundos
+            
+            gantt_data.append({
+                "Task": event_labels[current_event],
+                "Start": current_time,
+                "Finish": next_time,
+                "Duration": duration_seconds / 60,  # Convertir a minutos
+                "Event": current_event,
+                "Time": current_time.strftime("%H:%M")
+            })
+            
+        # Para el último evento, añadir una duración fija de 5 minutos
+        last_event, last_time = sorted_events[-1]
+        end_time = last_time + timedelta(minutes=5)
+        
+        gantt_data.append({
+            "Task": event_labels[last_event],
+            "Start": last_time,
+            "Finish": end_time,
+            "Duration": 5,  # 5 minutos
+            "Event": last_event,
+            "Time": last_time.strftime("%H:%M")
+        })
+        
+        # Crear DataFrame para Gantt chart
+        df = pd.DataFrame(gantt_data)
+        
+        # Colores para los eventos
+        colors_discrete_map = {
+            "Groomers In": "#1f77b4",
+            "Groomers Out": "#ff7f0e",
+            "Crew at Gate": "#2ca02c",
+            "OK to Board": "#d62728",
+            "Flight Secure": "#9467bd",
+            "Cierre de Puerta": "#8c564b",
+            "Push Back": "#e377c2",
+            "STD (Salida Programada)": "#7f7f7f",
+            "ATD (Salida Real)": "#bcbd22"
+        }
+        
+        # Crear el gráfico de Gantt utilizando Express
+        fig = px.timeline(
+            df, 
+            x_start="Start",  # Usamos x_start (parámetro correcto)
+            x_end="Finish", 
+            y="Task",        # Evento en el eje Y (parámetro correcto)
+            color="Task",
+            color_discrete_map=colors_discrete_map,
+            hover_data=["Time", "Duration"]
+        )
+        
+        # Después de crear el gráfico, invertimos los ejes con update_layout
+        fig.update_layout(
+            # Intercambiar definiciones de ejes
+            xaxis=dict(
+                title='Hora',
+                tickformat='%H:%M',
+            ),
+            yaxis=dict(
+                title='Eventos',
+            )
+        )
+        
+        # Añadir texto a cada barra con la duración
+        for i, row in df.iterrows():
+            # Calcular el punto medio usando microsegundos para evitar problemas con los tipos Timestamp
+            midpoint = pd.Timestamp(row["Start"].value / 2 + row["Finish"].value / 2)
+            
+            # Alternativa: convertir a datetime para operaciones aritméticas
+            # start_dt = row["Start"].to_pydatetime()
+            # end_dt = row["Finish"].to_pydatetime()
+            # midpoint = start_dt + (end_dt - start_dt) / 2
+            
+            fig.add_annotation(
+                x=midpoint,                      # Punto medio calculado correctamente
+                y=row["Task"],                  # Evento en Y
+                text=f"{int(row['Duration'])} min",
+                showarrow=False,
+                font=dict(size=10, color="white"),
+                xanchor="center",
+                yanchor="middle"
+            )
+        
+        # Ordenar los nombres de los eventos según su secuencia operativa
+        operational_order = [
+            "Groomers In", "Groomers Out", "Crew at Gate", "OK to Board", 
+            "Flight Secure", "Cierre de Puerta", "Push Back", "STD (Salida Programada)", "ATD (Salida Real)"
+        ]
+        
+        # Filtrar para incluir solo eventos presentes
+        operational_order = [event_labels[e] for e in events if e in events_dict]
+        
+        # Determinar el rango de tiempo para el eje X
+        all_times = [row["Start"] for _, row in df.iterrows()]
+        min_time = min(all_times)
+        max_time = df["Finish"].max()
+        
+        # Añadir un margen de tiempo
+        time_margin = timedelta(minutes=15)
+        plot_min_time = min_time - time_margin
+        plot_max_time = max_time + time_margin
+        
+        # Crear rangos de tiempo para el eje X
+        time_range = pd.date_range(plot_min_time, plot_max_time, freq='15min')
+        
+        # Formato final del gráfico (para mantener el eje Y invertido)
+        fig.update_layout(
+            title=f"Secuencia de Eventos - Vuelo {flight_data.get('flight_number', 'N/A')} ({flight_date})",
+            xaxis=dict(
+                title='Hora',
+                tickformat='%H:%M',
+                tickmode='array',
+                tickvals=time_range,
+                ticktext=[t.strftime('%H:%M') for t in time_range],
+                side="top"  # Colocamos las etiquetas de tiempo en la parte superior
+            ),
+            yaxis=dict(
+                title='Eventos',
+                categoryorder='array',
+                categoryarray=operational_order
+            ),
+            height=500,
+            margin=dict(l=20, r=20, t=60, b=60),
+            showlegend=False
+        )
+        
+        return fig
+    except Exception as e:
+        logger.exception(f"Error al crear diagrama de Gantt: {e}")
+        st.error(f"Error al crear diagrama: {str(e)}")
+        return None
+
+def fetch_flight_data_for_chart(client, date=None, flight_number=None):
+    """
+    Obtiene datos de vuelos desde BigQuery con filtros opcionales.
+    
+    Args:
+        client: Cliente de BigQuery
+        date: Fecha para filtrar (opcional)
+        flight_number: Número de vuelo para filtrar (opcional)
+        
+    Returns:
+        List[Dict]: Lista de datos de vuelos
+    """
+    try:
+        # Construir consulta SQL con filtros opcionales
+        query = f"""
+        SELECT *
+        FROM `{DEFAULT_TABLE_ID}`
+        WHERE 1=1
+        """
+        
+        if date:
+            query += f" AND flight_date = '{date}'"
+        
+        if flight_number:
+            query += f" AND flight_number = '{flight_number}'"
+            
+        query += " ORDER BY flight_date DESC, std DESC"
+        
+        logger.info(f"Ejecutando consulta: {query}")
+        
+        # Ejecutar consulta
+        query_job = client.query(query)
+        results = query_job.result()
+        
+        # Convertir resultados a lista de diccionarios
+        flights_data = []
+        for row in results:
+            flight_dict = dict(row.items())
+            flights_data.append(flight_dict)
+            
+        return flights_data
+    except Exception as e:
+        logger.exception(f"Error al obtener datos de vuelo: {e}")
+        st.error(f"Error al obtener datos: {str(e)}")
+        return []
+
+def render_timeline_tab(client):
+    """
+    Renderiza la pestaña de visualización de línea de tiempo.
+    
+    Args:
+        client: Cliente de BigQuery inicializado
+    """
+    st.header("📊 Visualización de Eventos de Vuelo")
+    
+    if not client:
+        st.error("No hay conexión con BigQuery. Verifique la configuración.")
+        return
+    
+    # Obtener todas las fechas y números de vuelo disponibles para los filtros
+    try:
+        dates_query = f"""
+        SELECT DISTINCT flight_date 
+        FROM `{DEFAULT_TABLE_ID}` 
+        ORDER BY flight_date DESC
+        """
+        
+        flights_query = f"""
+        SELECT DISTINCT flight_number 
+        FROM `{DEFAULT_TABLE_ID}` 
+        ORDER BY flight_number
+        """
+        
+        dates_job = client.query(dates_query)
+        flights_job = client.query(flights_query)
+        
+        dates = [row.flight_date.isoformat() for row in dates_job.result()]
+        flight_numbers = [row.flight_number for row in flights_job.result()]
+        
+        # Filtros para seleccionar fecha y vuelo
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            selected_date = st.selectbox(
+                "Seleccione fecha:",
+                options=["Todas"] + dates,
+                index=0
+            )
+            
+        with col2:
+            selected_flight = st.selectbox(
+                "Seleccione número de vuelo:",
+                options=["Todos"] + flight_numbers,
+                index=0
+            )
+            
+        # Convertir "Todas"/"Todos" a None para la función de búsqueda
+        date_filter = None if selected_date == "Todas" else selected_date
+        flight_filter = None if selected_flight == "Todos" else selected_flight
+        
+        # Obtener datos según filtros
+        flights_data = fetch_flight_data_for_chart(client, date_filter, flight_filter)
+        
+        if not flights_data:
+            st.warning("No se encontraron vuelos con los filtros seleccionados.")
+            return
+            
+        # Si hay más de un vuelo, permitir seleccionar cuál visualizar
+        if len(flights_data) > 1:
+            # Crear opciones para mostrar en selectbox
+            flight_options = [
+                f"{flight.get('flight_date')} - {flight.get('flight_number')} ({flight.get('origin', 'N/A')} → {flight.get('destination', 'N/A')})"
+                for flight in flights_data
+            ]
+            
+            selected_flight_idx = st.selectbox(
+                "Seleccione el vuelo a visualizar:",
+                options=range(len(flight_options)),
+                format_func=lambda i: flight_options[i]
+            )
+            
+            flight_to_display = flights_data[selected_flight_idx]
+        else:
+            flight_to_display = flights_data[0]
+        
+        # Mostrar información del vuelo
+        st.subheader("Información del Vuelo")
+        
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.write(f"**Fecha:** {flight_to_display.get('flight_date')}")
+            st.write(f"**Vuelo:** {flight_to_display.get('flight_number', 'N/A')}")
+        
+        with col2:
+            st.write(f"**Origen:** {flight_to_display.get('origin', 'N/A')}")
+            st.write(f"**Destino:** {flight_to_display.get('destination', 'N/A')}")
+        
+        with col3:
+            st.write(f"**Gate:** {flight_to_display.get('gate', 'N/A')}")
+            st.write(f"**PAX Total:** {flight_to_display.get('pax_ob_total', 'N/A')}")
+        
+        # Mostrar códigos de demora y comentarios si existen
+        if flight_to_display.get('delay_code'):
+            st.write(f"**Código de Demora:** {flight_to_display.get('delay_code')}")
+        
+        if flight_to_display.get('comments'):
+            st.write(f"**Comentarios:** {flight_to_display.get('comments')}")
+            
+        if flight_to_display.get('WCHR'):
+            st.write(f"**WCHR:** {flight_to_display.get('WCHR')}")
+        
+        # Tabla de horarios
+        st.subheader("Horarios de Eventos")
+        
+        time_fields = {
+            "STD": flight_to_display.get('std'),
+            "ATD": flight_to_display.get('atd'),
+            "Groomers In": flight_to_display.get('groomers_in'),
+            "Groomers Out": flight_to_display.get('groomers_out'),
+            "Crew at Gate": flight_to_display.get('crew_at_gate'),
+            "OK to Board": flight_to_display.get('ok_to_board'),
+            "Flight Secure": flight_to_display.get('flight_secure'),
+            "Cierre de Puerta": flight_to_display.get('cierre_de_puerta'),
+            "Push Back": flight_to_display.get('push_back')
+        }
+        
+        # Crear un DataFrame para mostrar los horarios como tabla
+        time_data = []
+        for event, time_val in time_fields.items():
+            # Formatear el tiempo para mostrarlo de manera legible
+            if time_val is not None:
+                if isinstance(time_val, time):
+                    formatted_time = time_val.strftime("%H:%M")
+                else:
+                    formatted_time = time_val
+            else:
+                formatted_time = "N/A"
+                
+            time_data.append({"Evento": event, "Hora": formatted_time})
+            
+        time_df = pd.DataFrame(time_data)
+        st.dataframe(time_df, hide_index=True, use_container_width=True)
+        
+        # Radio para elegir el tipo de visualización
+        chart_type = st.radio(
+            "Seleccione el tipo de visualización:",
+            options=["Gráfico de Gantt (Cascada)", "Gráfico de Puntos"],
+            horizontal=True
+        )
+        
+        # Crear y mostrar el gráfico según selección
+        st.subheader("Visualización de Eventos")
+        
+        try:
+            if chart_type == "Gráfico de Gantt (Cascada)":
+                fig = create_gantt_chart(flight_to_display)
+                if fig:
+                    st.plotly_chart(fig, use_container_width=True)
+            else:
+                # Usar el gráfico de puntos original
+                fig = create_cascade_timeline_chart(flight_to_display)
+                if fig:
+                    st.plotly_chart(fig, use_container_width=True)
+        except Exception as e:
+            logger.exception(f"Error al mostrar gráfico: {e}")
+            st.error("Error al generar el gráfico. Usando versión simplificada.")
+            
+            # Versión simplificada del gráfico sin timedeltas
+            events_data = []
+            for name, value in time_fields.items():
+                if value:
+                    if isinstance(value, time):
+                        time_str = value.strftime("%H:%M")
+                    else:
+                        time_str = str(value)
+                    events_data.append({"Evento": name, "Hora": time_str})
+            
+            if events_data:
+                events_df = pd.DataFrame(events_data)
+                fig = px.timeline(events_df, x="Hora", y="Evento", color="Evento")
+                st.plotly_chart(fig, use_container_width=True)
+    
+    except Exception as e:
+        logger.exception(f"Error al renderizar la pestaña de línea de tiempo: {e}")
+        st.error(f"Error en la visualización: {str(e)}")

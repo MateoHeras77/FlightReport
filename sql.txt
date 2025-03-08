@@ -1,0 +1,23 @@
+[
+  {"name": "flight_date", "type": "DATE"},
+  {"name": "origin", "type": "STRING"},
+  {"name": "destination", "type": "STRING"},
+  {"name": "flight_number", "type": "STRING"},
+  {"name": "std", "type": "TIME"},  
+  {"name": "atd", "type": "TIME"}, 
+  {"name": "groomers_in", "type": "TIME"},
+  {"name": "groomers_out", "type": "TIME"},
+  {"name": "crew_at_gate", "type": "TIME"},
+  {"name": "ok_to_board", "type": "TIME"},
+  {"name": "flight_secure", "type": "TIME"},
+  {"name": "cierre_de_puerta", "type": "TIME"},
+  {"name": "push_back", "type": "TIME"},
+  {"name": "pax_ob_total", "type": "STRING"},  
+  {"name": "customs_in", "type": "STRING"},  
+  {"name": "delay", "type": "STRING"},  
+  {"name": "gate", "type": "STRING"},
+  {"name": "carrousel", "type": "STRING"},
+  {"name": "delay_code", "type": "STRING"},
+  {"name": "WCHR", "type": "STRING"},
+  {"name": "comments", "type": "STRING"}
+]

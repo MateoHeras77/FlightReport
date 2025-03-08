@@ -2,3 +2,4 @@
 app.log
 credenciales.json
 /Python
+.streamlit/

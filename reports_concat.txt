@@ -1,0 +1,1443 @@
+✈️Flight Report ✈️
+*Date*: 30JAN2025
+*Origin*: YYZ
+*Dest*: SAL
+*FL#*:  627
+*STD*: 16:00
+*ATD*: 15:53
+*GROOMERS IN*: 14:12
+*GROOMERS OUT*: 14:32
+*CREW AT GATE*: 14:57
+*OK TO BOARD*: 15:07
+*FL SECURE*: 15:46
+*CIERRE DEPUERTA*:15:49
+*PUSH-BACK*: 15:53
+*PAX OB  TOTAL* : 181( 176+5inf)
+*GATE*: E72
+*Carrousel*: 13
+*Delay Code* :
+*WCHR*:
+- 626 | 7WCHR 2Agents
+- 627 | 4WCHR - 4 Agents
+*Comments*: •••
+-----
+✈️Flight Report ✈️
+*Date*: 30JAN2025
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  205
+*STD*: 22:55
+*ATD*: 22:55
+*GROOMERS IN*: 21:43
+*GROOMERS OUT*: 21:54
+*CREW AT GATE*: 21:36
+*OK TO BOARD*: 22:07
+*FL SECURE*: 22:45
+*CIERRE DE PUERTA*:22:49
+*PUSH-BACK*: 22:55
+*PAX OB  TOTAL* : 168
+C:11/Y:157
+*GATE*: E81
+*Carrousel*: 13
+*Delay Code* : ***
+*WCHR*:
+- 204 | 7 WCHR - 2 Agents
+- 205 | 7+2WCHR - 3 Agents
+*Comments*:
+-----
+✈️Flight Report ✈️
+*Date*: 31JAN2025
+*Origin*: YYZ
+*Dest*: SAL
+*FL#*:  627
+*STD*: 16:00
+*ATD*: 15:57
+*GROOMERS IN*: 14:25
+*GROOMERS OUT*: 14:45
+*CREW AT GATE*: 14:50
+*OK TO BOARD*: 15:03
+*FL SECURE*: 15:45
+*CIERRE DEPUERTA*:15:53
+*PUSH-BACK*: 15:57
+*PAX OB  TOTAL* : 174( 173+1inf)
+*GATE*: E72
+*Carrousel*: 13
+*Delay Code* :
+*WCHR*:
+- 626 | 6WCHR 4Agents
+- 627 | 9WCHR - 3 Agents
+*Comments*: •••
+La buena fruta es el producto de una buena cosecha
+Buen trabajo chicos
+Éxito tras éxito 👏👏👏💪💪💪 <This message was edited>
+-----
+✈️Flight Report ✈️
+*Date*: 31JAN2025
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  205
+*STD*: 22:55
+*ATD*: 23:30
+*GROOMERS IN*: 22:25
+*GROOMERS OUT*: 22:44
+*CREW AT GATE*: 21:35
+*OK TO BOARD*: 22:54
+*FL SECURE*: 23:10
+*CIERRE DEPUERTA*:23:27
+*PUSH-BACK*: 23:30
+*PAX OB  TOTAL* : 166
+C:12/Y:154
+*GATE*: E81
+*Carrousel*: 13
+*Delay Code* :
+93A-llegada tarde 27min
+86-cbsa 8min
+*WCHR*:
+- 204 | 1WCHR 1 Agent
+- 205 | 2WCHR - 1 Agent
+-----
+✈️Flight Report ✈️
+*Date*: 1FEB2025
+*Origin*: YYZ
+*Dest*: SAL
+*FL#*:  627
+*STD*: 16:00
+*ATD*: 15:54
+*GROOMERS IN*: 14:10
+*GROOMERS OUT*: 14:37
+*CREW AT GATE*: 14:46
+*OK TO BOARD*: 14:57
+*FL SECURE*: 15:40
+*CIERRE DEPUERTA*: 15:41
+*PUSH-BACK*: 15:54
+*PAX OB  TOTAL* : 151
+*GATE*: E72
+*Carrousel*: 13
+*Delay Code* :
+*WCHR*:
+- 626 | 7WCHR 3 Agents
+- 627 | 5WCHR - 2 Agents
+-----
+✈️Flight Report ✈️
+*Date*: 01FEB2025
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  205
+*STD*: 22:55
+*ATD*: 22:55
+*GROOMERS IN*: 21:26
+*GROOMERS OUT*: 21:49
+*CREW AT GATE*: 21:30
+*OK TO BOARD*: 22:04
+*FL SECURE*: 22:39
+*CIERRE DEPUERTA*:22:46
+*PUSH-BACK*: 22:55
+*PAX OB  TOTAL* : 176
+C:12/Y: 161+3 Inf
+*GATE*: E81
+*Carrousel*: 12
+*Delay Code* :
+*WCHR*:
+- 204 | 3WCHR - 2Agent
+- 205 | 6WCHR -2Agent
+-----
+✈️Flight Report ✈️
+*Date*: 02FEB25
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  255
+*STD*: 8:00
+*ATD*: 8:19
+*GROOMERS IN*: 7:08
+*GROOMERS OUT*: 7:26
+*CREW AT GATE*: 7:21
+*OK TO BOARD*: 7:30
+*FL SECURE*: 8:05
+*CIERRE DEPUERTA*:8:13
+*PUSH-BACK*: 8:19
+*PAX OB  TOTAL* : 161
+C:12/Y: 152 + 1 INF
+*GATE*: 522
+*Carrousel*: 13
+*Delay Code* :  87A infrastructure operador del aeropuerto (disponibilidad por congestión, avion de egyptair realizando proceso de arrival al momento del abordaje) - 8 mins
+93A - llegada tarde del aeronave - 11 mins
+*WCHR*:
+- 254 | 2WCHR - 2Agent
+- 255 | 3 WHCR + 1 WHCC - 2 agents
+Comentarios:
+Boarding began without ACAP agents. 2 AV agents entered with carry off in plane. ACAP agents arrived with last two pax at the end.
+-----
+✈️Flight Report ✈️
+*Date*: 02FEB2025
+*Origin*: YYZ
+*Dest*: SAL
+*FL#*:  627
+*STD*: 16:00
+*ATD*: 15:58
+*GROOMERS IN*: 14:02
+*GROOMERS OUT*: 14:22
+*CREW AT GATE*: 14:47
+*OK TO BOARD*: 15:05
+*FL SECURE*: 15:41
+*CIERRE DEPUERTA*: 15:47
+*PUSH-BACK*: 15:58
+*PAX OB  TOTAL* : 153
+*GATE*: E72
+*Carrousel*: 12
+*Delay Code* :
+*WCHR*:
+- 626 | 3WCHR 5Agents
+- 627 | 10WCHR 3Agents
+-----
+✈️Flight Report ✈️
+*Date*: 02FEB25
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  AV205
+*STD*: 22:55
+*ATD*: 23:10
+*GROOMERS IN*: 21:58
+*GROOMERS OUT*: 22:18
+*CREW AT GATE*: 22:19
+*OK TO BOARD*: 22:32
+*FL SECURE*: 22:57
+*CIERRE DEPUERTA*:
+23:00
+*PUSH-BACK*: 23:10
+*PAX OB  TOTAL* : 147
+C:05. Y: 142
+*GATE*: 81
+*Carrousel*: 13
+*Delay Code* :
+1 min 93A Llegada tarde, demora heredada
+14 min 38B Servicio de limpieza, otros proveedores, llegada tarde de personal de limpieza y solo 3 personas
+*WCHR*:
+- 204 | 2WCHR - 2Agent
+- 205 | 9 WHCR -2 agents
+Comentarios: — <This message was edited>
+-----
+✈️Flight Report ✈️
+*Date*: 03Feb25
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  255
+*STD*: 8:00
+*ATD*: 8:19
+*GROOMERS IN*: 7:12
+*GROOMERS OUT*: 7:25
+*CREW AT GATE*: 7:02
+*OK TO BOARD*: 7:38
+*FL SECURE*: 8:01
+*CUSTOMS: 7:00-7:10
+*CIERRE DEPUERTA*:8:13
+*PUSH-BACK*: 8:19
+*PAX OB  TOTAL* : 165
+C:11/Y: 154
+*GATE*: 523
+*Carrousel*: 12
+*Delay Code* :  86 CBSA-17mins
+93A - llegada tarde del aeronave - 2 mins
+*WCHR*:
+- 254 | 1WCHR - 1 agent
+- 255 | 7WHCR- 2 agents
+Comentarios:
+-----
+✈️Flight Report ✈️
+*Date*: 03FEB2025
+*Origin*: YYZ
+*Dest*: SAL
+*FL#*:  627
+*STD*: 16:00
+*ATD*: 16:41
+*GROOMERS IN*: 14:15
+*GROOMERS OUT*: 14:30
+*CREW AT GATE*: 14:50
+*OK TO BOARD*: 15:03
+*FL SECURE*: 15:38
+*CIERRE DEPUERTA*: 16:
+*PUSH-BACK*: 16:41
+*PAX OB  TOTAL* : 138
+*GATE*: E80
+*Carrousel*: 13
+*Delay Code* :
+COD 71 - mal clima estación de origen (41MIN)
+*WCHR*:
+- 626 | 4WCHR 3Agents
+- 627 | 2WCHR 2Agents
+-----
+✈️Flight Report ✈️
+*Date*: 03FEB2025
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  205
+*STD*: 22:55
+*ATD*: 22:52
+*GROOMERS IN*: 21:32
+*GROOMERS OUT*: 21:45
+*CREW AT GATE*: 21:51
+*OK TO BOARD*: 22:12
+*FL SECURE*: 22:43
+*CIERRE DEPUERTA*: 22:47
+*PUSH-BACK*: 22:52
+*PAX OB  TOTAL* : 143
+C - 6
+Y- 135
+INF - 2
+*GATE*: E79
+*Carrousel*: 13
+*WCHR*:
+- 204 | 4 WCHR 2 agents
+- 205 | 6WCHR 2Agents
+-----
+✈️Flight Report ✈️
+*Date*: 04FEB2025
+*Origin*: YYZ
+*Dest*: SAL
+*FL#*:  627
+*STD*: 16:00
+*ATD*: 16:57
+*GROOMERS IN*: 14:13
+*GROOMERS OUT*: 14:30
+*CREW AT GATE*: 14:45
+*OK TO BOARD*: 15:04
+*FL SECURE*: 15:33
+*CIERRE  DE PUERTA*: 15:48
+*PUSH-BACK*: 15:57
+*PAX OB  TOTAL* : 126
+*GATE*: E72
+*Carrousel*: 13
+*Delay Code* :
+*WCHR*:
+- 626 | 3WCHR 2gents
+- 627 | 3WCHR 2WCHS 3Agents
+*Comments*
+Exito tras Exito!!!
+-----
+✈️Flight Report ✈️
+*Date*: 04FEB2025
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  205
+*STD*: 22:55
+*ATD*: 22:53
+*GROOMERS IN*: 21:43
+*GROOMERS OUT*: 22:01
+*CREW AT GATE*: 21:30
+*OK TO BOARD*: 22:13
+*FL SECURE*: 22:37
+*CIERRE DEPUERTA*: 22:42
+*PUSH-BACK*: 22:53
+*PAX OB  TOTAL* : 169
+C - 12  / Y- 157
+*GATE*: E74
+*Carrousel*: 12
+*WCHR*:
+- 204 | 6 WCHR 2 agents
+- 205 | 7 WCHR 2Agents
+-----
+✈️Flight Report ✈️
+*Date*: 05FEB2025
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  255
+*STD*: 08:00
+*ATD*: 08:29
+*GROOMERS IN*: 07:40
+*GROOMERS OUT*: 07:57
+*CREW AT GATE*: 06:53
+*OK TO BOARD*: 07:57
+*FL SECURE*: 08:21
+*CIERRE DEPUERTA*: 08:27
+*PUSH-BACK*: 08:29
+*PAX OB  TOTAL* : 161
+C - 12/ Y- 149
+*GATE*: 522
+*Carrousel*: 12
+Customs on board: 07:21  out 07:40
+Delay code:86a  7 min
+93A Llegada tarde heredada 22 min
+*WCHR*:
+- 254 | 2WCHR 1agents
+- 255| 5WCHR 1Agents
+-----
+✈️Flight Report ✈️
+*Date*: 05FEB2025
+*Origin*: YYZ
+*Dest*: SAL
+*FL#*:  627
+*STD*: 16:00
+*ATD*: 15:58
+*GROOMERS IN*: 14:24
+*GROOMERS OUT*: 14:43
+*CREW AT GATE*: 14:52
+*OK TO BOARD*: 15:07
+*FL SECURE*: 15:39
+*CIERRE  DE PUERTA*: 15:56
+*PUSH-BACK*: 15:58
+*PAX OB  TOTAL* : 145
+*GATE*: E72
+*Carrousel*: 13
+*Delay Code* :
+*WCHR*:
+- 626 | 5WCHR 2WCHC 2gents
+- 627 | 7WCHR 4Agents
+-----
+✈️Flight Report ✈️
+*Date*: 05FEB2025
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  205
+*STD*: 22:55
+*ATD*: 22:56
+*GROOMERS IN*: 21:46
+*GROOMERS OUT*: 22:05
+*CREW AT GATE*: 21:45
+*OK TO BOARD*: 22:16
+*FL SECURE*: 22:46
+*CIERRE DE PUERTA*: 22:49
+*PUSH-BACK*: 22:56
+*PAX OB  TOTAL* : 166
+C - 12  / Y- 154
+*GATE*: E79
+*Carrousel*: 11
+*Delay*: 89A - 1 min (ATC) esperando autorización de torre de control para push back.
+*WCHR*:
+- 204 | 5 WCHR 2 Agents
+- 205 | 3 WCHR 1 Agent
+-----
+✈️Flight Report ✈️
+*Date*: 06FEB2025
+*Origin*: YYZ
+*Dest*: SAL
+*FL#*:  627
+*STD*: 16:00
+*ATD*: 15:56
+*GROOMERS IN*: 14:37
+*GROOMERS OUT*: 14:56
+*CREW AT GATE*: 14:50
+*OK TO BOARD*: 15:00
+*FL SECURE*: 15:46
+*CIERRE  DE PUERTA*: 15:48
+*PUSH-BACK*: 16:00
+*PAX OB  TOTAL* : 143
+*GATE*: E72
+*Carrousel*: 13
+*Delay Code* :
+*WCHR*:
+- 626 | 3WCHR  4gents
+- 627 | 9WCHR 3Agents <This message was edited>
+-----
+✈️Flight Report ✈️
+*Date*: 06FEB2025
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  205
+*STD*: 22:55
+*ATD*: 22:59
+*GROOMERS IN*: 21:40
+*GROOMERS OUT*: 22:01
+*CREW AT GATE*: 21:45
+*OK TO BOARD*: 22:15
+*FL SECURE*: 22:46
+*CIERRE DE PUERTA*: 22:49
+*PUSH-BACK*: 22:59
+*PAX OB  TOTAL* : 164
+C - 12  / Y- 151+1 INF
+*GATE*: E81
+*Carrousel*: 13
+*Delay*: 89(4mins) - ATC Air Canada taxing behind aircraft
+*WCHR*:
+- 204 | 4 WCHR 2 Agents
+- 205 | 1 WCHR 1 Agent
+-----
+✈️Flight Report ✈️
+*Date*: 07FEB2025
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  255
+*STD*: 09:00
+*ATD*: 09:25
+*GROOMERS IN*: 08:04
+*GROOMERS OUT*: 08:15
+*CREW AT GATE*: 07:56
+*OK TO BOARD*: 08:28
+*FL SECURE*: 08:56
+*CIERRE DEPUERTA*: 08:57
+*PUSH-BACK*: 09:25
+*PAX OB  TOTAL* : 168
+C - 12/ Y- 156
+*GATE*: 521
+*Carrousel*: 13
+•Customs on board: 07:50out 08:04
+•Delay code:86A CBSA 14min
+93A Llegada tarde heredada 59min
+16 min ATC ( Copa Airlines Aircraft presenta discrepancias en la salida bloqueando push back de Avianca )
+*WCHR*:
+- 254 | 2WCHR 2agents
+- 255| 4WCHR 2Agents
+- COMENT:
+-----
+✈️Flight Report ✈️
+*Date*: 07FEB2025
+*Origin*: YYZ
+*Dest*: SAL
+*FL#*:  627
+*STD*: 16:00
+*ATD*: 15:55
+*GROOMERS IN*: 14:34
+*GROOMERS OUT*: 14:59
+*CREW AT GATE*: 14:50
+*OK TO BOARD*: 15:08
+*FL SECURE*: 15:38
+*CIERRE  DE PUERTA*: 15:45
+*PUSH-BACK*: 15:55
+*PAX OB  TOTAL* : 151
+*GATE*: E72
+*Carrousel*: 13
+*Delay Code* :
+*WCHR*:
+- 626 | 3WCHR  4gents
+- 627 | 3WCHR + 1WCHC -3Agents
+-----
+✈️Flight Report ✈️
+*Date*: 07FEB2025
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  205
+*STD*: 22:55
+*ATD*: 23:28
+*GROOMERS IN*: 22:27
+*GROOMERS OUT*: 22:45
+*CREW AT GATE*: 22:20
+*OK TO BOARD*: 22:53
+*FL SECURE*: 23:13
+*CIERRE  DE PUERTA*: 23:21
+*PUSH-BACK*: 23:28
+*PAX OB  TOTAL* : C:7/Y:159 +1Inf
+*GATE*: E81
+*Carrousel*: 11
+*Delay Code* :  93A llegada tarde 21min.
+86 customs 12min
+*WCHR*:
+- 204 | 2WCHR  3Agents
+- 205 | 2WCHR 2 Agents
+-----
+✈️Flight Report ✈️
+*Date*: 08FEB2025
+*Origin*: YYZ
+*Dest*: SAL
+*FL#*:  627
+*STD*: 16:00
+*ATD*: 15:56
+*GROOMERS IN*: 14:35
+*GROOMERS OUT*: 14:53
+*CREW AT GATE*: 14:57
+*OK TO BOARD*: 15:18
+*FL SECURE*: 15:40
+*CIERRE  DE PUERTA*: 15:46
+*PUSH-BACK*: 15:56
+*PAX OB  TOTAL* : 158
+*GATE*: E72
+*Carrousel*: 13
+*Delay Code* :
+*WCHR*:
+- 626 | 8WCHR  3gents
+- 627 | 3WCHR + 1WCHC -2Agents
+COMMENTS:
+El trabajo en equipo exitoso brilla como una estrella fugaz
+Éxito tras éxito 💪💪👏👏
+-----
+✈️Flight Report ✈️
+*Date*: 08FEB2025
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  205
+*STD*: 22:55
+*ATD*: 00:06
+*GROOMERS IN*: 21:57
+*GROOMERS OUT*: 22:20
+*CREW AT GATE*: 21:41
+*OK TO BOARD*: 22:42
+*FL SECURE*: 22:55
+*CIERRE  DE PUERTA*: 23:26
+*PUSH-BACK*: 00:06
+*PAX OB  TOTAL* : C:12/Y:143
+*GATE*: E80
+*Carrousel*: 13
+*Customs on board*: IN 21:48 OUT 21:55
+*Delay Code* :
+71 (71min de demora mal clima en estación de origen )
+*WCHR*:
+- 204 | 5WCHR  2Agents
+- 205 | 5WCHR 2Agents
+-----
+✈️Flight Report ✈️
+*Date*: 09FEB2025
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  255
+*STD*: 08:00
+*ATD*: 08:58
+*GROOMERS IN*: 07:08
+*GROOMERS OUT*: 07:20
+*CREW AT GATE*: 07:12
+*OK TO BOARD*: 07:31
+*FL SECURE*: 07:51
+*CIERRE DEPUERTA*: 08:00
+*PUSH-BACK*: 08:58
+*PAX OB  TOTAL* : 138
+C - 2/ Y- 136
+*GATE*: 521
+*Carrousel*: 13
+•Customs on board:  NA
+•Delay code:
+(53) weather
+*WCHR*:
+- 254 | 5WCHR 2agents
+- 255| 11WCHR 1Agents
+- COMENT: <This message was edited>
+-----
+✈️Flight Report ✈️
+*Date*: 09FEB2025
+*Origin*: YYZ
+*Dest*: SAL
+*FL#*:  627
+*STD*: 16:00
+*ATD*: 15:57
+*GROOMERS IN*: 14:25
+*GROOMERS OUT*: 14:39
+*CREW AT GATE*: 14:47
+*OK TO BOARD*: 15:03
+*FL SECURE*: 15:45
+*CIERRE  DE PUERTA*: 15:48
+*PUSH-BACK*: 15:57
+*PAX OB  TOTAL* : 138
+*GATE*: E80
+*Carrousel*: 13
+*Delay Code* :
+*WCHR*:
+- 626 | 6WCHR  2gents
+- 627 | 6WCHR -2Agents
+COMMENTS:
+-----
+✈️Flight Report ✈️
+*Date*: 09FEB2025
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  205
+*STD*: 22:55
+*ATD*: 23:45
+*GROOMERS IN*: 21:24
+*GROOMERS OUT*: 21:43
+*CREW AT GATE*: 21:34
+*OK TO BOARD*: 22:02
+*FL SECURE*: 22:47
+*CIERRE  DE PUERTA*: 22:48
+*PUSH-BACK*: 23:45
+*PAX OB  TOTAL* : C:8/Y:128+2inf
+*GATE*: E81
+*Carrousel*: 13
+*Delay Code* : 33 (50min de demora) - Equipo de Cargado
+*WCHR*:
+- 204 | 4WCHR  1 Agent
+- 205 | 6WCHR 1WCHC 2 Agents
+-----
+✈️Flight Report ✈️
+*Date*: 10FEB2025
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  255
+*STD*: 08:00
+*ATD*: 08:19
+*GROOMERS IN*: 07:08
+*GROOMERS OUT*: 07:18
+*CREW AT GATE*: 07:00
+*OK TO BOARD*: 07:34
+*FL SECURE*: 07:57
+*CIERRE DEPUERTA*: 08:04
+*PUSH-BACK*: 08:19
+*PAX OB  TOTAL* : 167
+C - 11/ Y- 156
+*GATE*: 523
+*Carrousel*: 13
+•Customs on board:
+•Delay code:
+93A llegada tarde 10min
+32 Carga y descarga de la aeronave 9min
+*WCHR*:
+- 254 | 2WCHR 1agents
+- 255| 10WCHR 2Agents
+- COMENT:
+-----
+✈️Flight Report ✈️
+*Date*: 10FEB2025
+*Origin*: YYZ
+*Dest*: SAL
+*FL#*:  627
+*STD*: 16:00
+*ATD*: 15:55
+*GROOMERS IN*: 14:20
+*GROOMERS OUT*: 14:38
+*CREW AT GATE*: 14:53
+*OK TO BOARD*: 15:02
+*FL SECURE*: 15:41
+*CIERRE  DE PUERTA*: 15:50
+*PUSH-BACK*: 15:55
+*PAX OB  TOTAL* : 142
+*GATE*: E81
+*Carrousel*: 13
+*Delay Code* :
+*WCHR*:
+- 626 | 6WCHR  2gents
+- 627 | 8WCHR -2Agents
+COMMENTS: <This message was edited>
+-----
+✈️Flight Report ✈️
+*Date*: 10FEB2025
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  205
+*STD*: 22:55
+*ATD*: 22:54
+*GROOMERS IN*: 21:42
+*GROOMERS OUT*: 22:02
+*CREW AT GATE*: 21:36
+*OK TO BOARD*: 22:05
+*FL SECURE*: 22:42
+*CIERRE  DE PUERTA*: 22:47
+*PUSH-BACK*: 22:54
+*PAX OB  TOTAL* : C:11/Y:145+3inf
+*GATE*: E78
+*Carrousel*: 12
+*Delay Code* :
+*WCHR*:
+- 204 | 6WCHR  1 Agent
+- 205 | 16WCHR 6 Agents
+COMMENTS:
+Otro vuelo otro Éxito tras Éxito!👏🏽👏🏽👏🏽 <This message was edited>
+-----
+✈️Flight Report ✈️
+*Date*: 11FEB2025
+*Origin*: YYZ
+*Dest*: SAL
+*FL#*:  627
+*STD*: 16:00
+*ATD*: 15:58
+*GROOMERS IN*: 14:08
+*GROOMERS OUT*: 14:25
+*CREW AT GATE*: 14:55
+*OK TO BOARD*: 15:09
+*FL SECURE*: 15:47
+*CIERRE  DE PUERTA*:15:49
+*PUSH-BACK*: 15:58
+*PAX OB  TOTAL* : 173
+*GATE*: E80
+*Carrousel*: 12
+*Delay Code* :
+*WCHR*:
+- 626 | 6WCHR  2 Agents
+- 627 | 6WCHR 2 Agents
+COMMENTS:
+-----
+✈️Flight Report ✈️
+*Date*: 11FEB2025
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  205
+*STD*: 22:55
+*ATD*: 22:51
+*GROOMERS IN*: 21:27
+*GROOMERS OUT*: 21:48
+*CREW AT GATE*: 21:30
+*OK TO BOARD*: 22:02
+*FL SECURE*: 22:31
+*CIERRE  DE PUERTA*:22:37
+*PUSH-BACK*:  22:51
+*PAX OB  TOTAL* : 167
+C - 9
+Y - 156
+INF - 2
+*GATE*: E72
+*Carrousel*: 13
+*Delay Code* :
+*WCHR*:
+- 204  | 7 WCHR  2 Agents
+- 205 |  11 WCHR 4 Agents
+COMMENTS:
+-----
+✈️Flight Report ✈️
+*Date*: 12FEB2025
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  255
+*STD*: 08:00
+*ATD*: 08:22
+*GROOMERS IN*: 07:28
+*GROOMERS OUT*: 07:40
+*CREW AT GATE*: 07:00
+*OK TO BOARD*: 07:47
+*FL SECURE*: 08:17
+*CIERRE  DE PUERTA*:08:18
+*PUSH-BACK*:  08:22
+*PAX OB  TOTAL* :
+C - 12
+Y - 159
+INF - 3
+*GATE*: 522
+*Carrousel*: 12
+*Delay Code* : 86 - CBSA 22 mins
+*WCHR*:
+- 254 | 3 WCHR  1 Agents
+- 255 |  5 WCHR 2 Agents
+COMMENTS: <This message was edited>
+-----
+✈️Flight Report ✈️
+*Date*: 12FEB2025
+*Origin*: YYZ
+*Dest*: SAL
+*FL#*:  627
+*STD*: 16:00
+*ATD*: 15:57
+*GROOMERS IN*: 14:13
+*GROOMERS OUT: 14:29
+*CREW AT GATE*: 14:57
+*OK TO BOARD*: 15:06
+*FL SECURE*: 15:40
+*CIERRE  DE PUERTA*:15:46
+*PUSH-BACK*: 15:57
+*PAX OB  TOTAL* : 165
+*GATE*: E78
+*Carrousel*: 13
+*Delay Code* :
+*WCHR*:
+- 626 | 2WCHR  2 Agents
+- 627 | 2WCHR 1 Agents
+COMMENTS:  * EXITO TRAS EXITO*
+-----
+✈️Flight Report ✈️
+*Date*: 13FEB2025
+*Origin*: YYZ
+*Dest*: SAL
+*FL#*:  627
+*STD*: 16:00
+*ATD*: 16:36
+*GROOMERS IN*: 14:00
+*GROOMERS OUT: 14:23
+*CREW AT GATE*: 14:57
+*OK TO BOARD*: 15:09
+*FL SECURE*: 16:15
+*CIERRE  DE PUERTA*:16:20
+*PUSH-BACK*: 16:36
+*PAX OB  TOTAL* : 184
+*GATE*: E81
+*Carrousel*: 13
+*Delay Code:*
+71 mal clima estación de origen - 36min
+*WCHR*:
+- 626 | 1WCHR  2 Agents
+- 627 | 5WCHR 3 Agents
+-----
+✈️Flight Report ✈️
+*Date*: 13FEB2025
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  AV5055
+*STD*: 2255
+*ATD*: 23:23
+*GROOMERS IN*: 22:10
+*GROOMERS OUT: 22:35
+*CREW AT GATE*: 22:26
+*OK TO BOARD*: 22:48
+*FL SECURE*: 23:14
+*CIERRE  DE PUERTA*:23:16
+*PUSH-BACK*: 23:23
+*PAX OB  TOTAL* : 179
+C/12 Y/166 + 1 inf
+*GATE*: E80
+*Carrousel*: 12
+*Delay Code:*
+38 B - 10 mnts servicio de limpieza ( llegada tarde del personal de limpieza y llegan cortos de personal)
+93 A 18 mnts llegada tarde                                                                                 *WCHR*:
+- 204 5 WCHR  2
+- 5055  1 WCHR 1 Agent
+-----
+✈️Flight Report ✈️
+*Date*: 14FEB2025
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  255
+*STD*: 08:00
+*ATD*: 08:31
+*GROOMERS IN*: 07:11
+*GROOMERS OUT*: 07:23
+*CREW AT GATE*: 07:14
+*OK TO BOARD*: 07:28
+*FL SECURE*: 08:16
+*CIERRE DEPUERTA*: 08:16
+*PUSH-BACK*: 08:31
+*PAX OB  TOTAL* : 180
+C - 12 / Y- 167 / Inf - 1
+*GATE*: 523
+*Carrousel*: 12
+•Customs on board:  NA
+•Delay code:
+Total 31 min demorada
+93A (11min) llegada tarde
+89A (20min) ATC
+*WCHR*:
+- 254 | 7WCHR 1 agents
+- 255| 4 WCHR  1 Agent
+- COMENT:
+-----
+✈️Flight Report ✈️
+*Date*: 14FEB2025
+*Origin*: YYZ
+*Dest*: SAL
+*FL#*:  627
+*STD*: 16:00
+*ATD*: 16:09
+*GROOMERS IN*: 14:28
+*GROOMERS OUT: 14:43
+*CREW AT GATE*: 14:57
+*OK TO BOARD*: 15:09
+*FL SECURE*: 15:51
+*CIERRE  DE PUERTA*:15:5
+*PUSH-BACK*: 16:09
+*PAX OB  TOTAL* : 181
+*GATE*: E81
+*Carrousel*: 13
+*Delay Code:*
+62E (9 MIN) - APU inoperativo
+*WCHR*:
+- 626 | 6 WCHR  4 Agents
+- 627 |  7 WCHR 3 Agents
+-----
+✈️Flight Report ✈️
+*Date*: 14FEB2025
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  AV5055
+*STD*: 22:55
+*ATD*: 23:09
+*GROOMERS IN*: 21:53
+*GROOMERS OUT: 22:11
+*CREW AT GATE*: 22:26
+*OK TO BOARD*: 22:21
+*FL SECURE*: 22:45
+*CIERRE  DE PUERTA*:22:48
+*PUSH-BACK*: 23:09
+*PAX OB  TOTAL* : 173
+C/12 Y/168+ 1 inf
+*GATE*: E81
+*Carrousel*: 12
+*Delay Code:*
+4min 93A 10min 32 carga y descargue de la aeronave.
+WCHR*:
+- 204 3WCHR  1 Agent
+- 205 0WCHR  0 Agent
+-----
+✈️Flight Report ✈️
+*Date*: 15FEB2025
+*Origin*: YYZ
+*Dest*: SAL
+*FL#*:  627
+*STD*: 16:00
+*ATD*: 16:15
+*GROOMERS IN*: 14:38
+*GROOMERS OUT*: 14:55
+*CREW AT GATE*: 14:53
+*OK TO BOARD*: 15:08
+*FL SECURE*: 15:55
+*CIERRE  DE PUERTA*:16:09
+*PUSH-BACK*: 16:15
+*PAX OB  TOTAL* : 177
+*GATE*: E72
+*Carrousel*: 13
+*Delay Code:*
+71 - mal clima en estación de origen (15 min)
+*WCHR*:
+- 626 | 7 WCHR  4 Agents
+- 627 |  1 WCHR 2 Agents
+-----
+✈️Flight Report ✈️
+*Date*: 15FEB2025
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  205
+*STD*: 22:55
+*ATD*: 23:01
+*GROOMERS IN*: 21:34
+*GROOMERS OUT*: 21:50
+*CREW AT GATE*: 21:38
+*OK TO BOARD*: 22:10
+*FL SECURE*: 22:44
+*CIERRE  DE PUERTA*: 22:46
+*PUSH-BACK*: 23:01
+*PAX OB  TOTAL* : 167
+*GATE*: E80
+*Carrousel*: 12
+*Delay Code:*
+71 - mal clima en estación de origen (6min)                                                          *WCHR*:
+- 204 | 8 WCHR  2Agents
+- 205  |  4WCHR 1Agent
+-----
+✈️Flight Report ✈️
+*Date*: 17FEB2025
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  255
+*STD*: 08:35
+*ATD*: 08:56
+*GROOMERS IN*: 07:24
+*GROOMERS OUT*: 07:40
+*CREW AT GATE*: 07:25
+*OK TO BOARD*: 08:10
+*FL SECURE*: 08:45
+*CIERRE  DE PUERTA*: 08:51
+*PUSH-BACK*:08:56
+*PAX OB  TOTAL* : c 12 Y 161 +1inf
+*GATE*: 522
+*Carrousel*: 12
+*Delay Code:* 41 a defecto de aeronaves  36 min
+93 a llegada tarde 20 min
+*WCHR*:
+- 254 | 7 WCHR  2Agents
+- 255|  5WCHR 1Agent
+-----
+✈️Flight Report ✈️
+*Date*: 17FEB2025
+*Origin*: YYZ
+*Dest*: SAL
+*FL#*:  3627
+*STD*: 13:40
+*ATD*: 13:51
+*GROOMERS IN*: 12:23
+*GROOMERS OUT*: 12:40
+*CREW AT GATE*: 12:34
+*OK TO BOARD*: 12:45
+*FL SECURE*: 13:15
+*CIERRE  DE PUERTA*: 13:47
+*PUSH-BACK*: 13:51
+*PAX OB  TOTAL* : 135
+*GATE*: E80
+*Carrousel*: 13
+*Delay Code:*
+71 - mal clima en estación de origen (11min)
+*WCHR*:
+- 3626 | 4 WCHR  2Agents
+- 3627|  1WCHR 0 Agent
+-----
+✈️Flight Report ✈️
+*Date*: 27JAN2025
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  5053
+*STD*: 19:30
+*ATD*: 22:34
+*GROOMERS IN*: 20:20
+*GROOMERS OUT*: 22:41
+*CREW AT GATE*: 20:
+*OK TO BOARD*: 22:52
+*FL SECURE*: 21:52
+*CIERRE DE PUERTA*:22:00
+*PUSH-BACK*: 22:34
+*PAX OB  TOTAL* : 158
+*GATE*: 521
+*Carrousel*: 12
+*Delay Code* :
+- 93A (89min)- Llegada tarde
+- ⁠71 (95min)- Mal clima en estación de origen
+*WCHR*:
+- 204 | 6WCHR - 3 Agents
+- 205 | 4WCHR - 2 Agents
+*Comments*: •••
+-----
+✈️Flight Report ✈️
+*Date*: 18FEB2025
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  5055
+*STD*: 01:35
+*ATD*: 02:33
+*GROOMERS IN*: 00:38
+*GROOMERS OUT*: 00:52
+*CREW AT GATE*: 01:05
+*OK TO BOARD*: 01:34
+*FL SECURE*: 02:20
+*CIERRE DE PUERTA*: 02:22
+*PUSH-BACK*: 02:33
+*PAX OB  TOTAL* : 142
+*GATE*: E79
+*Carrousel*: 13
+*Delay Code* :
+- 93A (4min)- Llegada tarde
+- ⁠71 (54min)- Mal clima en estación de origen
+*WCHR*:
+- 204 | 1WCHR - 2 Agents
+- 205 | 7WCHR - 3 Agents
+*Comments*: ••• <This message was edited>
+-----
+✈️Flight Report ✈️
+*Date*: 18FEB2025
+*Origin*: YYZ
+*Dest*: SAL
+*FL#*:  3627
+*STD*: 13:40
+*ATD*: 17:25
+*GROOMERS IN*: 14:35
+*GROOMERS OUT*: 14:53
+*CREW AT GATE*:
+*OK TO BOARD*:
+*FL SECURE*: 15:37
+*CIERRE  DE PUERTA*: 16:52
+*PUSH-BACK*: 17:25
+*PAX OB  TOTAL* : 181
+*GATE*: E79
+*Carrousel*: 13
+*Delay Code* :
+*WCHR*:
+- 626 | 6WCHR  2gents
+- 627 | 5WCHR -4Agents
+COMMENTS:
+Los Dias difíciles nos hacen más fuerte y resilient!
+-----
+✈️Flight Report ✈️
+*Date*: 18FEB2025
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  205
+*STD*: 22:55
+*ATD*:00:54
+*GROOMERS IN*: 21:30
+*GROOMERS OUT*: 21:53
+*CREW AT GATE*: 21:40
+*OK TO BOARD*: 22:08
+*FL SECURE*: 23:15
+*CIERRE  DE PUERTA*: 23:32
+*PUSH-BACK*:  00:54
+*PAX OB  TOTAL* : 169
+*GATE*: E76
+*Carrousel*: 12
+*Delay Code* :
+71 Mal clima en la estación :119 minutos
+*WCHR*:
+- 204 | 5WCHR  2 Agents
+- 205 | 13WCHR -3 Agents
+COMMENTS:
+Cada tropiezo es para enseñar cómo levantarnos de nuevo 💪💪 <This message was edited>
+-----
+✈️Flight Report ✈️
+*Date*: 19FEB2025
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  255
+*STD*: 08:00
+*ATD*: 08:02
+*GROOMERS IN*: 07:05
+*GROOMERS OUT*: 07:16
+*CREW AT GATE*: 06:42
+*OK TO BOARD*: 07:25
+*FL SECURE*: 07:51
+*CIERRE DEPUERTA*: 07:53
+*PUSH-BACK*: 08:02
+*PAX OB  TOTAL* : 159
+C - 11/ Y- 147 mas 1 inf
+*GATE*: E81
+*Carrousel*: 12
+•Delay code: 93a llegada tarde de aeronave 02 mnts
+*WCHR*:
+- 254 | 4WCHR 2agents
+- 255| 4WCHR 1Agents
+- COMENT:
+-----
+✈️Flight Report ✈️
+*Date*: 19FEB2025
+*Origin*: YYZ
+*Dest*: SAL
+*FL#*:  627
+*STD*: 16:00
+*ATD*: 15:58
+*GROOMERS IN*: 14:07
+*GROOMERS OUT*: 14:20
+*CREW AT GATE*: 14:50
+*OK TO BOARD*: 15:03
+*FL SECURE*: 15:32
+*CIERRE  DE PUERTA*: 15:52
+*PUSH-BACK*: 15:58
+*PAX OB  TOTAL* : 166
+*GATE*: E72
+*Carrousel*: 13
+*Delay Code* :
+*WCHR*:
+- 626 | 7WCHR  -3Agents
+- 627 | 10WCHR -5Agents
+COMMENTS:
+-----
+✈️Flight Report ✈️
+*Date*: 19FEB2025
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  205
+*STD*: 22:55
+*ATD*:23:05
+*GROOMERS IN*: 21:12
+*GROOMERS OUT*: 21:28
+*CREW AT GATE*: 21:40
+*OK TO BOARD*: 22:05
+*FL SECURE*: 22:54
+*CIERRE  DE PUERTA*: 23:32
+*PUSH-BACK*:  23:05
+*PAX OB  TOTAL* : 12 - 164
+*GATE*: E72
+*Carrousel*: 13
+*Delay Code* :
+71 Mal clima en la estación :10 minutos
+*WCHR*:
+- 204 | 6WCHR  2 Agents
+- 205 | 8WCHR - 3 Agents
+-----
+✈️Flight Report ✈️
+*Date*: 20FEB2025
+*Origin*: YYZ
+*Dest*: SAL
+*FL#*:  627
+*STD*: 16:00
+*ATD*: 16:01
+*GROOMERS IN*: 13:53
+*GROOMERS OUT*: 14:14
+*CREW AT GATE*: 14:53
+*OK TO BOARD*: 15:07
+*FL SECURE*: 15:49
+*CIERRE  DE PUERTA*: 15:59
+*PUSH-BACK*:  16:01
+*PAX OB  TOTAL* : 175
+*GATE*: E72
+*Carrousel*: 13
+*Delay Code* :  71 weather 1Min
+*WCHR*:
+- 626 | 12WCHR  8 Agents
+- 627 | 11WCHR  1WCHC- 3 Agents
+-----
+✈️Flight Report ✈️
+*Date*: 21FEB2025
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  255
+*STD*: 08:00
+*ATD*: 08:29
+*GROOMERS IN*: 07:14
+*GROOMERS OUT*: 07:25
+*CREW AT GATE*: 07:30
+*OK TO BOARD*: 07:42
+*FL SECURE*: 08:10
+*CIERRE DEPUERTA*: 08:12
+*PUSH-BACK*: 08:29
+*PAX OB  TOTAL* :  166
+C - 12/ Y- 154
+*GATE*: 523
+*Carrousel*: 12
+•Customs on board:
+•Delay code:
+93A llegada tarde 16min
+32 Carga y descarga de la aeronave 13min
+*WCHR*:
+- 254 | 3WCHR 2Agents
+- 255| 4WCHR 2Agents
+- COMENT:
+-----
+✈️Flight Report ✈️
+*Date*: 21FEB2025
+*Origin*: YYZ
+*Dest*: SAL
+*FL#*:  627
+*STD*: 16:00
+*ATD*: 16:03
+*GROOMERS IN*: 14:24
+*GROOMERS OUT*: 14:43
+*CREW AT GATE*: 14:54
+*OK TO BOARD*: 15:10
+*FL SECURE*: 15:48
+*CIERRE DEPUERTA*: 15:50
+*PUSH-BACK*: 16:03
+*PAX OB  TOTAL* :  176
+*GATE*: E78
+*Carrousel*: 13
+*Delay code*:
+39B falta de equipo en tierra (headsets) 3min
+*WCHR*:
+- 626| 6WCHR 3Agents
+- 627| 3WCHR 2Agents
+-----
+✈️Flight Report ✈️
+*Date*: 22FEB2025
+*Origin*: YYZ
+*Dest*: SAL
+*FL#*:  627
+*STD*: 16:00
+*ATD*: 16:08
+*GROOMERS IN*: 14:20
+*GROOMERS OUT*: 14:33
+*CREW AT GATE*: 14:57
+*OK TO BOARD*: 15:08
+*FL SECURE*: 15:37
+*CIERRE DEPUERTA*: 15:44
+*PUSH-BACK*: 16:08
+*PAX OB  TOTAL* :  136
+*GATE*: E80
+*Carrousel*: 13
+*Delay code*:
+89A ATC 08 mnts
+*WCHR*:
+- 626| 6WCHR 3Agents
+- 627 | 7WCHR 3Agents
+-----
+✈️Flight Report ✈️
+*Date*: 23FEB2025
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  255
+*STD*: 08:00
+*ATD*: 08:30
+*GROOMERS IN*: 07:08
+*GROOMERS OUT*: 07:22
+*CREW AT GATE*: 07:08
+*OK TO BOARD*: 07:33
+*FL SECURE*: 07:51
+*CIERRE DEPUERTA*: 08:03
+*PUSH-BACK*: 08:30
+*PAX OB  TOTAL* :  143
+C:6
+Y: 137
+*GATE*: 524
+*Carrousel*: 13
+•Customs on board:
+•Delay code:
+(93A)5 llegada tarde
+(86) 25 CBSA tracker scanner en rampa
+* WCHR*:
+- 626: 2WCHR 1Agents
+- 627: 5 WCHR 1 Agents
+- COMENT:
+CBSA tracker scanner en rampa
+-----
+✈️Flight Report ✈️
+*Date*: 23FEB2025
+*Origin*: YYZ
+*Dest*: SAL
+*FL#*:  627
+*STD*: 16:00
+*ATD*: 15:51
+*GROOMERS IN*: 14:20
+*GROOMERS OUT*: 14:35
+*CREW AT GATE*: 14:45
+*OK TO BOARD*: 15:12
+*FL SECURE*: 15:33
+*CIERRE DEPUERTA*: 15:47
+*PUSH-BACK*: 15:51
+*PAX OB  TOTAL* :  127
+*GATE*: E80
+*Carrousel*: 13
+*Delay code*: -
+*WCHR*:
+- 626| 1WCHR 1Agents
+- 627 | 13WCHR 2Agents
+-----
+✈️Flight Report ✈️
+*Date*: 24FEB2025
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  255
+*STD*: 08:00
+*ATD*: 08:18
+*GROOMERS IN*: 07:09
+*GROOMERS OUT*: 07:21
+*CREW AT GATE*: 07:01
+*OK TO BOARD*: 07:35
+*FL SECURE*: 08:00
+*CIERRE DEPUERTA*: 08:02
+*PUSH-BACK*: 08:18
+*PAX OB  TOTAL* :  141
+C - 10/ Y- 131
+*GATE*: 523
+*Carrousel*: 12
+•Customs on board:
+•Delay code:
+93A llegada tarde 11min
+18A mayor tiempo de busqueda de equipaje ( bag pull )  7 min
+*WCHR*:
+- 254 | 4WCHR 2Agents
+- 255| 3WCHR 1Agents
+- COMENT:
+-----
+✈️Flight Report ✈️
+*Date*: 24FEB2025
+*Origin*: YYZ
+*Dest*: SAL
+*FL#*:  627
+*STD*: 16:00
+*ATD*: 15:58
+*GROOMERS IN*: 14:18
+*GROOMERS OUT*: 14:34
+*CREW AT GATE*: 14:57
+*OK TO BOARD*: 15:14
+*FL SECURE*: 15:36
+*CIERRE DEPUERTA*: 15:50
+*PUSH-BACK*: 15:58
+*PAX OB  TOTAL* :  125
+*GATE*: E79
+*Carrousel*: 13
+*Delay code*: -
+*WCHR*:
+- 626| 6WCHR 3Agents
+- 627 | 8WCHR 3Agents
+Comments:
+El trabajo en equipo es la receta perfecta para conseguir
+Éxitos tras Éxitos 💪💪💪
+-----
+✈️Flight Report ✈️
+*Date*: 24FEB2025
+*Origin*: YYZ
+*Dest*: BOG
+*FL#*:  205
+*STD*: 22:55
+*ATD*: 22:53
+*GROOMERS IN*: 21:21
+*GROOMERS OUT*: 21:35
+*CREW AT GATE*: 21:30
+*OK TO BOARD*: 22:55
+*FL SECURE*: 22:35
+*CIERRE DEPUERTA*:22:38
+*PUSH-BACK*: 22:53
+*PAX OB  TOTAL* : 137
+*GATE*: E73
+*Carrousel*: 12
+*Delay Code* : •••
+*WCHR*:
+- 204 | 4WCHR- 2 Agents
+- 205 | 6WCHR - 2 Agents
+*Comments*: •••
+-----
+✈️Flight Report ✈️
+*Date*: 25FEB2025
+*Origin*: YYZ
+*Dest*: SAL
+*FL#*:  627
+*STD*: 16:00
+*ATD*: 15:49
+*GROOMERS IN*: 14:15
+*GROOMERS OUT*: 14:34
+*CREW AT GATE*: 14:50
+*OK TO BOARD*: 15:02
+*FL SECURE*: 15:33
+*CIERRE DEPUERTA*: 15:41
+*PUSH-BACK*: 15:49
+*PAX OB  TOTAL* : 134
+*GATE*: E72
+*Carrousel*: 13
+*Delay code*: -
+*WCHR*:
+- 626| 4WCHR 3Agents
+- 627 | 7WCHR+1WCHC 3Agents
+Comments:
+El trabajo en equipo es la receta perfecta para conseguir
+Éxitos tras Éxitos 💪💪💪

@@ -1,5 +1,6 @@
-streamlit
-google-cloud-bigquery
-python-dotenv
-pandas
-numpy
+streamlit>=1.25.0
+google-cloud-bigquery>=3.11.0
+python-dotenv>=1.0.0
+pandas>=2.0.0
+numpy>=1.24.0
+plotly>=5.13.0
