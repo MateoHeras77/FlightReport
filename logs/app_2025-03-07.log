@@ -873,3 +873,43 @@ TypeError: unsupported operand type(s) for +: 'Timestamp' and 'Timestamp'
         FROM `unfc-439001.avianca2000.ReporteVuelo`
         WHERE 1=1
          AND flight_date = '2025-03-07' AND flight_number = 'AV205' ORDER BY flight_date DESC, std DESC
+2025-03-07 22:28:13,796 - INFO - Aplicación iniciada
+2025-03-07 22:28:13,961 - INFO - Credenciales cargadas correctamente desde Streamlit Secrets.
+2025-03-07 22:28:13,963 - INFO - BigQuery client initialized successfully.
+2025-03-07 22:28:15,228 - INFO - Ejecutando consulta: 
+        SELECT *
+        FROM `unfc-439001.avianca2000.ReporteVuelo`
+        WHERE 1=1
+         ORDER BY flight_date DESC, std DESC
+2025-03-07 22:28:19,680 - INFO - Aplicación iniciada
+2025-03-07 22:28:19,830 - INFO - Credenciales cargadas correctamente desde Streamlit Secrets.
+2025-03-07 22:28:19,832 - INFO - BigQuery client initialized successfully.
+2025-03-07 22:28:20,573 - INFO - Ejecutando consulta: 
+        SELECT *
+        FROM `unfc-439001.avianca2000.ReporteVuelo`
+        WHERE 1=1
+         AND flight_date = '2025-03-07' ORDER BY flight_date DESC, std DESC
+2025-03-07 22:28:24,723 - INFO - Aplicación iniciada
+2025-03-07 22:28:24,835 - INFO - Credenciales cargadas correctamente desde Streamlit Secrets.
+2025-03-07 22:28:24,835 - INFO - BigQuery client initialized successfully.
+2025-03-07 22:28:25,535 - INFO - Ejecutando consulta: 
+        SELECT *
+        FROM `unfc-439001.avianca2000.ReporteVuelo`
+        WHERE 1=1
+         AND flight_date = '2025-03-07' AND flight_number = 'AV205' ORDER BY flight_date DESC, std DESC
+2025-03-07 22:28:36,194 - INFO - Aplicación iniciada
+2025-03-07 22:28:36,346 - INFO - Credenciales cargadas correctamente desde Streamlit Secrets.
+2025-03-07 22:28:36,347 - INFO - BigQuery client initialized successfully.
+2025-03-07 22:28:37,091 - INFO - Ejecutando consulta: 
+        SELECT *
+        FROM `unfc-439001.avianca2000.ReporteVuelo`
+        WHERE 1=1
+         AND flight_date = '2025-03-07' AND flight_number = 'AV205' ORDER BY flight_date DESC, std DESC
+2025-03-07 22:29:02,868 - INFO - Aplicación iniciada
+2025-03-07 22:29:03,003 - INFO - Credenciales cargadas correctamente desde Streamlit Secrets.
+2025-03-07 22:29:03,004 - INFO - BigQuery client initialized successfully.
+2025-03-07 22:29:03,757 - INFO - Ejecutando consulta: 
+        SELECT *
+        FROM `unfc-439001.avianca2000.ReporteVuelo`
+        WHERE 1=1
+         AND flight_date = '2025-03-07' AND flight_number = 'AV205' ORDER BY flight_date DESC, std DESC

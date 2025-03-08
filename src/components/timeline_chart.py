@@ -699,29 +699,45 @@ def render_timeline_tab(client):
         # Mostrar información del vuelo
         st.subheader("Información del Vuelo")
         
+        # Primera fila de información básica
         col1, col2, col3 = st.columns(3)
         
         with col1:
             st.write(f"**Fecha:** {flight_to_display.get('flight_date')}")
             st.write(f"**Vuelo:** {flight_to_display.get('flight_number', 'N/A')}")
+            st.write(f"**Gate:** {flight_to_display.get('gate', 'N/A')}")
         
         with col2:
             st.write(f"**Origen:** {flight_to_display.get('origin', 'N/A')}")
             st.write(f"**Destino:** {flight_to_display.get('destination', 'N/A')}")
+            st.write(f"**Carrousel:** {flight_to_display.get('carrousel', 'N/A')}")
         
         with col3:
-            st.write(f"**Gate:** {flight_to_display.get('gate', 'N/A')}")
             st.write(f"**PAX Total:** {flight_to_display.get('pax_ob_total', 'N/A')}")
+            st.write(f"**Customs In:** {flight_to_display.get('customs_in', 'N/A')}")
         
-        # Mostrar códigos de demora y comentarios si existen
-        if flight_to_display.get('delay_code'):
-            st.write(f"**Código de Demora:** {flight_to_display.get('delay_code')}")
-        
-        if flight_to_display.get('comments'):
-            st.write(f"**Comentarios:** {flight_to_display.get('comments')}")
+        # Segunda fila para información adicional
+        if any(field for field in [
+            flight_to_display.get('delay'), 
+            flight_to_display.get('delay_code'),
+            flight_to_display.get('comments'),
+            flight_to_display.get('WCHR')
+        ]):
+            st.markdown("---")  # Separador
             
-        if flight_to_display.get('WCHR'):
-            st.write(f"**WCHR:** {flight_to_display.get('WCHR')}")
+            col4, col5 = st.columns(2)
+            
+            with col4:
+                if flight_to_display.get('delay'):
+                    st.write(f"**Delay:** {flight_to_display.get('delay')}")
+                if flight_to_display.get('delay_code'):
+                    st.write(f"**Código de Demora:** {flight_to_display.get('delay_code')}")
+            
+            with col5:
+                if flight_to_display.get('comments'):
+                    st.write(f"**Comentarios:** {flight_to_display.get('comments')}")
+                if flight_to_display.get('WCHR'):
+                    st.write(f"**WCHR:** {flight_to_display.get('WCHR')}")
         
         # Tabla de horarios
         st.subheader("Horarios de Eventos")
