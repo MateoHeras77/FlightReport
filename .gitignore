@@ -4,3 +4,5 @@ credenciales.json
 /Python
 .streamlit/
 Wpp/
+logs/
+*.pyc
