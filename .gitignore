@@ -6,3 +6,5 @@ credenciales.json
 Wpp/
 logs/
 *.pyc
+*.toml
+*.txt
