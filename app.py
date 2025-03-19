@@ -53,14 +53,43 @@ with tab1:
         st.subheader("📑 Revisión de Datos")
         display_data = st.session_state.form_data["data_to_display"]
 
-        # Mostrar los datos en columnas
+        # Agrupar los datos por categorías más lógicas
+        operation_times = {k: v for k, v in display_data.items() if k in [
+            'std', 'atd', 'groomers_in', 'groomers_out', 'crew_at_gate',
+            'ok_to_board', 'flight_secure', 'cierre_de_puerta', 'push_back'
+        ]}
+        flight_info = {k: v for k, v in display_data.items() if any(x in k.lower() for x in ['flight', 'route', 'aircraft']) and k not in operation_times}
+        other_info = {k: v for k, v in display_data.items() if k not in operation_times and k not in flight_info}
+
+        # Mostrar información de tiempos de operación
+        st.subheader("⏰ Tiempos de Operación")
         cols = st.columns(3)
-        keys = list(display_data.keys())
-        for i, key in enumerate(keys):
-            cols[i % 3].write(f"**{key}:** {display_data[key]}")
+        for i, (key, value) in enumerate(operation_times.items()):
+            cols[i % 3].write(f"*{key}:* {value}")
+
+        # Mostrar información del vuelo
+        st.subheader("✈️ Información del Vuelo")
+        cols = st.columns(3)
+        for i, (key, value) in enumerate(flight_info.items()):
+            cols[i % 3].write(f"*{key}:* {value}")
+
+        # Mostrar información adicional
+        if other_info:
+            st.subheader("📝 Otros Detalles")
+            cols = st.columns(3)
+            for i, (key, value) in enumerate(other_info.items()):
+                cols[i % 3].write(f"*{key}:* {value}")
 
         # Mostrar el reporte completo y botón para copiar
-        report_text = "\n".join([f"{k}: {display_data[k]}" for k in keys])
+        st.subheader("📋 Reporte Final")
+        report_text = "\n".join([
+            "⏰ TIEMPOS DE OPERACIÓN",
+            *[f"*{k}:* {v}" for k, v in operation_times.items()],
+            "\n✈️ INFORMACIÓN DEL VUELO",
+            *[f"*{k}:* {v}" for k, v in flight_info.items()],
+            "\n📝 OTROS DETALLES",
+            *[f"*{k}:* {v}" for k, v in other_info.items()]
+        ])
         st.text_area("Reporte Final", value=report_text, height=200)
         create_copy_button(report_text)
 
