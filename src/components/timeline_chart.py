@@ -570,7 +570,7 @@ def create_gantt_chart(flight_data: Dict[str, Any]) -> Optional[go.Figure]:
         st.error(f"Error al crear diagrama: {str(e)}")
         return None
 
-def fetch_flight_data_for_chart(client, date=None, flight_number=None):
+def fetch_flight_data_for_chart(client, date=None, flight_number=None, created_at=None):
     """
     Obtiene datos de vuelos desde Supabase con filtros opcionales.
     
@@ -578,6 +578,7 @@ def fetch_flight_data_for_chart(client, date=None, flight_number=None):
         client: Cliente de Supabase
         date: Fecha para filtrar (opcional)
         flight_number: Número de vuelo para filtrar (opcional)
+        created_at: Timestamp de creación para filtrar (opcional)
         
     Returns:
         List[Dict]: Lista de datos de vuelos
@@ -596,6 +597,11 @@ def fetch_flight_data_for_chart(client, date=None, flight_number=None):
             # Registrar el número de vuelo para depuración
             logger.info(f"Filtrando por vuelo: {flight_number}")
             query = query.eq("flight_number", flight_number)
+        
+        if created_at:
+            # Registrar el timestamp de creación para depuración
+            logger.info(f"Filtrando por timestamp de creación: {created_at}")
+            query = query.eq("created_at", created_at)
             
         # Ordenar resultados
         query = query.order("flight_date", desc=True).order("std", desc=True)
@@ -692,8 +698,47 @@ def render_timeline_tab(client):
         # Mostrar filtros aplicados para depuración
         logger.info(f"Filtros aplicados - Fecha: {date_filter}, Vuelo: {flight_filter}")
         
-        # Obtener datos según filtros
-        flights_data = fetch_flight_data_for_chart(client, date_filter, flight_filter)
+        # Obtener datos preliminares según los dos primeros filtros para el tercer filtro
+        preliminary_data = fetch_flight_data_for_chart(client, date_filter, flight_filter)
+        
+        # Tercer filtro: created_at (condicionado a los dos primeros filtros)
+        created_at_filter = None
+        if preliminary_data:
+            # Extraer timestamps de creación únicos
+            created_at_values = []
+            for item in preliminary_data:
+                if 'created_at' in item and item['created_at']:
+                    # Formatear el timestamp para mostrar fecha y hora completa
+                    try:
+                        dt = datetime.fromisoformat(item['created_at'].replace('Z', '+00:00'))
+                        formatted_dt = dt.strftime("%Y-%m-%d %H:%M:%S")
+                        created_at_values.append((formatted_dt, item['created_at']))
+                    except Exception as e:
+                        logger.error(f"Error al formatear timestamp: {e}")
+                        created_at_values.append((str(item['created_at']), item['created_at']))
+            
+            # Ordenar por timestamp (más reciente primero)
+            created_at_values = sorted(set(created_at_values), key=lambda x: x[0], reverse=True)
+            
+            # Si hay timestamps disponibles, mostrar el filtro
+            if created_at_values:
+                display_values = ["Todos"] + [dt[0] for dt in created_at_values]
+                raw_values = [None] + [dt[1] for dt in created_at_values]
+                
+                selected_index = st.selectbox(
+                    "Seleccione timestamp de creación:",
+                    options=display_values,
+                    index=0
+                )
+                
+                # Obtener el valor raw correspondiente al valor seleccionado
+                if selected_index != "Todos":
+                    selected_idx = display_values.index(selected_index)
+                    created_at_filter = raw_values[selected_idx]
+                    logger.info(f"Filtrando por timestamp de creación: {created_at_filter}")
+        
+        # Obtener datos finales con los tres filtros
+        flights_data = fetch_flight_data_for_chart(client, date_filter, flight_filter, created_at_filter)
         
         if not flights_data:
             st.warning("No se encontraron vuelos con los filtros seleccionados.")
@@ -702,10 +747,20 @@ def render_timeline_tab(client):
         # Si hay más de un vuelo, permitir seleccionar cuál visualizar
         if len(flights_data) > 1:
             # Crear opciones para mostrar en selectbox
-            flight_options = [
-                f"{flight.get('flight_date')} - {flight.get('flight_number')} ({flight.get('origin', 'N/A')} → {flight.get('destination', 'N/A')})"
-                for flight in flights_data
-            ]
+            flight_options = []
+            for flight in flights_data:
+                option_text = f"{flight.get('flight_date')} - {flight.get('flight_number')} ({flight.get('origin', 'N/A')} → {flight.get('destination', 'N/A')})"
+                
+                # Añadir timestamp de creación si existe
+                if 'created_at' in flight and flight['created_at']:
+                    try:
+                        dt = datetime.fromisoformat(flight['created_at'].replace('Z', '+00:00'))
+                        created_at_str = dt.strftime("%Y-%m-%d %H:%M:%S")
+                        option_text += f" - Creado: {created_at_str}"
+                    except Exception as e:
+                        option_text += f" - Creado: {str(flight['created_at'])}"
+                        
+                flight_options.append(option_text)
             
             selected_flight_idx = st.selectbox(
                 "Seleccione el vuelo a visualizar:",
@@ -736,6 +791,15 @@ def render_timeline_tab(client):
         with col3:
             st.write(f"**PAX Total:** {flight_to_display.get('pax_ob_total', 'N/A')}")
             st.write(f"**Customs In:** {flight_to_display.get('customs_in', 'N/A')}")
+            
+            # Mostrar timestamp de creación si existe
+            if 'created_at' in flight_to_display and flight_to_display['created_at']:
+                try:
+                    dt = datetime.fromisoformat(flight_to_display['created_at'].replace('Z', '+00:00'))
+                    created_at_str = dt.strftime("%Y-%m-%d %H:%M:%S")
+                    st.write(f"**Creado:** {created_at_str}")
+                except Exception as e:
+                    st.write(f"**Creado:** {flight_to_display['created_at']}")
         
         # Segunda fila para información adicional
         if any(field for field in [

@@ -8,3 +8,4 @@ logs/
 *.pyc
 *.toml
 *.txt
+*.bat
