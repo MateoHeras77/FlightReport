@@ -1,6 +1,6 @@
 # Avianca - Sistema de Reporte de Vuelos
 
-Aplicación desarrollada en Streamlit para la gestión y envío de reportes de vuelos de Avianca a BigQuery.
+Aplicación desarrollada en Streamlit para la gestión y envío de reportes de vuelos de Avianca a Supabase.
 
 ## Estructura del Proyecto
 
@@ -11,13 +11,14 @@ avianca/
 ├── logs/                   # Directorio para archivos de log
 └── src/                    # Código fuente de la aplicación
     ├── components/         # Componentes UI de Streamlit
-    │   └── flight_form.py  # Formulario de vuelo
+    │   ├── flight_form.py  # Formulario de vuelo
+    │   └── timeline_chart.py # Visualización de línea de tiempo
     ├── config/             # Configuraciones
-    │   ├── bigquery_config.py  # Configuración de BigQuery
+    │   ├── supabase_config.py  # Configuración de Supabase
     │   └── logging_config.py   # Configuración de logging
     ├── models/             # Modelos de datos
     ├── services/           # Servicios externos
-    │   └── bigquery_service.py  # Servicios para BigQuery
+    │   └── supabase_service.py  # Servicios para Supabase
     └── utils/              # Utilidades
         └── form_utils.py   # Utilidades para formularios
 ```
@@ -26,7 +27,7 @@ avianca/
 
 - Python 3.8 o superior
 - Streamlit
-- Google Cloud BigQuery
+- Supabase
 - Otras dependencias en `requirements.txt`
 
 ## Instalación
@@ -39,8 +40,8 @@ pip install -r requirements.txt
 ```
 
 3. Configurar credenciales:
-   - Crear un archivo `.streamlit/secrets.toml` con las credenciales de Google Cloud
-   - O configurar las credenciales en la plataforma donde se despliega Streamlit
+   - Crear un archivo `.streamlit/secrets.toml` con las credenciales de Supabase
+   - Ver `example_secrets.toml` para un ejemplo de configuración
 
 ## Ejecución
 
@@ -54,6 +55,6 @@ streamlit run app.py
 
 Los logs se almacenan en el directorio `logs/` con archivos diarios con formato `app_YYYY-MM-DD.log`.
 
-## BigQuery
+## Supabase
 
-La aplicación envía datos a la tabla `unfc-439001.avianca2000.Reportes` en BigQuery. Esta tabla debe estar configurada con las columnas apropiadas para recibir los datos del formulario.
+La aplicación envía datos a la tabla `FlightReport` en Supabase. Esta tabla debe estar configurada con las columnas apropiadas para recibir los datos del formulario.
