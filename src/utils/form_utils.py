@@ -23,9 +23,9 @@ def validate_time_field(time_str: str, field_name: str):
         return (False, f"El campo {field_name} tiene formato inválido. Use HH:MM.")
 
 
-def format_time_for_bigquery(time_str: str) -> str:
+def format_time_for_database(time_str: str) -> str:
     """
-    Convierte HH:MM a HH:MM:SS para BigQuery.
+    Convierte HH:MM a HH:MM:SS para la base de datos.
     
     Args:
         time_str (str): Tiempo en formato HH:MM

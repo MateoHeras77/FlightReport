@@ -2,7 +2,7 @@ import datetime
 import streamlit as st
 from typing import Dict, Any, Tuple
 
-from src.utils.form_utils import validate_time_field, format_time_for_bigquery
+from src.utils.form_utils import validate_time_field, format_time_for_database
 from src.config.logging_config import setup_logger
 
 # Configurar logger
@@ -137,21 +137,21 @@ def process_form_data(
     if not all_valid:
         return False, None
 
-    # Preparar datos para BigQuery y visualización
-    bigquery_data = {
+    # Preparar datos para la base de datos y visualización
+    database_data = {
         "flight_date": flight_date.isoformat(),
         "origin": origin,
         "destination": destination,
         "flight_number": flight_number,
-        "std": format_time_for_bigquery(normalized_times["STD"]),
-        "atd": format_time_for_bigquery(normalized_times["ATD"]),
-        "groomers_in": format_time_for_bigquery(normalized_times["Groomers In"]),
-        "groomers_out": format_time_for_bigquery(normalized_times["Groomers Out"]),
-        "crew_at_gate": format_time_for_bigquery(normalized_times["Crew at Gate"]),
-        "ok_to_board": format_time_for_bigquery(normalized_times["OK to Board"]),
-        "flight_secure": format_time_for_bigquery(normalized_times["Flight Secure"]),
-        "cierre_de_puerta": format_time_for_bigquery(normalized_times["Cierre de Puerta"]),
-        "push_back": format_time_for_bigquery(normalized_times["Push Back"]),
+        "std": format_time_for_database(normalized_times["STD"]),
+        "atd": format_time_for_database(normalized_times["ATD"]),
+        "groomers_in": format_time_for_database(normalized_times["Groomers In"]),
+        "groomers_out": format_time_for_database(normalized_times["Groomers Out"]),
+        "crew_at_gate": format_time_for_database(normalized_times["Crew at Gate"]),
+        "ok_to_board": format_time_for_database(normalized_times["OK to Board"]),
+        "flight_secure": format_time_for_database(normalized_times["Flight Secure"]),
+        "cierre_de_puerta": format_time_for_database(normalized_times["Cierre de Puerta"]),
+        "push_back": format_time_for_database(normalized_times["Push Back"]),
         "pax_ob_total": pax_ob_total,
         "customs_in": customs_in,
         "delay": delay,
@@ -163,7 +163,7 @@ def process_form_data(
     }
     
     # Revertir formato de tiempo para visualización
-    display_data = bigquery_data.copy()
+    display_data = database_data.copy()
     for key in normalized_times.keys():
         field_name = key.lower().replace(" ", "_")
         if display_data[field_name]:
@@ -172,5 +172,5 @@ def process_form_data(
     logger.info("Datos del formulario procesados y validados correctamente")
     return True, {
         "data_to_display": display_data,
-        "data_for_bigquery": bigquery_data
+        "data_for_database": database_data
     }

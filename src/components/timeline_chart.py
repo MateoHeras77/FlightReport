@@ -3,12 +3,11 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 from datetime import datetime, timedelta, time
-import numpy as np
-from typing import Dict, List, Any, Optional
 import json
+from typing import Dict, List, Any, Optional
 
 from src.config.logging_config import setup_logger
-from src.config.bigquery_config import DEFAULT_TABLE_ID
+from src.config.supabase_config import DEFAULT_TABLE_NAME
 
 # Configurar logger
 logger = setup_logger()
@@ -573,10 +572,10 @@ def create_gantt_chart(flight_data: Dict[str, Any]) -> Optional[go.Figure]:
 
 def fetch_flight_data_for_chart(client, date=None, flight_number=None):
     """
-    Obtiene datos de vuelos desde BigQuery con filtros opcionales.
+    Obtiene datos de vuelos desde Supabase con filtros opcionales.
     
     Args:
-        client: Cliente de BigQuery
+        client: Cliente de Supabase
         date: Fecha para filtrar (opcional)
         flight_number: Número de vuelo para filtrar (opcional)
         
@@ -584,33 +583,42 @@ def fetch_flight_data_for_chart(client, date=None, flight_number=None):
         List[Dict]: Lista de datos de vuelos
     """
     try:
-        # Construir consulta SQL con filtros opcionales
-        query = f"""
-        SELECT *
-        FROM `{DEFAULT_TABLE_ID}`
-        WHERE 1=1
-        """
+        # Iniciar consulta a Supabase
+        query = client.table(DEFAULT_TABLE_NAME).select("*")
         
+        # Aplicar filtros si existen
         if date:
-            query += f" AND flight_date = '{date}'"
+            # Registrar la fecha para depuración
+            logger.info(f"Filtrando por fecha: {date} (tipo: {type(date).__name__})")
+            query = query.eq("flight_date", date)
         
         if flight_number:
-            query += f" AND flight_number = '{flight_number}'"
+            # Registrar el número de vuelo para depuración
+            logger.info(f"Filtrando por vuelo: {flight_number}")
+            query = query.eq("flight_number", flight_number)
             
-        query += " ORDER BY flight_date DESC, std DESC"
+        # Ordenar resultados
+        query = query.order("flight_date", desc=True).order("std", desc=True)
         
-        logger.info(f"Ejecutando consulta: {query}")
+        logger.info(f"Ejecutando consulta a Supabase en tabla: {DEFAULT_TABLE_NAME}")
         
         # Ejecutar consulta
-        query_job = client.query(query)
-        results = query_job.result()
+        response = query.execute()
+        
+        # Verificar si hay errores
+        if hasattr(response, 'error') and response.error is not None:
+            logger.error(f"Error en la consulta a Supabase: {response.error}")
+            return []
         
         # Convertir resultados a lista de diccionarios
-        flights_data = []
-        for row in results:
-            flight_dict = dict(row.items())
-            flights_data.append(flight_dict)
-            
+        flights_data = response.data
+        
+        # Registrar la cantidad de resultados para depuración
+        logger.info(f"Consulta exitosa. Resultados obtenidos: {len(flights_data)}")
+        if len(flights_data) > 0:
+            # Mostrar las claves del primer resultado para depuración
+            logger.info(f"Claves disponibles en los datos: {list(flights_data[0].keys())}")
+        
         return flights_data
     except Exception as e:
         logger.exception(f"Error al obtener datos de vuelo: {e}")
@@ -622,33 +630,43 @@ def render_timeline_tab(client):
     Renderiza la pestaña de visualización de línea de tiempo.
     
     Args:
-        client: Cliente de BigQuery inicializado
+        client: Cliente de Supabase inicializado
     """
-    st.header("📊 Visualización de Eventos de Vuelo")
+    st.header("Visualización de Eventos de Vuelo")
     
     if not client:
-        st.error("No hay conexión con BigQuery. Verifique la configuración.")
+        st.error("No hay conexión con Supabase. Verifique la configuración.")
         return
     
     # Obtener todas las fechas y números de vuelo disponibles para los filtros
     try:
-        dates_query = f"""
-        SELECT DISTINCT flight_date 
-        FROM `{DEFAULT_TABLE_ID}` 
-        ORDER BY flight_date DESC
-        """
+        # Consulta para fechas únicas
+        logger.info(f"Consultando fechas únicas en tabla: {DEFAULT_TABLE_NAME}")
+        dates_response = client.table(DEFAULT_TABLE_NAME).select("flight_date").execute()
         
-        flights_query = f"""
-        SELECT DISTINCT flight_number 
-        FROM `{DEFAULT_TABLE_ID}` 
-        ORDER BY flight_number
-        """
+        # Consulta para números de vuelo únicos
+        logger.info(f"Consultando números de vuelo únicos en tabla: {DEFAULT_TABLE_NAME}")
+        flights_response = client.table(DEFAULT_TABLE_NAME).select("flight_number").execute()
         
-        dates_job = client.query(dates_query)
-        flights_job = client.query(flights_query)
+        if hasattr(dates_response, 'error') and dates_response.error is not None:
+            logger.error(f"Error al obtener fechas: {dates_response.error}")
+            dates = []
+        else:
+            # Extraer fechas únicas
+            logger.info(f"Datos de fechas obtenidos: {len(dates_response.data)}")
+            all_dates = [item['flight_date'] for item in dates_response.data]
+            dates = sorted(list(set(all_dates)), reverse=True)
+            logger.info(f"Fechas únicas encontradas: {dates}")
         
-        dates = [row.flight_date.isoformat() for row in dates_job.result()]
-        flight_numbers = [row.flight_number for row in flights_job.result()]
+        if hasattr(flights_response, 'error') and flights_response.error is not None:
+            logger.error(f"Error al obtener números de vuelo: {flights_response.error}")
+            flight_numbers = []
+        else:
+            # Extraer números de vuelo únicos
+            logger.info(f"Datos de vuelos obtenidos: {len(flights_response.data)}")
+            all_flights = [item['flight_number'] for item in flights_response.data]
+            flight_numbers = sorted(list(set(all_flights)))
+            logger.info(f"Números de vuelo únicos encontrados: {flight_numbers}")
         
         # Filtros para seleccionar fecha y vuelo
         col1, col2 = st.columns(2)
@@ -670,6 +688,9 @@ def render_timeline_tab(client):
         # Convertir "Todas"/"Todos" a None para la función de búsqueda
         date_filter = None if selected_date == "Todas" else selected_date
         flight_filter = None if selected_flight == "Todos" else selected_flight
+        
+        # Mostrar filtros aplicados para depuración
+        logger.info(f"Filtros aplicados - Fecha: {date_filter}, Vuelo: {flight_filter}")
         
         # Obtener datos según filtros
         flights_data = fetch_flight_data_for_chart(client, date_filter, flight_filter)

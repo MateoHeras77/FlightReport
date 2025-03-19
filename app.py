@@ -8,11 +8,11 @@ load_dotenv()  # Cargar variables de entorno desde .env
 
 # Importar módulos propios
 from src.config.logging_config import setup_logger
-from src.config.bigquery_config import initialize_bigquery_client, DEFAULT_TABLE_ID
+from src.config.supabase_config import initialize_supabase_client, DEFAULT_TABLE_NAME
 from src.components.flight_form import render_flight_form
 from src.components.timeline_chart import render_timeline_tab
 from src.utils.form_utils import create_copy_button
-from src.services.bigquery_service import send_data_to_bigquery
+from src.services.supabase_service import send_data_to_supabase
 
 # Configurar logger
 logger = setup_logger()
@@ -25,8 +25,8 @@ st.set_page_config(
     layout="wide"
 )
 
-# Inicializar cliente de BigQuery
-client, project_id, error_msg = initialize_bigquery_client()
+# Inicializar cliente de Supabase
+client, project_ref, error_msg = initialize_supabase_client()
 if error_msg:
     st.error(error_msg)
 
@@ -64,13 +64,13 @@ with tab1:
         st.text_area("Reporte Final", value=report_text, height=200)
         create_copy_button(report_text)
 
-        # Botón para enviar a BigQuery
+        # Botón para enviar a Supabase
         if st.button("Enviar y Finalizar"):
-            bigquery_data = st.session_state.form_data["data_for_bigquery"]
-            success, error_message = send_data_to_bigquery(client, DEFAULT_TABLE_ID, bigquery_data)
+            database_data = st.session_state.form_data["data_for_database"]
+            success, error_message = send_data_to_supabase(client, DEFAULT_TABLE_NAME, database_data)
             
             if success:
-                st.success("Datos enviados exitosamente a BigQuery")
+                st.success("Datos enviados exitosamente a la base de datos")
             else:
                 st.error(f"Error al enviar datos: {error_message}")
 
