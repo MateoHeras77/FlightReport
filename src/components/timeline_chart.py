@@ -68,6 +68,28 @@ def handle_midnight_crossover(events_dict: Dict[str, datetime], flight_date: dat
     if not valid_times:
         return events_dict
         
+    # Identificar eventos clave para determinar si el vuelo es nocturno
+    # Generalmente los primeros eventos (groomers_in, crew_at_gate) ocurren antes
+    early_events = ["groomers_in", "crew_at_gate"]
+    late_events = ["flight_secure", "cierre_de_puerta", "push_back", "atd"]
+    
+    early_times = [events_dict[e] for e in early_events if e in events_dict and events_dict[e] is not None]
+    late_times = [events_dict[e] for e in late_events if e in events_dict and events_dict[e] is not None]
+    
+    # Si hay eventos tempranos y tardíos, y los tempranos tienen hora mayor (ej. 23:00)
+    # que los tardíos (ej. 01:00), entonces estamos cruzando la medianoche
+    is_overnight = False
+    if early_times and late_times:
+        avg_early = sum((dt.hour * 60 + dt.minute) for dt in early_times) / len(early_times)
+        avg_late = sum((dt.hour * 60 + dt.minute) for dt in late_times) / len(late_times)
+        
+        # Si el promedio de horas tempranas es mayor que el de horas tardías,
+        # probablemente estamos cruzando la medianoche
+        if avg_early > avg_late and avg_early > 20 * 60 and avg_late < 4 * 60:  # 20:00 y 04:00
+            is_overnight = True
+            logger.info(f"Detectado vuelo nocturno: eventos tempranos ~{avg_early/60:.1f}h, eventos tardíos ~{avg_late/60:.1f}h")
+    
+    # Enfoque tradicional: usar la hora mínima como referencia
     min_time = min(valid_times)
     adjusted_dict = {}
     
@@ -76,15 +98,20 @@ def handle_midnight_crossover(events_dict: Dict[str, datetime], flight_date: dat
             adjusted_dict[event] = None
             continue
             
-        # Si hay una diferencia de más de 12 horas con la hora mínima
-        # asumimos que el evento ocurrió el día anterior o siguiente
-        hours_diff = (event_time - min_time).total_seconds() / 3600
-        if hours_diff > 12:
-            adjusted_dict[event] = event_time - timedelta(days=1)
-        elif hours_diff < -12:
+        # Si detectamos que es un vuelo nocturno y este es un evento tardío con hora temprana
+        if is_overnight and event in late_events and event_time.hour < 12:
+            # Añadir un día para que sea posterior a los eventos tempranos
             adjusted_dict[event] = event_time + timedelta(days=1)
+            logger.info(f"Ajustando evento nocturno {event}: {event_time} -> {adjusted_dict[event]}")
         else:
-            adjusted_dict[event] = event_time
+            # Enfoque tradicional: verificar diferencia de horas
+            hours_diff = (event_time - min_time).total_seconds() / 3600
+            if hours_diff > 12:
+                adjusted_dict[event] = event_time - timedelta(days=1)
+            elif hours_diff < -12:
+                adjusted_dict[event] = event_time + timedelta(days=1)
+            else:
+                adjusted_dict[event] = event_time
             
     return adjusted_dict
 
@@ -93,12 +120,16 @@ def create_cascade_timeline_chart(flight_data: Dict[str, Any]) -> Optional[go.Fi
     Crea una gráfica de cascada con los eventos del vuelo.
     
     Args:
-        flight_data: Diccionario con los datos del vuelo
+        flight_data: Diccionario con los datos del vuelo o lista de diccionarios para múltiples vuelos
         
     Returns:
         go.Figure: Gráfica de línea de tiempo
     """
     try:
+        # Determinar si estamos manejando un solo vuelo o múltiples vuelos
+        is_multiple_flights = isinstance(flight_data, list)
+        flights_to_process = flight_data if is_multiple_flights else [flight_data]
+        
         # Eventos a mostrar en el orden correcto
         events = [
             "groomers_in", "groomers_out", "crew_at_gate", "ok_to_board", 
@@ -118,26 +149,43 @@ def create_cascade_timeline_chart(flight_data: Dict[str, Any]) -> Optional[go.Fi
             "push_back": "Push Back"
         }
         
-        # Convertir fechas y horas a objetos datetime
-        flight_date = flight_data.get("flight_date")
-        if not flight_date:
-            st.error("No hay fecha de vuelo disponible")
-            return None
+        if is_multiple_flights:
+            # Calcular tiempos promedio para múltiples vuelos
+            average_times = calculate_average_event_times(flights_to_process)
             
-        # Convertir a string si es un objeto datetime.date
-        if hasattr(flight_date, 'isoformat'):
-            flight_date = flight_date.isoformat()
+            if not average_times:
+                st.warning("No hay suficientes datos para calcular tiempos promedio")
+                return None
             
-        events_dict = {}
-        for event in events:
-            time_obj = flight_data.get(event)
-            if time_obj:
-                events_dict[event] = convert_time_string_to_datetime(flight_date, time_obj)
-            else:
-                events_dict[event] = None
+            # Crear un diccionario con los tiempos promedio
+            events_dict = average_times
+            
+            # Usar la fecha del primer vuelo como referencia
+            reference_date = flights_to_process[0].get("flight_date")
+            if not reference_date:
+                st.error("No hay fecha de vuelo disponible")
+                return None
+        else:
+            # Procesar un solo vuelo
+            flight_date = flight_data.get("flight_date")
+            if not flight_date:
+                st.error("No hay fecha de vuelo disponible")
+                return None
                 
-        # Manejar eventos que cruzan la medianoche
-        events_dict = handle_midnight_crossover(events_dict, flight_date)
+            # Convertir a string si es un objeto datetime.date
+            if hasattr(flight_date, 'isoformat'):
+                flight_date = flight_date.isoformat()
+                
+            events_dict = {}
+            for event in events:
+                time_obj = flight_data.get(event)
+                if time_obj:
+                    events_dict[event] = convert_time_string_to_datetime(flight_date, time_obj)
+                else:
+                    events_dict[event] = None
+                    
+            # Manejar eventos que cruzan la medianoche
+            events_dict = handle_midnight_crossover(events_dict, flight_date)
         
         # Filtrar eventos nulos
         events_dict = {k: v for k, v in events_dict.items() if v is not None}
@@ -151,50 +199,6 @@ def create_cascade_timeline_chart(flight_data: Dict[str, Any]) -> Optional[go.Fi
             [(event, time) for event, time in events_dict.items()],
             key=lambda x: x[1]
         )
-        
-        # Verificar eventos con la misma hora de inicio
-        modified_sorted_events = []
-        i = 0
-        while i < len(sorted_events):
-            current_event, current_time = sorted_events[i]
-            
-            # Si es el último evento o el siguiente evento tiene tiempo diferente, no hay problema
-            if i == len(sorted_events) - 1 or sorted_events[i+1][1] != current_time:
-                modified_sorted_events.append((current_event, current_time))
-                i += 1
-                continue
-            
-            # Grupo de eventos con la misma hora de inicio
-            same_time_events = [(current_event, current_time)]
-            
-            # Encuentra todos los eventos que ocurren al mismo tiempo
-            j = i + 1
-            while j < len(sorted_events) and sorted_events[j][1] == current_time:
-                same_time_events.append(sorted_events[j])
-                j += 1
-            
-            # Determinar la hora de fin para estos eventos
-            end_time = None
-            if j < len(sorted_events):
-                end_time = sorted_events[j][1]  # El siguiente evento con diferente hora
-            else:
-                # Si todos los eventos restantes tienen la misma hora, añadir un pequeño incremento
-                end_time = current_time + timedelta(minutes=5)
-            
-            # Distribuir los eventos uniformemente en el intervalo
-            interval = (end_time - current_time) / len(same_time_events)
-            
-            for k, (event, _) in enumerate(same_time_events):
-                if k == len(same_time_events) - 1:
-                    # El último evento de este grupo termina en el tiempo final
-                    modified_sorted_events.append((event, current_time + k * interval))
-                else:
-                    # Los demás eventos tienen duración uniforme
-                    modified_sorted_events.append((event, current_time + k * interval))
-            
-            i = j  # Saltar al siguiente grupo de eventos
-        
-        sorted_events = modified_sorted_events
         
         # Crear la figura
         fig = go.Figure()
@@ -224,7 +228,7 @@ def create_cascade_timeline_chart(flight_data: Dict[str, Any]) -> Optional[go.Fi
             # Calcular la duración en minutos
             duration_minutes = max(1, (next_time - current_time).total_seconds() / 60)  # Mínimo 1 minuto
             
-            # Crear barra para el evento actual (ahora el eje Y tiene los tiempos y el eje X los eventos)
+            # Crear barra para el evento actual
             fig.add_trace(go.Bar(
                 y=[duration_minutes],  # Duración en minutos como valor numérico para el eje Y
                 x=[event_labels[current_event]],  # Evento en el eje X
@@ -267,7 +271,7 @@ def create_cascade_timeline_chart(flight_data: Dict[str, Any]) -> Optional[go.Fi
         # Crear rangos de tiempo para el eje Y
         time_range = pd.date_range(plot_min_time, plot_max_time, freq='15min')
         
-        # Ordenar los nombres de los eventos según su secuencia operativa, no por tiempo
+        # Ordenar los nombres de los eventos según su secuencia operativa
         operational_order = [
             "groomers_in", "groomers_out", "crew_at_gate", "ok_to_board", 
             "flight_secure", "cierre_de_puerta", "push_back", "std", "atd"
@@ -277,8 +281,14 @@ def create_cascade_timeline_chart(flight_data: Dict[str, Any]) -> Optional[go.Fi
         operational_order = [e for e in operational_order if e in events_dict]
         
         # Formato del gráfico
+        title = "Secuencia de Eventos"
+        if is_multiple_flights:
+            title += f" - Promedio de {len(flights_to_process)} Vuelos"
+        else:
+            title += f" - Vuelo {flight_data.get('flight_number', 'N/A')} ({flight_data.get('flight_date', 'N/A')})"
+            
         fig.update_layout(
-            title=f"Secuencia de Eventos - Vuelo {flight_data.get('flight_number', 'N/A')} ({flight_date})",
+            title=title,
             yaxis=dict(  # Ahora el eje Y es el tiempo
                 title='Hora',
                 tickformat='%H:%M',
@@ -318,17 +328,112 @@ def create_cascade_timeline_chart(flight_data: Dict[str, Any]) -> Optional[go.Fi
         st.error(f"Error al crear gráfico: {str(e)}")
         return None
 
+def calculate_average_event_times(flights_data: List[Dict[str, Any]]) -> Dict[str, datetime]:
+    """
+    Calcula los tiempos promedio para cada evento considerando cruces de medianoche.
+    
+    Args:
+        flights_data: Lista de diccionarios con datos de vuelos
+        
+    Returns:
+        Dict[str, datetime]: Diccionario con eventos y sus tiempos promedio
+    """
+    try:
+        # Eventos a procesar
+        events = [
+            "groomers_in", "groomers_out", "crew_at_gate", "ok_to_board", 
+            "flight_secure", "cierre_de_puerta", "push_back", "std", "atd"
+        ]
+        
+        # Diccionario para almacenar todos los tiempos por evento
+        event_times = {event: [] for event in events}
+        
+        # Procesar cada vuelo
+        for flight in flights_data:
+            flight_date = flight.get("flight_date")
+            if not flight_date:
+                continue
+                
+            # Convertir tiempos a datetime
+            for event in events:
+                time_obj = flight.get(event)
+                if time_obj:
+                    dt = convert_time_string_to_datetime(flight_date, time_obj)
+                    if dt:
+                        event_times[event].append(dt)
+        
+        # Calcular promedios considerando cruces de medianoche
+        average_times = {}
+        
+        for event, times in event_times.items():
+            if not times:
+                continue
+                
+            # Ordenar tiempos
+            sorted_times = sorted(times)
+            
+            # Detectar si hay cruces de medianoche
+            is_overnight = False
+            for i in range(len(sorted_times) - 1):
+                if (sorted_times[i+1] - sorted_times[i]).total_seconds() > 12 * 3600:  # Más de 12 horas de diferencia
+                    is_overnight = True
+                    break
+            
+            if is_overnight:
+                # Para cruces de medianoche, ajustar tiempos
+                adjusted_times = []
+                for i, t in enumerate(sorted_times):
+                    if i > 0 and (t - sorted_times[i-1]).total_seconds() > 12 * 3600:
+                        # Si hay un salto grande, ajustar el tiempo actual
+                        adjusted_times.append(t - timedelta(days=1))
+                    else:
+                        adjusted_times.append(t)
+                
+                # Calcular promedio de tiempos ajustados
+                total_seconds = sum(t.hour * 3600 + t.minute * 60 + t.second for t in adjusted_times)
+                avg_seconds = total_seconds / len(adjusted_times)
+                
+                # Crear datetime promedio
+                avg_hour = int(avg_seconds // 3600)
+                avg_minute = int((avg_seconds % 3600) // 60)
+                avg_second = int(avg_seconds % 60)
+                
+                # Usar la fecha del primer vuelo como referencia
+                reference_date = sorted_times[0].date()
+                average_times[event] = datetime.combine(reference_date, time(avg_hour, avg_minute, avg_second))
+            else:
+                # Para vuelos normales, calcular promedio directo
+                total_seconds = sum(t.hour * 3600 + t.minute * 60 + t.second for t in sorted_times)
+                avg_seconds = total_seconds / len(sorted_times)
+                
+                avg_hour = int(avg_seconds // 3600)
+                avg_minute = int((avg_seconds % 3600) // 60)
+                avg_second = int(avg_seconds % 60)
+                
+                reference_date = sorted_times[0].date()
+                average_times[event] = datetime.combine(reference_date, time(avg_hour, avg_minute, avg_second))
+        
+        return average_times
+        
+    except Exception as e:
+        logger.exception(f"Error al calcular tiempos promedio: {e}")
+        return {}
+
 def create_gantt_chart(flight_data: Dict[str, Any]) -> Optional[go.Figure]:
     """
     Crea un diagrama de Gantt con los eventos del vuelo.
     
     Args:
-        flight_data: Diccionario con los datos del vuelo
+        flight_data: Diccionario con los datos del vuelo o lista de diccionarios para múltiples vuelos
         
     Returns:
         go.Figure: Gráfica de línea de tiempo tipo Gantt
     """
     try:
+        # Determinar si estamos manejando un solo vuelo o múltiples vuelos
+        is_multiple_flights = isinstance(flight_data, list)
+        flights_to_process = flight_data if is_multiple_flights else [flight_data]
+        
         # Eventos a mostrar en el orden correcto
         events = [
             "groomers_in", "groomers_out", "crew_at_gate", "ok_to_board", 
@@ -348,26 +453,43 @@ def create_gantt_chart(flight_data: Dict[str, Any]) -> Optional[go.Figure]:
             "push_back": "Push Back"
         }
         
-        # Convertir fechas y horas a objetos datetime
-        flight_date = flight_data.get("flight_date")
-        if not flight_date:
-            st.error("No hay fecha de vuelo disponible")
-            return None
+        if is_multiple_flights:
+            # Calcular tiempos promedio para múltiples vuelos
+            average_times = calculate_average_event_times(flights_to_process)
             
-        # Convertir a string si es un objeto datetime.date
-        if hasattr(flight_date, 'isoformat'):
-            flight_date = flight_date.isoformat()
+            if not average_times:
+                st.warning("No hay suficientes datos para calcular tiempos promedio")
+                return None
             
-        events_dict = {}
-        for event in events:
-            time_obj = flight_data.get(event)
-            if time_obj:
-                events_dict[event] = convert_time_string_to_datetime(flight_date, time_obj)
-            else:
-                events_dict[event] = None
+            # Crear un diccionario con los tiempos promedio
+            events_dict = average_times
+            
+            # Usar la fecha del primer vuelo como referencia
+            reference_date = flights_to_process[0].get("flight_date")
+            if not reference_date:
+                st.error("No hay fecha de vuelo disponible")
+                return None
+        else:
+            # Procesar un solo vuelo
+            flight_date = flight_data.get("flight_date")
+            if not flight_date:
+                st.error("No hay fecha de vuelo disponible")
+                return None
                 
-        # Manejar eventos que cruzan la medianoche
-        events_dict = handle_midnight_crossover(events_dict, flight_date)
+            # Convertir a string si es un objeto datetime.date
+            if hasattr(flight_date, 'isoformat'):
+                flight_date = flight_date.isoformat()
+                
+            events_dict = {}
+            for event in events:
+                time_obj = flight_data.get(event)
+                if time_obj:
+                    events_dict[event] = convert_time_string_to_datetime(flight_date, time_obj)
+                else:
+                    events_dict[event] = None
+                    
+            # Manejar eventos que cruzan la medianoche
+            events_dict = handle_midnight_crossover(events_dict, flight_date)
         
         # Filtrar eventos nulos
         events_dict = {k: v for k, v in events_dict.items() if v is not None}
@@ -481,9 +603,9 @@ def create_gantt_chart(flight_data: Dict[str, Any]) -> Optional[go.Figure]:
         # Crear el gráfico de Gantt utilizando Express
         fig = px.timeline(
             df, 
-            x_start="Start",  # Usamos x_start (parámetro correcto)
+            x_start="Start", 
             x_end="Finish", 
-            y="Task",        # Evento en el eje Y (parámetro correcto)
+            y="Task",
             color="Task",
             color_discrete_map=colors_discrete_map,
             hover_data=["Time", "Duration"]
@@ -506,14 +628,9 @@ def create_gantt_chart(flight_data: Dict[str, Any]) -> Optional[go.Figure]:
             # Calcular el punto medio usando microsegundos para evitar problemas con los tipos Timestamp
             midpoint = pd.Timestamp(row["Start"].value / 2 + row["Finish"].value / 2)
             
-            # Alternativa: convertir a datetime para operaciones aritméticas
-            # start_dt = row["Start"].to_pydatetime()
-            # end_dt = row["Finish"].to_pydatetime()
-            # midpoint = start_dt + (end_dt - start_dt) / 2
-            
             fig.add_annotation(
-                x=midpoint,                      # Punto medio calculado correctamente
-                y=row["Task"],                  # Evento en Y
+                x=midpoint,
+                y=row["Task"],
                 text=f"{int(row['Duration'])} min",
                 showarrow=False,
                 font=dict(size=10, color="white"),
@@ -543,16 +660,22 @@ def create_gantt_chart(flight_data: Dict[str, Any]) -> Optional[go.Figure]:
         # Crear rangos de tiempo para el eje X
         time_range = pd.date_range(plot_min_time, plot_max_time, freq='15min')
         
-        # Formato final del gráfico (para mantener el eje Y invertido)
+        # Formato final del gráfico
+        title = "Secuencia de Eventos"
+        if is_multiple_flights:
+            title += f" - Promedio de {len(flights_to_process)} Vuelos"
+        else:
+            title += f" - Vuelo {flight_data.get('flight_number', 'N/A')} ({flight_data.get('flight_date', 'N/A')})"
+            
         fig.update_layout(
-            title=f"Secuencia de Eventos - Vuelo {flight_data.get('flight_number', 'N/A')} ({flight_date})",
+            title=title,
             xaxis=dict(
                 title='Hora',
                 tickformat='%H:%M',
                 tickmode='array',
                 tickvals=time_range,
                 ticktext=[t.strftime('%H:%M') for t in time_range],
-                side="top"  # Colocamos las etiquetas de tiempo en la parte superior
+                side="top"
             ),
             yaxis=dict(
                 title='Eventos',
@@ -575,12 +698,16 @@ def create_combined_events_chart(flight_data: Dict[str, Any]) -> Optional[go.Fig
     Crea un gráfico de barras con eventos combinados que muestra la duración de procesos específicos.
     
     Args:
-        flight_data: Diccionario con los datos del vuelo
+        flight_data: Diccionario con los datos del vuelo o lista de diccionarios para múltiples vuelos
         
     Returns:
         go.Figure: Gráfica de barras con eventos combinados
     """
     try:
+        # Determinar si estamos manejando un solo vuelo o múltiples vuelos
+        is_multiple_flights = isinstance(flight_data, list)
+        flights_to_process = flight_data if is_multiple_flights else [flight_data]
+        
         # Eventos necesarios para los cálculos
         required_events = [
             "groomers_in", "groomers_out", "crew_at_gate", "ok_to_board", "flight_secure"
@@ -600,27 +727,38 @@ def create_combined_events_chart(flight_data: Dict[str, Any]) -> Optional[go.Fig
             "boarding": "#9467bd"
         }
         
-        # Convertir fechas y horas a objetos datetime
-        flight_date = flight_data.get("flight_date")
-        if not flight_date:
-            st.error("No hay fecha de vuelo disponible")
-            return None
+        if is_multiple_flights:
+            # Calcular tiempos promedio para múltiples vuelos
+            average_times = calculate_average_event_times(flights_to_process)
             
-        # Convertir a string si es un objeto datetime.date
-        if hasattr(flight_date, 'isoformat'):
-            flight_date = flight_date.isoformat()
+            if not average_times:
+                st.warning("No hay suficientes datos para calcular tiempos promedio")
+                return None
             
-        # Convertir todos los eventos requeridos a datetime
-        events_dict = {}
-        for event in required_events:
-            time_obj = flight_data.get(event)
-            if time_obj:
-                events_dict[event] = convert_time_string_to_datetime(flight_date, time_obj)
-            else:
-                events_dict[event] = None
+            # Crear un diccionario con los tiempos promedio
+            events_dict = average_times
+        else:
+            # Procesar un solo vuelo
+            flight_date = flight_data.get("flight_date")
+            if not flight_date:
+                st.error("No hay fecha de vuelo disponible")
+                return None
                 
-        # Manejar eventos que cruzan la medianoche
-        events_dict = handle_midnight_crossover(events_dict, flight_date)
+            # Convertir a string si es un objeto datetime.date
+            if hasattr(flight_date, 'isoformat'):
+                flight_date = flight_date.isoformat()
+                
+            # Convertir todos los eventos requeridos a datetime
+            events_dict = {}
+            for event in required_events:
+                time_obj = flight_data.get(event)
+                if time_obj:
+                    events_dict[event] = convert_time_string_to_datetime(flight_date, time_obj)
+                else:
+                    events_dict[event] = None
+                    
+            # Manejar eventos que cruzan la medianoche
+            events_dict = handle_midnight_crossover(events_dict, flight_date)
         
         # Verificar si tenemos todos los eventos necesarios para cada evento combinado
         combined_events = {}
@@ -630,27 +768,72 @@ def create_combined_events_chart(flight_data: Dict[str, Any]) -> Optional[go.Fig
         if events_dict.get("groomers_in") and events_dict.get("groomers_out"):
             start_time = events_dict["groomers_in"]
             end_time = events_dict["groomers_out"]
-            if end_time > start_time:  # Asegurarse de que el tiempo final es posterior al inicial
+            
+            # Asegurarse de que el tiempo final es posterior al inicial
+            if end_time <= start_time:
+                # Si el tiempo final es anterior o igual al inicial, podría ser un cruce de medianoche no detectado
+                logger.warning(f"Posible cruce de medianoche no detectado en Groomers: {start_time} -> {end_time}")
+                # Intentar ajustar añadiendo un día al tiempo final
+                end_time_adjusted = end_time + timedelta(days=1)
+                duration = (end_time_adjusted - start_time).total_seconds() / 60
+                
+                # Solo aplicar el ajuste si la duración resultante es razonable (menos de 12 horas)
+                if duration < 12 * 60:
+                    logger.info(f"Ajustando tiempo final de Groomers: {end_time} -> {end_time_adjusted}")
+                    combined_events["groomers_total"] = (start_time, end_time_adjusted)
+                    durations["groomers_total"] = duration
+            else:
+                # Caso normal: el tiempo final es posterior al inicial
                 combined_events["groomers_total"] = (start_time, end_time)
-                duration = (end_time - start_time).total_seconds() / 60  # Duración en minutos
+                duration = (end_time - start_time).total_seconds() / 60
                 durations["groomers_total"] = duration
         
         # 2. Revisión del Avión = Ok_to_Board - crew_at_gate
         if events_dict.get("crew_at_gate") and events_dict.get("ok_to_board"):
             start_time = events_dict["crew_at_gate"]
             end_time = events_dict["ok_to_board"]
-            if end_time > start_time:  # Asegurarse de que el tiempo final es posterior al inicial
+            
+            # Asegurarse de que el tiempo final es posterior al inicial
+            if end_time <= start_time:
+                # Si el tiempo final es anterior o igual al inicial, podría ser un cruce de medianoche no detectado
+                logger.warning(f"Posible cruce de medianoche no detectado en Revisión: {start_time} -> {end_time}")
+                # Intentar ajustar añadiendo un día al tiempo final
+                end_time_adjusted = end_time + timedelta(days=1)
+                duration = (end_time_adjusted - start_time).total_seconds() / 60
+                
+                # Solo aplicar el ajuste si la duración resultante es razonable (menos de 12 horas)
+                if duration < 12 * 60:
+                    logger.info(f"Ajustando tiempo final de Revisión: {end_time} -> {end_time_adjusted}")
+                    combined_events["revision_avion"] = (start_time, end_time_adjusted)
+                    durations["revision_avion"] = duration
+            else:
+                # Caso normal: el tiempo final es posterior al inicial
                 combined_events["revision_avion"] = (start_time, end_time)
-                duration = (end_time - start_time).total_seconds() / 60  # Duración en minutos
+                duration = (end_time - start_time).total_seconds() / 60
                 durations["revision_avion"] = duration
         
         # 3. Boarding = flight_secure - Ok_to_Board
         if events_dict.get("ok_to_board") and events_dict.get("flight_secure"):
             start_time = events_dict["ok_to_board"]
             end_time = events_dict["flight_secure"]
-            if end_time > start_time:  # Asegurarse de que el tiempo final es posterior al inicial
+            
+            # Asegurarse de que el tiempo final es posterior al inicial
+            if end_time <= start_time:
+                # Si el tiempo final es anterior o igual al inicial, podría ser un cruce de medianoche no detectado
+                logger.warning(f"Posible cruce de medianoche no detectado en Boarding: {start_time} -> {end_time}")
+                # Intentar ajustar añadiendo un día al tiempo final
+                end_time_adjusted = end_time + timedelta(days=1)
+                duration = (end_time_adjusted - start_time).total_seconds() / 60
+                
+                # Solo aplicar el ajuste si la duración resultante es razonable (menos de 12 horas)
+                if duration < 12 * 60:
+                    logger.info(f"Ajustando tiempo final de Boarding: {end_time} -> {end_time_adjusted}")
+                    combined_events["boarding"] = (start_time, end_time_adjusted)
+                    durations["boarding"] = duration
+            else:
+                # Caso normal: el tiempo final es posterior al inicial
                 combined_events["boarding"] = (start_time, end_time)
-                duration = (end_time - start_time).total_seconds() / 60  # Duración en minutos
+                duration = (end_time - start_time).total_seconds() / 60
                 durations["boarding"] = duration
         
         # Si no hay eventos combinados válidos, mostrar mensaje y salir
@@ -727,8 +910,14 @@ def create_combined_events_chart(flight_data: Dict[str, Any]) -> Optional[go.Fig
         )
         
         # Formato del gráfico
+        title = "Duración de Procesos"
+        if is_multiple_flights:
+            title += f" - Promedio de {len(flights_to_process)} Vuelos"
+        else:
+            title += f" - Vuelo {flight_data.get('flight_number', 'N/A')} ({flight_data.get('flight_date', 'N/A')})"
+            
         fig.update_layout(
-            title=f"Duración de Procesos - Vuelo {flight_data.get('flight_number', 'N/A')} ({flight_date})",
+            title=title,
             xaxis_title="Procesos",
             yaxis_title="Duración (minutos)",
             height=500,
@@ -919,7 +1108,7 @@ def render_timeline_tab(client):
         # Si hay más de un vuelo, permitir seleccionar cuál visualizar
         if len(flights_data) > 1:
             # Crear opciones para mostrar en selectbox
-            flight_options = []
+            flight_options = ["Todos los vuelos"]  # Añadir opción para visualizar todos
             for flight in flights_data:
                 option_text = f"{flight.get('flight_date')} - {flight.get('flight_number')} ({flight.get('origin', 'N/A')} → {flight.get('destination', 'N/A')})"
                 
@@ -940,93 +1129,110 @@ def render_timeline_tab(client):
                 format_func=lambda i: flight_options[i]
             )
             
-            flight_to_display = flights_data[selected_flight_idx]
+            if selected_flight_idx == 0:  # Si seleccionó "Todos los vuelos"
+                # Mostrar información resumida de todos los vuelos
+                st.subheader("Información Resumida de Todos los Vuelos")
+                
+                # Crear una tabla con información básica de todos los vuelos
+                flight_summary = []
+                for flight in flights_data:
+                    flight_summary.append({
+                        "Fecha": flight.get('flight_date', 'N/A'),
+                        "Vuelo": flight.get('flight_number', 'N/A'),
+                        "Origen": flight.get('origin', 'N/A'),
+                        "Destino": flight.get('destination', 'N/A'),
+                        "STD": flight.get('std', 'N/A'),
+                        "ATD": flight.get('atd', 'N/A'),
+                        "Delay": flight.get('delay', 'N/A')
+                    })
+                
+                st.dataframe(flight_summary)
+                
+                # Usar todos los vuelos para visualización
+                flights_to_display = flights_data
+            else:
+                # Ajustar el índice para compensar la opción "Todos los vuelos"
+                flight_to_display = flights_data[selected_flight_idx - 1]
+                flights_to_display = [flight_to_display]
+                
+                # Mostrar información del vuelo seleccionado
+                st.subheader("Información del Vuelo")
+                
+                # Primera fila de información básica
+                col1, col2, col3 = st.columns(3)
+                
+                with col1:
+                    st.write(f"**Fecha:** {flight_to_display.get('flight_date')}")
+                    st.write(f"**Vuelo:** {flight_to_display.get('flight_number', 'N/A')}")
+                    st.write(f"**Gate:** {flight_to_display.get('gate', 'N/A')}")
+                
+                with col2:
+                    st.write(f"**Origen:** {flight_to_display.get('origin', 'N/A')}")
+                    st.write(f"**Destino:** {flight_to_display.get('destination', 'N/A')}")
+                    st.write(f"**Carrousel:** {flight_to_display.get('carrousel', 'N/A')}")
+                
+                with col3:
+                    st.write(f"**STD:** {flight_to_display.get('std', 'N/A')}")
+                    st.write(f"**ATD:** {flight_to_display.get('atd', 'N/A')}")
+                    st.write(f"**Delay:** {flight_to_display.get('delay', 'N/A')} min")
         else:
             flight_to_display = flights_data[0]
-        
-        # Mostrar información del vuelo
-        st.subheader("Información del Vuelo")
-        
-        # Primera fila de información básica
-        col1, col2, col3 = st.columns(3)
-        
-        with col1:
-            st.write(f"**Fecha:** {flight_to_display.get('flight_date')}")
-            st.write(f"**Vuelo:** {flight_to_display.get('flight_number', 'N/A')}")
-            st.write(f"**Gate:** {flight_to_display.get('gate', 'N/A')}")
-        
-        with col2:
-            st.write(f"**Origen:** {flight_to_display.get('origin', 'N/A')}")
-            st.write(f"**Destino:** {flight_to_display.get('destination', 'N/A')}")
-            st.write(f"**Carrousel:** {flight_to_display.get('carrousel', 'N/A')}")
-        
-        with col3:
-            st.write(f"**PAX Total:** {flight_to_display.get('pax_ob_total', 'N/A')}")
-            st.write(f"**Customs In:** {flight_to_display.get('customs_in', 'N/A')}")
+            flights_to_display = [flight_to_display]
             
-            # Mostrar timestamp de creación si existe
-            if 'created_at' in flight_to_display and flight_to_display['created_at']:
-                try:
-                    dt = datetime.fromisoformat(flight_to_display['created_at'].replace('Z', '+00:00'))
-                    created_at_str = dt.strftime("%Y-%m-%d %H:%M:%S")
-                    st.write(f"**Creado:** {created_at_str}")
-                except Exception as e:
-                    st.write(f"**Creado:** {flight_to_display['created_at']}")
-        
-        # Segunda fila para información adicional
-        if any(field for field in [
-            flight_to_display.get('delay'), 
-            flight_to_display.get('delay_code'),
-            flight_to_display.get('comments'),
-            flight_to_display.get('WCHR')
-        ]):
-            st.markdown("---")  # Separador
+            # Mostrar información del vuelo
+            st.subheader("Información del Vuelo")
             
-            col4, col5 = st.columns(2)
+            # Primera fila de información básica
+            col1, col2, col3 = st.columns(3)
             
-            with col4:
-                if flight_to_display.get('delay'):
-                    st.write(f"**Delay:** {flight_to_display.get('delay')}")
-                if flight_to_display.get('delay_code'):
-                    st.write(f"**Código de Demora:** {flight_to_display.get('delay_code')}")
+            with col1:
+                st.write(f"**Fecha:** {flight_to_display.get('flight_date')}")
+                st.write(f"**Vuelo:** {flight_to_display.get('flight_number', 'N/A')}")
+                st.write(f"**Gate:** {flight_to_display.get('gate', 'N/A')}")
             
-            with col5:
-                if flight_to_display.get('comments'):
-                    st.write(f"**Comentarios:** {flight_to_display.get('comments')}")
-                if flight_to_display.get('WCHR'):
-                    st.write(f"**WCHR:** {flight_to_display.get('WCHR')}")
+            with col2:
+                st.write(f"**Origen:** {flight_to_display.get('origin', 'N/A')}")
+                st.write(f"**Destino:** {flight_to_display.get('destination', 'N/A')}")
+                st.write(f"**Carrousel:** {flight_to_display.get('carrousel', 'N/A')}")
+            
+            with col3:
+                st.write(f"**STD:** {flight_to_display.get('std', 'N/A')}")
+                st.write(f"**ATD:** {flight_to_display.get('atd', 'N/A')}")
+                st.write(f"**Delay:** {flight_to_display.get('delay', 'N/A')} min")
         
         # Tabla de horarios
-        st.subheader("Horarios de Eventos")
-        
-        time_fields = {
-            "STD": flight_to_display.get('std'),
-            "ATD": flight_to_display.get('atd'),
-            "Groomers In": flight_to_display.get('groomers_in'),
-            "Groomers Out": flight_to_display.get('groomers_out'),
-            "Crew at Gate": flight_to_display.get('crew_at_gate'),
-            "OK to Board": flight_to_display.get('ok_to_board'),
-            "Flight Secure": flight_to_display.get('flight_secure'),
-            "Cierre de Puerta": flight_to_display.get('cierre_de_puerta'),
-            "Push Back": flight_to_display.get('push_back')
-        }
-        
-        # Crear un DataFrame para mostrar los horarios como tabla
-        time_data = []
-        for event, time_val in time_fields.items():
-            # Formatear el tiempo para mostrarlo de manera legible
-            if time_val is not None:
-                if isinstance(time_val, time):
-                    formatted_time = time_val.strftime("%H:%M")
-                else:
-                    formatted_time = time_val
-            else:
-                formatted_time = "N/A"
-                
-            time_data.append({"Evento": event, "Hora": formatted_time})
+        if len(flights_to_display) == 1:
+            st.subheader("Horarios de Eventos")
             
-        time_df = pd.DataFrame(time_data)
-        st.dataframe(time_df, hide_index=True, use_container_width=True)
+            flight_to_display = flights_to_display[0]
+            time_fields = {
+                "STD": flight_to_display.get('std'),
+                "ATD": flight_to_display.get('atd'),
+                "Groomers In": flight_to_display.get('groomers_in'),
+                "Groomers Out": flight_to_display.get('groomers_out'),
+                "Crew at Gate": flight_to_display.get('crew_at_gate'),
+                "OK to Board": flight_to_display.get('ok_to_board'),
+                "Flight Secure": flight_to_display.get('flight_secure'),
+                "Cierre de Puerta": flight_to_display.get('cierre_de_puerta'),
+                "Push Back": flight_to_display.get('push_back')
+            }
+            
+            # Crear un DataFrame para mostrar los horarios como tabla
+            time_data = []
+            for event, time_val in time_fields.items():
+                # Formatear el tiempo para mostrarlo de manera legible
+                if time_val is not None:
+                    if isinstance(time_val, time):
+                        formatted_time = time_val.strftime("%H:%M")
+                    else:
+                        formatted_time = time_val
+                else:
+                    formatted_time = "N/A"
+                    
+                time_data.append({"Evento": event, "Hora": formatted_time})
+            
+            # Mostrar tabla de horarios
+            st.dataframe(time_data, hide_index=True)
         
         # Radio para elegir el tipo de visualización
         chart_type = st.radio(
@@ -1040,37 +1246,22 @@ def render_timeline_tab(client):
         
         try:
             if chart_type == "Gráfico de Gantt (Cascada)":
-                fig = create_gantt_chart(flight_to_display)
+                # Pasar la lista completa de vuelos al gráfico de Gantt
+                fig = create_gantt_chart(flights_to_display)
                 if fig:
                     st.plotly_chart(fig, use_container_width=True)
             elif chart_type == "Gráfico de Eventos Combinados":
-                fig = create_combined_events_chart(flight_to_display)
+                fig = create_combined_events_chart(flights_to_display[0] if len(flights_to_display) == 1 else flights_to_display)
                 if fig:
                     st.plotly_chart(fig, use_container_width=True)
             else:
                 # Usar el gráfico de puntos original
-                fig = create_cascade_timeline_chart(flight_to_display)
+                fig = create_cascade_timeline_chart(flights_to_display[0] if len(flights_to_display) == 1 else flights_to_display)
                 if fig:
                     st.plotly_chart(fig, use_container_width=True)
         except Exception as e:
             logger.exception(f"Error al mostrar gráfico: {e}")
-            st.error("Error al generar el gráfico. Usando versión simplificada.")
-            
-            # Versión simplificada del gráfico sin timedeltas
-            events_data = []
-            for name, value in time_fields.items():
-                if value:
-                    if isinstance(value, time):
-                        time_str = value.strftime("%H:%M")
-                    else:
-                        time_str = str(value)
-                    events_data.append({"Evento": name, "Hora": time_str})
-            
-            if events_data:
-                events_df = pd.DataFrame(events_data)
-                fig = px.timeline(events_df, x="Hora", y="Evento", color="Evento")
-                st.plotly_chart(fig, use_container_width=True)
-    
+            st.error(f"Error al generar el gráfico: {str(e)}")
     except Exception as e:
         logger.exception(f"Error al renderizar la pestaña de línea de tiempo: {e}")
         st.error(f"Error en la visualización: {str(e)}")
