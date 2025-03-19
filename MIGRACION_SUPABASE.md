@@ -1,25 +1,25 @@
-# Migraciu00f3n de BigQuery a Supabase
+# Migración de BigQuery a Supabase
 
-Este documento describe los pasos para completar la migraciu00f3n de BigQuery a Supabase en la aplicaciu00f3n Avianca Flight Report.
+Este documento describe los pasos para completar la migración de BigQuery a Supabase en la aplicación Avianca Flight Report.
 
 ## Pasos Completados
 
-1. Se han creado nuevos archivos de configuraciu00f3n y servicios para Supabase:
-   - `src/config/supabase_config.py`: Configuraciu00f3n del cliente de Supabase
+1. Se han creado nuevos archivos de configuración y servicios para Supabase:
+   - `src/config/supabase_config.py`: Configuración del cliente de Supabase
    - `src/services/supabase_service.py`: Servicios para enviar y obtener datos de Supabase
 
 2. Se han modificado los archivos existentes para usar Supabase en lugar de BigQuery:
-   - `src/utils/form_utils.py`: Se cambiu00f3 `format_time_for_bigquery` a `format_time_for_database`
-   - `src/components/flight_form.py`: Se actualizu00f3 para usar la nueva funciu00f3n y nomenclatura
+   - `src/utils/form_utils.py`: Se cambió `format_time_for_bigquery` a `format_time_for_database`
+   - `src/components/flight_form.py`: Se actualizó para usar la nueva función y nomenclatura
    - `src/components/timeline_chart.py`: Se cambiaron las consultas SQL por consultas a la API de Supabase
-   - `app.py`: Se actualizu00f3 para usar Supabase en lugar de BigQuery
+   - `app.py`: Se actualizó para usar Supabase en lugar de BigQuery
 
 ## Pasos Pendientes
 
 1. **Configurar Supabase**:
-   - Crear una cuenta en [Supabase](https://supabase.io/) si au00fan no tienes una
+   - Crear una cuenta en [Supabase](https://supabase.io/) si aún no tienes una
    - Crear un nuevo proyecto
-   - Crear una tabla llamada `FlightReport` con la misma estructura que la tabla de BigQuery
+   - Crear una tabla llamada `FlightReport` con la estructura necesaria
 
 2. **Configurar Secretos**:
    - Actualizar el archivo `.streamlit/secrets.toml` con las credenciales de Supabase
@@ -30,7 +30,7 @@ Este documento describe los pasos para completar la migraciu00f3n de BigQuery a 
 
 ## Estructura de la Tabla en Supabase
 
-La tabla `FlightReport` en Supabase debe tener la siguiente estructura (basada en la estructura actual de BigQuery):
+La tabla `FlightReport` en Supabase debe tener la siguiente estructura:
 
 ```sql
 CREATE TABLE "FlightReport" (
@@ -60,14 +60,14 @@ CREATE TABLE "FlightReport" (
 );
 ```
 
-## Verificaciu00f3n
+## Verificación
 
-Despuu00e9s de completar la migraciu00f3n, verifica que:
+Después de completar la migración, verifica que:
 
-1. La aplicaciu00f3n pueda conectarse a Supabase correctamente
-2. Los datos se envu00eden correctamente a la tabla de Supabase
-3. La visualizaciu00f3n de eventos funcione correctamente con los datos de Supabase
+1. La aplicación pueda conectarse a Supabase correctamente
+2. Los datos se envíen correctamente a la tabla de Supabase
+3. La visualización de eventos funcione correctamente con los datos de Supabase
 
 ## Soporte
 
-Si encuentras algu00fan problema durante la migraciu00f3n, revisa los logs de la aplicaciu00f3n para obtener mu00e1s informaciu00f3n sobre posibles errores.
+Si encuentras algún problema durante la migración, revisa los logs de la aplicación para obtener más información sobre posibles errores.

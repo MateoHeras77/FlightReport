@@ -1,11 +1,91 @@
+# Archivos de entorno y credenciales
 .env
-app.log
+.env.*
+*.env
 credenciales.json
-/Python
-.streamlit/
-Wpp/
+secrets.toml
+
+# Archivos de logs
 logs/
-*.pyc
-*.toml
-*.txt
+*.log
+app.log
+
+# Archivos de caché y temporales
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Archivos de IDE y editores
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Archivos específicos del proyecto
 *.bat
+*.cmd
+*.sh
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Directorios específicos del proyecto
+/Python
+/Wpp
+/wpp
+
+# Archivos de configuración que pueden contener información sensible
+config.json
+*.config
+*.conf
+
+# Archivos de base de datos
+*.db
+*.sqlite
+*.sqlite3
+
+# Archivos de caché de Streamlit
+.streamlit/secrets.toml
+
+# Archivos de documentación que pueden contener información sensible
+*_supabase.md
+*_migration.md
+*_setup.md
+*_config.md
+*_secrets.md
+*_credentials.md
+*_keys.md
+*_tokens.md
+*_auth.md
+*_security.md
+
+# Mantener estos archivos importantes
+!.streamlit/config.toml
+!requirements.txt
+!runtime.txt
+!README.md
+!example_secrets.toml
