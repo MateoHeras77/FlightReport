@@ -1143,7 +1143,11 @@ def render_timeline_tab(client):
                         "Destino": flight.get('destination', 'N/A'),
                         "STD": flight.get('std', 'N/A'),
                         "ATD": flight.get('atd', 'N/A'),
-                        "Delay": flight.get('delay', 'N/A')
+                        "Delay": flight.get('delay', 'N/A'),
+                        "PAX OB": flight.get('pax_ob_total', 'N/A'),
+                        "WCHR": flight.get('WCHR', 'N/A'),
+                        "Customs": flight.get('customs_in', 'N/A'),
+                        "Delay Code": flight.get('delay_code', 'N/A')
                     })
                 
                 st.dataframe(flight_summary)
@@ -1158,23 +1162,77 @@ def render_timeline_tab(client):
                 # Mostrar información del vuelo seleccionado
                 st.subheader("Información del Vuelo")
                 
-                # Primera fila de información básica
-                col1, col2, col3 = st.columns(3)
-                
-                with col1:
-                    st.write(f"**Fecha:** {flight_to_display.get('flight_date')}")
-                    st.write(f"**Vuelo:** {flight_to_display.get('flight_number', 'N/A')}")
-                    st.write(f"**Gate:** {flight_to_display.get('gate', 'N/A')}")
-                
-                with col2:
-                    st.write(f"**Origen:** {flight_to_display.get('origin', 'N/A')}")
-                    st.write(f"**Destino:** {flight_to_display.get('destination', 'N/A')}")
-                    st.write(f"**Carrousel:** {flight_to_display.get('carrousel', 'N/A')}")
-                
-                with col3:
-                    st.write(f"**STD:** {flight_to_display.get('std', 'N/A')}")
-                    st.write(f"**ATD:** {flight_to_display.get('atd', 'N/A')}")
-                    st.write(f"**Delay:** {flight_to_display.get('delay', 'N/A')} min")
+                # Crear contenedores para diferentes secciones de información
+                for flight in flights_to_display:
+                    # Información básica del vuelo
+                    with st.container():
+                        st.markdown("##### Información Básica")
+                        col1, col2, col3 = st.columns(3)
+                        with col1:
+                            st.write(f"**Fecha:** {flight.get('flight_date', 'N/A')}")
+                            st.write(f"**Número de Vuelo:** {flight.get('flight_number', 'N/A')}")
+                            st.write(f"**Gate:** {flight.get('gate', 'N/A')}")
+                        with col2:
+                            st.write(f"**Origen:** {flight.get('origin', 'N/A')}")
+                            st.write(f"**Destino:** {flight.get('destination', 'N/A')}")
+                            st.write(f"**Carrusel:** {flight.get('carrousel', 'N/A')}")
+                        with col3:
+                            st.write(f"**STD:** {flight.get('std', 'N/A')}")
+                            st.write(f"**ATD:** {flight.get('atd', 'N/A')}")
+                            st.write(f"**Delay:** {flight.get('delay', 'N/A')} min")
+                    
+                    # Información de pasajeros y servicios especiales
+                    with st.container():
+                        st.markdown("##### Información de Pasajeros y Servicios")
+                        col1, col2, col3 = st.columns(3)
+                        with col1:
+                            st.write(f"**PAX OB Total:** {flight.get('pax_ob_total', 'N/A')}")
+                            st.write(f"**WCHR:** {flight.get('WCHR', 'N/A')}")
+                        with col2:
+                            st.write(f"**Customs:** {flight.get('customs_in', 'N/A')}")
+                            st.write(f"**Delay Code:** {flight.get('delay_code', 'N/A')}")
+                        with col3:
+                            if flight.get('delay'):
+                                st.write(f"**Delay:** {flight.get('delay', 'N/A')} min")
+                    
+                    # Eventos temporales
+                    with st.container():
+                        st.markdown("##### Eventos Temporales")
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            st.write(f"**Groomers In:** {flight.get('groomers_in', 'N/A')}")
+                            st.write(f"**Groomers Out:** {flight.get('groomers_out', 'N/A')}")
+                            st.write(f"**Crew at Gate:** {flight.get('crew_at_gate', 'N/A')}")
+                            st.write(f"**OK to Board:** {flight.get('ok_to_board', 'N/A')}")
+                        with col2:
+                            st.write(f"**Flight Secure:** {flight.get('flight_secure', 'N/A')}")
+                            st.write(f"**Cierre de Puerta:** {flight.get('cierre_de_puerta', 'N/A')}")
+                            st.write(f"**Push Back:** {flight.get('push_back', 'N/A')}")
+                    
+                    # Información adicional
+                    with st.container():
+                        st.markdown("##### Información Adicional")
+                        if flight.get('comments'):
+                            st.write(f"**Comentarios:** {flight.get('comments')}")
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            if flight.get('created_at'):
+                                try:
+                                    created_dt = datetime.fromisoformat(flight['created_at'].replace('Z', '+00:00'))
+                                    st.write(f"**Creado:** {created_dt.strftime('%Y-%m-%d %H:%M:%S')}")
+                                except:
+                                    st.write(f"**Creado:** {flight.get('created_at', 'N/A')}")
+                        with col2:
+                            if flight.get('updated_at'):
+                                try:
+                                    updated_dt = datetime.fromisoformat(flight['updated_at'].replace('Z', '+00:00'))
+                                    st.write(f"**Actualizado:** {updated_dt.strftime('%Y-%m-%d %H:%M:%S')}")
+                                except:
+                                    st.write(f"**Actualizado:** {flight.get('updated_at', 'N/A')}")
+                    
+                    # Línea divisoria entre vuelos si hay múltiples
+                    if len(flights_to_display) > 1:
+                        st.markdown("---")
         else:
             flight_to_display = flights_data[0]
             flights_to_display = [flight_to_display]
@@ -1182,23 +1240,77 @@ def render_timeline_tab(client):
             # Mostrar información del vuelo
             st.subheader("Información del Vuelo")
             
-            # Primera fila de información básica
-            col1, col2, col3 = st.columns(3)
-            
-            with col1:
-                st.write(f"**Fecha:** {flight_to_display.get('flight_date')}")
-                st.write(f"**Vuelo:** {flight_to_display.get('flight_number', 'N/A')}")
-                st.write(f"**Gate:** {flight_to_display.get('gate', 'N/A')}")
-            
-            with col2:
-                st.write(f"**Origen:** {flight_to_display.get('origin', 'N/A')}")
-                st.write(f"**Destino:** {flight_to_display.get('destination', 'N/A')}")
-                st.write(f"**Carrousel:** {flight_to_display.get('carrousel', 'N/A')}")
-            
-            with col3:
-                st.write(f"**STD:** {flight_to_display.get('std', 'N/A')}")
-                st.write(f"**ATD:** {flight_to_display.get('atd', 'N/A')}")
-                st.write(f"**Delay:** {flight_to_display.get('delay', 'N/A')} min")
+            # Crear contenedores para diferentes secciones de información
+            for flight in flights_to_display:
+                # Información básica del vuelo
+                with st.container():
+                    st.markdown("##### Información Básica")
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        st.write(f"**Fecha:** {flight.get('flight_date', 'N/A')}")
+                        st.write(f"**Número de Vuelo:** {flight.get('flight_number', 'N/A')}")
+                        st.write(f"**Gate:** {flight.get('gate', 'N/A')}")
+                    with col2:
+                        st.write(f"**Origen:** {flight.get('origin', 'N/A')}")
+                        st.write(f"**Destino:** {flight.get('destination', 'N/A')}")
+                        st.write(f"**Carrusel:** {flight.get('carrousel', 'N/A')}")
+                    with col3:
+                        st.write(f"**STD:** {flight.get('std', 'N/A')}")
+                        st.write(f"**ATD:** {flight.get('atd', 'N/A')}")
+                        st.write(f"**Delay:** {flight.get('delay', 'N/A')} min")
+                
+                # Información de pasajeros y servicios especiales
+                with st.container():
+                    st.markdown("##### Información de Pasajeros y Servicios")
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        st.write(f"**PAX OB Total:** {flight.get('pax_ob_total', 'N/A')}")
+                        st.write(f"**WCHR:** {flight.get('WCHR', 'N/A')}")
+                    with col2:
+                        st.write(f"**Customs In:** {flight.get('customs_in', 'N/A')}")
+                        st.write(f"**Delay Code:** {flight.get('delay_code', 'N/A')}")
+                    with col3:
+                        if flight.get('delay'):
+                            st.write(f"**Delay:** {flight.get('delay', 'N/A')} min")
+                
+                # Eventos temporales
+                with st.container():
+                    st.markdown("##### Eventos Temporales")
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.write(f"**Groomers In:** {flight.get('groomers_in', 'N/A')}")
+                        st.write(f"**Groomers Out:** {flight.get('groomers_out', 'N/A')}")
+                        st.write(f"**Crew at Gate:** {flight.get('crew_at_gate', 'N/A')}")
+                        st.write(f"**OK to Board:** {flight.get('ok_to_board', 'N/A')}")
+                    with col2:
+                        st.write(f"**Flight Secure:** {flight.get('flight_secure', 'N/A')}")
+                        st.write(f"**Cierre de Puerta:** {flight.get('cierre_de_puerta', 'N/A')}")
+                        st.write(f"**Push Back:** {flight.get('push_back', 'N/A')}")
+                
+                # Información adicional
+                with st.container():
+                    st.markdown("##### Información Adicional")
+                    if flight.get('comments'):
+                        st.write(f"**Comentarios:** {flight.get('comments')}")
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        if flight.get('created_at'):
+                            try:
+                                created_dt = datetime.fromisoformat(flight['created_at'].replace('Z', '+00:00'))
+                                st.write(f"**Creado:** {created_dt.strftime('%Y-%m-%d %H:%M:%S')}")
+                            except:
+                                st.write(f"**Creado:** {flight.get('created_at', 'N/A')}")
+                    with col2:
+                        if flight.get('updated_at'):
+                            try:
+                                updated_dt = datetime.fromisoformat(flight['updated_at'].replace('Z', '+00:00'))
+                                st.write(f"**Actualizado:** {updated_dt.strftime('%Y-%m-%d %H:%M:%S')}")
+                            except:
+                                st.write(f"**Actualizado:** {flight.get('updated_at', 'N/A')}")
+                
+                # Línea divisoria entre vuelos si hay múltiples
+                if len(flights_to_display) > 1:
+                    st.markdown("---")
         
         # Tabla de horarios
         if len(flights_to_display) == 1:
@@ -1214,7 +1326,8 @@ def render_timeline_tab(client):
                 "OK to Board": flight_to_display.get('ok_to_board'),
                 "Flight Secure": flight_to_display.get('flight_secure'),
                 "Cierre de Puerta": flight_to_display.get('cierre_de_puerta'),
-                "Push Back": flight_to_display.get('push_back')
+                "Push Back": flight_to_display.get('push_back'),
+                "Customs": flight_to_display.get('customs_in')
             }
             
             # Crear un DataFrame para mostrar los horarios como tabla
@@ -1237,7 +1350,7 @@ def render_timeline_tab(client):
         # Radio para elegir el tipo de visualización
         chart_type = st.radio(
             "Seleccione el tipo de visualización:",
-            options=["Gráfico de Gantt (Cascada)", "Gráfico de Puntos", "Gráfico de Eventos Combinados"],
+            options=["Gráfico de Gantt (Cascada)", "Gráfico de Barras", "Gráfico de Eventos Combinados"],
             horizontal=True
         )
         

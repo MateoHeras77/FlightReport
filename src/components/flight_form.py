@@ -47,7 +47,7 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
         col5, col6 = st.columns(2)
         with col5:
             pax_ob_total = st.text_input("PAX OB Total", key="pax_ob_total").strip()
-            customs_in = st.text_input("Customs In", key="customs_in").strip()
+            customs_in = st.text_input("Customs", key="customs_in").strip()
             delay = st.text_area("Delay", value="", key="delay")
         with col6:
             gate = st.text_input("Gate", key="gate").strip()
