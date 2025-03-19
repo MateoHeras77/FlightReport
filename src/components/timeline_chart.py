@@ -570,6 +570,178 @@ def create_gantt_chart(flight_data: Dict[str, Any]) -> Optional[go.Figure]:
         st.error(f"Error al crear diagrama: {str(e)}")
         return None
 
+def create_combined_events_chart(flight_data: Dict[str, Any]) -> Optional[go.Figure]:
+    """
+    Crea un gráfico de barras con eventos combinados que muestra la duración de procesos específicos.
+    
+    Args:
+        flight_data: Diccionario con los datos del vuelo
+        
+    Returns:
+        go.Figure: Gráfica de barras con eventos combinados
+    """
+    try:
+        # Eventos necesarios para los cálculos
+        required_events = [
+            "groomers_in", "groomers_out", "crew_at_gate", "ok_to_board", "flight_secure"
+        ]
+        
+        # Nombres descriptivos para los eventos combinados
+        combined_event_labels = {
+            "groomers_total": "Groomers Total",
+            "revision_avion": "Revisión del Avión",
+            "boarding": "Boarding"
+        }
+        
+        # Colores para los eventos combinados
+        colors = {
+            "groomers_total": "#1f77b4",
+            "revision_avion": "#2ca02c",
+            "boarding": "#9467bd"
+        }
+        
+        # Convertir fechas y horas a objetos datetime
+        flight_date = flight_data.get("flight_date")
+        if not flight_date:
+            st.error("No hay fecha de vuelo disponible")
+            return None
+            
+        # Convertir a string si es un objeto datetime.date
+        if hasattr(flight_date, 'isoformat'):
+            flight_date = flight_date.isoformat()
+            
+        # Convertir todos los eventos requeridos a datetime
+        events_dict = {}
+        for event in required_events:
+            time_obj = flight_data.get(event)
+            if time_obj:
+                events_dict[event] = convert_time_string_to_datetime(flight_date, time_obj)
+            else:
+                events_dict[event] = None
+                
+        # Manejar eventos que cruzan la medianoche
+        events_dict = handle_midnight_crossover(events_dict, flight_date)
+        
+        # Verificar si tenemos todos los eventos necesarios para cada evento combinado
+        combined_events = {}
+        durations = {}
+        
+        # 1. Groomers Total = groomers_out - groomers_in
+        if events_dict.get("groomers_in") and events_dict.get("groomers_out"):
+            start_time = events_dict["groomers_in"]
+            end_time = events_dict["groomers_out"]
+            if end_time > start_time:  # Asegurarse de que el tiempo final es posterior al inicial
+                combined_events["groomers_total"] = (start_time, end_time)
+                duration = (end_time - start_time).total_seconds() / 60  # Duración en minutos
+                durations["groomers_total"] = duration
+        
+        # 2. Revisión del Avión = Ok_to_Board - crew_at_gate
+        if events_dict.get("crew_at_gate") and events_dict.get("ok_to_board"):
+            start_time = events_dict["crew_at_gate"]
+            end_time = events_dict["ok_to_board"]
+            if end_time > start_time:  # Asegurarse de que el tiempo final es posterior al inicial
+                combined_events["revision_avion"] = (start_time, end_time)
+                duration = (end_time - start_time).total_seconds() / 60  # Duración en minutos
+                durations["revision_avion"] = duration
+        
+        # 3. Boarding = flight_secure - Ok_to_Board
+        if events_dict.get("ok_to_board") and events_dict.get("flight_secure"):
+            start_time = events_dict["ok_to_board"]
+            end_time = events_dict["flight_secure"]
+            if end_time > start_time:  # Asegurarse de que el tiempo final es posterior al inicial
+                combined_events["boarding"] = (start_time, end_time)
+                duration = (end_time - start_time).total_seconds() / 60  # Duración en minutos
+                durations["boarding"] = duration
+        
+        # Si no hay eventos combinados válidos, mostrar mensaje y salir
+        if not combined_events:
+            st.warning("No hay suficientes datos para mostrar eventos combinados")
+            return None
+            
+        # Crear la figura
+        fig = go.Figure()
+        
+        # Datos para el gráfico
+        bar_data = []
+        
+        # Crear datos para cada evento combinado
+        for event_key, (start_time, end_time) in combined_events.items():
+            duration = durations[event_key]
+            
+            # Información para el tooltip
+            if event_key == "groomers_total":
+                start_label = "Groomers In"
+                end_label = "Groomers Out"
+            elif event_key == "revision_avion":
+                start_label = "Crew at Gate"
+                end_label = "OK to Board"
+            elif event_key == "boarding":
+                start_label = "OK to Board"
+                end_label = "Flight Secure"
+            else:
+                start_label = "Inicio"
+                end_label = "Fin"
+            
+            hover_text = f"{combined_event_labels[event_key]}<br>" \
+                       f"Inicio: {start_label} ({start_time.strftime('%H:%M')})<br>" \
+                       f"Fin: {end_label} ({end_time.strftime('%H:%M')})<br>" \
+                       f"Duración: {int(duration)} minutos"
+            
+            bar_data.append({
+                "Evento": combined_event_labels[event_key],
+                "Duración": duration,
+                "Inicio": start_time,
+                "Fin": end_time,
+                "HoverText": hover_text
+            })
+        
+        # Crear DataFrame para el gráfico
+        df = pd.DataFrame(bar_data)
+        
+        # Ordenar los eventos en el orden deseado
+        event_order = ["Groomers Total", "Revisión del Avión", "Boarding"]
+        df["Evento"] = pd.Categorical(df["Evento"], categories=event_order, ordered=True)
+        df = df.sort_values("Evento")
+        
+        # Crear el gráfico de barras
+        fig = px.bar(
+            df,
+            x="Evento",
+            y="Duración",
+            color="Evento",
+            color_discrete_map={
+                "Groomers Total": colors["groomers_total"],
+                "Revisión del Avión": colors["revision_avion"],
+                "Boarding": colors["boarding"]
+            },
+            text="Duración",
+            hover_data=["Inicio", "Fin"],
+            custom_data=["HoverText"]
+        )
+        
+        # Personalizar el tooltip
+        fig.update_traces(
+            hovertemplate="%{customdata[0]}",
+            texttemplate="%{y:.0f} min",
+            textposition="inside"
+        )
+        
+        # Formato del gráfico
+        fig.update_layout(
+            title=f"Duración de Procesos - Vuelo {flight_data.get('flight_number', 'N/A')} ({flight_date})",
+            xaxis_title="Procesos",
+            yaxis_title="Duración (minutos)",
+            height=500,
+            showlegend=False,
+            margin=dict(l=20, r=20, t=60, b=60)
+        )
+        
+        return fig
+    except Exception as e:
+        logger.exception(f"Error al crear gráfico de eventos combinados: {e}")
+        st.error(f"Error al crear gráfico: {str(e)}")
+        return None
+
 def fetch_flight_data_for_chart(client, date=None, flight_number=None, created_at=None):
     """
     Obtiene datos de vuelos desde Supabase con filtros opcionales.
@@ -859,7 +1031,7 @@ def render_timeline_tab(client):
         # Radio para elegir el tipo de visualización
         chart_type = st.radio(
             "Seleccione el tipo de visualización:",
-            options=["Gráfico de Gantt (Cascada)", "Gráfico de Puntos"],
+            options=["Gráfico de Gantt (Cascada)", "Gráfico de Puntos", "Gráfico de Eventos Combinados"],
             horizontal=True
         )
         
@@ -869,6 +1041,10 @@ def render_timeline_tab(client):
         try:
             if chart_type == "Gráfico de Gantt (Cascada)":
                 fig = create_gantt_chart(flight_to_display)
+                if fig:
+                    st.plotly_chart(fig, use_container_width=True)
+            elif chart_type == "Gráfico de Eventos Combinados":
+                fig = create_combined_events_chart(flight_to_display)
                 if fig:
                     st.plotly_chart(fig, use_container_width=True)
             else:
