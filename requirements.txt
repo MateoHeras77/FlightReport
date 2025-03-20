@@ -1,5 +1,5 @@
 streamlit==1.31.1
-supabase==2.3.1
+supabase==1.2.0
 python-dotenv==1.0.1
 pandas==2.2.0
 numpy==1.26.3
