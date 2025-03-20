@@ -88,4 +88,4 @@ config.json
 !requirements.txt
 !runtime.txt
 !README.md
-!example_secrets.toml
+example_secrets.toml
