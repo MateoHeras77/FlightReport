@@ -29,7 +29,7 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
 
         flight_number = st.selectbox("🔢 Número de vuelo", ["AV205", "AV255", "AV627"], key="flight_number")
 
-        st.subheader("⏰ Horarios (solo HH:MM)")
+        st.subheader("⏰ Tiempos")
         col3, col4 = st.columns(2)
         with col3:
             std = st.text_input("STD (Salida Programada)", value="", placeholder="HH:MM", key="std")
