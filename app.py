@@ -21,7 +21,7 @@ try:
     from src.config.logging_config import setup_logger
     from src.config.supabase_config import initialize_supabase_client, DEFAULT_TABLE_NAME
     from src.components.flight_form import render_flight_form
-    from src.components.timeline_chart import render_timeline_tab
+    from src.components.tabs_manager import render_tabs  # Importar el nuevo sistema de pestañas
     from src.utils.form_utils import create_copy_button
     from src.services.supabase_service import send_data_to_supabase
 
@@ -60,7 +60,7 @@ except Exception as e:
 
 # Crear tabs para las diferentes funcionalidades
 try:
-    tab1, tab2 = st.tabs(["🛫 Ingreso de Datos", "📊 Visualización de Eventos"])
+    tab1, tab2 = st.tabs(["🛫 Ingreso de Datos", "📊 Visualización"])
 except Exception as e:
     logger.error(f"Error al crear tabs: {str(e)}", exc_info=True)
     st.error("Error al cargar la interfaz de usuario")
@@ -148,10 +148,11 @@ with tab1:
         logger.error(f"Error en Tab 1: {str(e)}", exc_info=True)
         st.error("Error al procesar los datos del formulario")
 
-# Tab 2: Visualización de Eventos
+# Tab 2: Visualización con sistema modular de pestañas
 with tab2:
     try:
-        render_timeline_tab(client)
+        # Usar el nuevo sistema de pestañas modular
+        render_tabs(client)
     except Exception as e:
         logger.error(f"Error en Tab 2: {str(e)}", exc_info=True)
         st.error("Error al cargar la visualización de eventos")

@@ -4,7 +4,7 @@ import sys
 import os
 
 # Agregar el directorio raíz al path para que las importaciones funcionen
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 from src.config.supabase_config import initialize_supabase_client, DEFAULT_TABLE_NAME
 from src.config.logging_config import setup_logger
