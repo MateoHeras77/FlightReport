@@ -1,15 +1,15 @@
 import streamlit as st
 from src.components.tabs.timeline_tab import render_timeline_tab
+from src.components.tabs.flight_status_tab import render_flight_status_tab
 
 def render_tabs(client):
     """
-    Renderiza un sistema de pestañas para la aplicación,
-    permitiendo fácilmente agregar nuevas pestañas con diferente información.
+    Renderiza un sistema de pestañas para la visualización.
     
     Args:
         client: Cliente de Supabase inicializado
     """
-    # Definir las pestañas disponibles
+    # Definir las pestañas disponibles - Ya sin "Estado de Vuelo"
     tabs = ["Línea de Tiempo", "Análisis", "Resumen"]
     
     # Crear el contenedor de pestañas
