@@ -7,13 +7,10 @@ from pathlib import Path
 # Configuración inicial
 try:
     print("Iniciando aplicación Avianca Flight Report...")
-    load_dotenv()  # Cargar variables de entorno desde .env
     
-    # Verificar variables de entorno críticas
-    required_env_vars = ['SUPABASE_URL', 'SUPABASE_KEY']
-    missing_vars = [var for var in required_env_vars if not os.getenv(var)]
-    if missing_vars:
-        raise ValueError(f"Variables de entorno faltantes: {', '.join(missing_vars)}")
+    # Cargar credenciales desde secrets.toml
+    supabase_url = st.secrets["supabase"]["url"]
+    supabase_key = st.secrets["supabase"]["key"]
     
     # Configurar rutas base
     BASE_DIR = Path(__file__).resolve().parent
