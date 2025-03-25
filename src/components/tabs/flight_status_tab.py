@@ -132,7 +132,24 @@ def render_flight_info_card(flight_data: Dict) -> None:
         ">
             {status}
         </div>
-    </div>
+        <a href="https://www.flightradar24.com/" target="_blank" style="
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #1a1a1a, #333);
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-family: 'Segoe UI', sans-serif;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+">
+    ✈️ <span>Ver en FlightRadar24</span>
+    </a>
+
     """, unsafe_allow_html=True)
 
 def display_route_info(flight_data: Dict) -> None:
@@ -262,7 +279,17 @@ def render_flight_status_tab(client) -> None:
         
         # Mostrar tarjeta de información del vuelo
         render_flight_info_card(flight_info)
-        
+
+        # Mostrar progreso del vuelo
+        st.subheader("Progreso del Vuelo")
+        try:
+            fig = create_flight_progress_chart(flight_info)
+            if fig:
+                st.plotly_chart(fig, use_container_width=True)
+        except Exception as e:
+            logger.exception(f"Error al generar gráfico de progreso: {e}")
+            st.error(f"Error al generar gráfico de progreso: {str(e)}")
+
         # Mostrar ruta
         display_route_info(flight_info)
         
@@ -278,15 +305,15 @@ def render_flight_status_tab(client) -> None:
         
         # Mostrar visualizaciones
         st.subheader("Visualizaciones")
-        
+
         # Seleccionar visualización
         viz_type = st.radio(
             "Seleccione el tipo de visualización:",
-            options=["Mapa de Ruta"],
+            options=["Mapa de Ruta"],  # Eliminado "Progreso del Vuelo"
             horizontal=True,
             key="viz_type"
         )
-        
+
         # Mostrar visualización seleccionada
         try:
             if viz_type == "Mapa de Ruta":
@@ -295,4 +322,4 @@ def render_flight_status_tab(client) -> None:
                     st.plotly_chart(fig, use_container_width=True)
         except Exception as e:
             logger.exception(f"Error al generar visualización: {e}")
-            st.error(f"Error al generar la visualización: {str(e)}")
+            st.error(f"Error al generar visualización: {str(e)}")

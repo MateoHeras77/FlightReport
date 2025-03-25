@@ -110,114 +110,53 @@ def create_flight_map(flight_data: Dict[str, Any]) -> Optional[go.Figure]:
 
 def create_flight_progress_chart(flight_data: Dict[str, Any]) -> Optional[go.Figure]:
     """
-    Crea un gráfico de progreso del vuelo con tiempos estimados y reales.
-    
+    Creates a progress chart for the flight showing the timeline from departure to arrival.
+
     Args:
-        flight_data: Diccionario con información del vuelo
-        
+        flight_data: Dictionary containing flight information.
+
     Returns:
-        go.Figure: Gráfico de progreso del vuelo o None si hay error
+        go.Figure: Progress chart or None if an error occurs.
     """
     try:
-        # Extraer información de tiempos
+        # Extract times from flight data
         departure = flight_data.get('departure', {})
         arrival = flight_data.get('arrival', {})
-        
-        # Verificar si tenemos información de horarios
+
+        # Validate required times
         if not (departure.get('scheduledTime') and arrival.get('scheduledTime')):
-            st.warning("No hay suficiente información de horarios para crear el gráfico de progreso.")
+            st.warning("No sufficient time information available to create the progress chart.")
             return None
-        
-        # Extraer los tiempos en UTC para normalizar
-        try:
-            departure_scheduled = datetime.fromisoformat(departure['scheduledTime']['utc'].replace('Z', '+00:00'))
-            arrival_scheduled = datetime.fromisoformat(arrival['scheduledTime']['utc'].replace('Z', '+00:00'))
-            
-            # Tiempo actual UTC
-            now_utc = datetime.now(pytz.UTC)
-            
-            # Obtener tiempo revisado si existe
-            departure_revised = departure_scheduled
-            if departure.get('revisedTime'):
-                departure_revised = datetime.fromisoformat(departure['revisedTime']['utc'].replace('Z', '+00:00'))
-            
-            arrival_revised = arrival_scheduled
-            if arrival.get('revisedTime'):
-                arrival_revised = datetime.fromisoformat(arrival['revisedTime']['utc'].replace('Z', '+00:00'))
-            
-            # Tiempo estimado de llegada si existe
-            arrival_estimated = arrival_revised
-            if arrival.get('predictedTime'):
-                arrival_estimated = datetime.fromisoformat(arrival['predictedTime']['utc'].replace('Z', '+00:00'))
-        except Exception as e:
-            logger.error(f"Error al procesar tiempos: {e}")
-            st.warning("Error al procesar los tiempos del vuelo.")
-            return None
-            
-        # Calcular duración total programada y revisada en horas
-        scheduled_duration = (arrival_scheduled - departure_scheduled).total_seconds() / 3600
-        revised_duration = (arrival_revised - departure_revised).total_seconds() / 3600
-        
-        # Estado del vuelo
-        status = flight_data.get('status', 'Desconocido')
-        
-        # Determinar el progreso del vuelo
-        progress = 0
-        if status == 'Landed':
-            progress = 100
-        elif status == 'EnRoute':
-            # Calcular el progreso basado en el tiempo actual
-            if now_utc >= departure_revised and now_utc <= arrival_estimated:
-                elapsed = (now_utc - departure_revised).total_seconds() / 3600
-                total = revised_duration
-                progress = min(100, max(0, (elapsed / total) * 100))
-        
-        # Códigos IATA
-        dep_iata = departure.get('airport', {}).get('iata', '---')
-        arr_iata = arrival.get('airport', {}).get('iata', '---')
-        
-        # Crear figura para el gráfico de progreso
+
+        # Convert times to Toronto timezone
+        toronto_tz = pytz.timezone("America/Toronto")
+        departure_scheduled = datetime.fromisoformat(departure['scheduledTime']['utc'].replace('Z', '+00:00')).astimezone(toronto_tz)
+        arrival_scheduled = datetime.fromisoformat(arrival['scheduledTime']['utc'].replace('Z', '+00:00')).astimezone(toronto_tz)
+
+        departure_revised = departure_scheduled
+        if departure.get('revisedTime'):
+            departure_revised = datetime.fromisoformat(departure['revisedTime']['utc'].replace('Z', '+00:00')).astimezone(toronto_tz)
+
+        arrival_revised = arrival_scheduled
+        if arrival.get('revisedTime'):
+            arrival_revised = datetime.fromisoformat(arrival['revisedTime']['utc'].replace('Z', '+00:00')).astimezone(toronto_tz)
+
+        arrival_estimated = arrival_revised
+        if arrival.get('predictedTime'):
+            arrival_estimated = datetime.fromisoformat(arrival['predictedTime']['utc'].replace('Z', '+00:00')).astimezone(toronto_tz)
+
+        # Current time in Toronto
+        now_toronto = datetime.now(toronto_tz)
+
+        # Calculate progress
+        total_duration = (arrival_revised - departure_revised).total_seconds()
+        elapsed_time = (now_toronto - departure_revised).total_seconds()
+        progress = max(0, min(100, (elapsed_time / total_duration) * 100)) if total_duration > 0 else 0
+
+        # Create the progress chart
         fig = go.Figure()
-        
-        # Colores según estado
-        status_colors = {
-            'Scheduled': '#1E88E5',    # Azul
-            'EnRoute': '#43A047',      # Verde
-            'Landed': '#7CB342',       # Verde claro
-            'Delayed': '#FBC02D',      # Amarillo
-            'Diverted': '#F57C00',     # Naranja
-            'Cancelled': '#E53935',    # Rojo
-        }
-        
-        progress_color = status_colors.get(status, '#757575')
-        
-        # Añadir marcador de salida
-        fig.add_trace(go.Scatter(
-            x=[0],
-            y=[0],
-            mode='markers+text',
-            marker=dict(size=15, symbol='circle', color='#1E88E5'),
-            text=[dep_iata],
-            textposition="bottom center",
-            hoverinfo='text',
-            hovertext=[f"Salida: {departure_revised.strftime('%H:%M')}"],
-            name='Salida'
-        ))
-        
-        # Añadir marcador de llegada
-        fig.add_trace(go.Scatter(
-            x=[100],
-            y=[0],
-            mode='markers+text',
-            marker=dict(size=15, symbol='circle', color='#E53935'),
-            text=[arr_iata],
-            textposition="bottom center",
-            hoverinfo='text',
-            hovertext=[f"Llegada estimada: {arrival_estimated.strftime('%H:%M')}"],
-            name='Llegada'
-        ))
-        
-        # Añadir barra de progreso (fondo gris)
+
+        # Add progress bar background
         fig.add_shape(
             type="rect",
             x0=0,
@@ -228,8 +167,8 @@ def create_flight_progress_chart(flight_data: Dict[str, Any]) -> Optional[go.Fig
             fillcolor="lightgray",
             layer="below"
         )
-        
-        # Añadir barra de progreso completado
+
+        # Add progress bar foreground
         if progress > 0:
             fig.add_shape(
                 type="rect",
@@ -237,44 +176,89 @@ def create_flight_progress_chart(flight_data: Dict[str, Any]) -> Optional[go.Fig
                 x1=progress,
                 y0=-0.1,
                 y1=0.1,
-                line=dict(color=progress_color, width=1),
-                fillcolor=progress_color,
+                line=dict(color="#43A047", width=1),
+                fillcolor="#43A047",
                 layer="below"
             )
-            
-            # Añadir posición actual del avión
+
+        # Add markers for departure and arrival
+        fig.add_trace(go.Scatter(
+            x=[0],
+            y=[0],
+            mode='markers+text',
+            marker=dict(size=15, symbol='circle', color='#1E88E5'),
+            text=["Salida"],
+            textposition="bottom center",
+            hoverinfo='text',
+            hovertext=[f"Salida: {departure_revised.strftime('%H:%M %Z')}"],
+            name='Salida'
+        ))
+
+        fig.add_trace(go.Scatter(
+            x=[100],
+            y=[0],
+            mode='markers+text',
+            marker=dict(size=15, symbol='circle', color='#E53935'),
+            text=["Llegada"],
+            textposition="bottom center",
+            hoverinfo='text',
+            hovertext=[f"Llegada estimada: {arrival_estimated.strftime('%H:%M %Z')}"],
+            name='Llegada'
+        ))
+
+        # Add current position marker
+        if progress > 0:
             fig.add_trace(go.Scatter(
                 x=[progress],
                 y=[0],
                 mode='markers',
-                marker=dict(
-                    size=18,
-                    symbol='triangle-up',
-                    color=progress_color,
-                    angle=90
-                ),
+                marker=dict(size=18, symbol='triangle-up', color='#43A047', angle=90),
                 hoverinfo='text',
                 hovertext=[f"Progreso: {progress:.1f}%"],
                 name='Posición actual'
             ))
-        
-        # Añadir sombra para retraso si aplica
-        if arrival_revised > arrival_scheduled:
-            delay_minutes = (arrival_revised - arrival_scheduled).total_seconds() / 60
-            
-            # Solo mostrar si hay retraso significativo
-            if delay_minutes > 5:
+
+        # Add time details to the sides of the chart
+        fig.add_annotation(
+            x=20,
+            y=0.35,
+            text=f"<b>Salida</b><br>Programado: {departure_scheduled.strftime('%H:%M %Z')}<br>Revisado: {departure_revised.strftime('%H:%M %Z')}",
+            showarrow=False,
+            font=dict(size=12),
+            xanchor='right',
+            align='right'
+        )
+
+        fig.add_annotation(
+            x=80,
+            y=0.35,
+            text=f"<b>Llegada</b><br>Programado: {arrival_scheduled.strftime('%H:%M %Z')}<br>Revisado: {arrival_revised.strftime('%H:%M %Z')}<br><b>Estimado: {arrival_estimated.strftime('%H:%M %Z')}</b>",
+            showarrow=False,
+            font=dict(size=12),
+            xanchor='left',
+            align='left'
+        )
+
+        # Add last update time
+        last_update = flight_data.get('lastUpdatedUtc', 'Desconocido')
+        if last_update != 'Desconocido':
+            try:
+                update_dt = datetime.fromisoformat(last_update.replace('Z', '+00:00')).astimezone(toronto_tz)
+                update_str = update_dt.strftime("%Y-%m-%d %H:%M:%S %Z")
                 fig.add_annotation(
-                    x=100,
-                    y=0.3,
-                    text=f"Retraso: {int(delay_minutes)} min",
+                    x=50,
+                    y=-0.5,
+                    text=f"Última actualización: {update_str}",
                     showarrow=False,
-                    font=dict(color="#FBC02D", size=14)
+                    font=dict(size=12, color="gray"),
+                    xanchor='center'
                 )
-        
-        # Configurar diseño
+            except Exception as e:
+                logger.error(f"Error parsing last update time: {e}")
+
+        # Configure layout
         fig.update_layout(
-            title=f"Progreso del Vuelo - {flight_data.get('number', 'N/A')}",
+            title="Progreso del Vuelo",
             showlegend=False,
             xaxis=dict(
                 showticklabels=False,
@@ -286,36 +270,16 @@ def create_flight_progress_chart(flight_data: Dict[str, Any]) -> Optional[go.Fig
                 showticklabels=False,
                 showgrid=False,
                 zeroline=False,
-                range=[-0.5, 0.5]
+                range=[-0.6, 0.6]
             ),
-            height=250,
-            margin=dict(l=20, r=20, t=50, b=20),
+            height=300,
+            margin=dict(l=20, r=20, t=50, b=50),
             plot_bgcolor='white'
         )
-        
-        # Añadir texto de estado
-        fig.add_annotation(
-            x=50,
-            y=0.4,
-            text=f"Estado: {status}",
-            showarrow=False,
-            font=dict(size=16, color=progress_color)
-        )
-        
-        # Añadir información de duración
-        hours = int(revised_duration)
-        minutes = int((revised_duration - hours) * 60)
-        
-        fig.add_annotation(
-            x=50,
-            y=-0.3,
-            text=f"Duración estimada: {hours}h {minutes}m",
-            showarrow=False,
-            font=dict(size=14)
-        )
-        
+
         return fig
+
     except Exception as e:
-        logger.exception(f"Error al crear gráfico de progreso: {e}")
-        st.error(f"Error al generar gráfico de progreso: {str(e)}")
+        logger.exception(f"Error creating flight progress chart: {e}")
+        st.error(f"Error generating progress chart: {str(e)}")
         return None
