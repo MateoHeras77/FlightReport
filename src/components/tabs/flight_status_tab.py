@@ -33,9 +33,10 @@ def fetch_flight_status(flight_number: str, custom_date: Optional[str] = None) -
         today = date.today().strftime("%Y-%m-%d")
         querystring = {"withAircraftImage": "false", "withLocation": "false", "scheduledDepartureDate": custom_date or today}
         
-        # Headers con la clave de API
+        # Headers con la clave de API desde secrets.toml
+        api_key = st.secrets["aerodatabox"]["api_key"]
         headers = {
-            "x-rapidapi-key": "7f32888a48msh378beb96d2932d2p15868djsnefd014a934e6",
+            "x-rapidapi-key": api_key,
             "x-rapidapi-host": "aerodatabox.p.rapidapi.com"
         }
         
