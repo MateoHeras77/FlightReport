@@ -23,9 +23,9 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
         with col1:
             flight_date = st.date_input("📅 Fecha de vuelo", datetime.date.today(), key="flight_date")
         with col2:
-            origin = st.text_input("🌍 Origen", key="origin").strip()
+            origin = st.selectbox("🌍 Origen", ["YYZ"], index=0, key="origin")
         with col3:
-            destination = st.text_input("✈️ Destino", key="destination").strip()
+            destination = st.selectbox("✈️ Destino", ["", "BOG", "SAL"], index=0, key="destination")
 
         flight_number = st.selectbox("🔢 Número de vuelo", ["AV205", "AV255", "AV627"], key="flight_number")
 
@@ -43,34 +43,76 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
             cierre_de_puerta = st.text_input("Cierre de Puerta", value="", placeholder="HH:MM", key="cierre_de_puerta")
             push_back = st.text_input("Push Back", value="", placeholder="HH:MM", key="push_back")
 
-        st.subheader("📝 Otros Datos")
-        col5, col6 = st.columns(2)
-        with col5:
-            pax_ob_total = st.text_input("PAX OB Total", key="pax_ob_total").strip()
-            customs_in = st.text_input("Customs", key="customs_in").strip()
-            delay = st.text_area("Delay", value="", key="delay")
-        with col6:
-            gate = st.text_input("Gate", key="gate").strip()
-            carrousel = st.text_input("Carrousel", key="carrousel").strip()
-            delay_code = st.text_area("Delay Code", value="", height=150, key="delay_code")
+        st.subheader("📋 Información de Customs")
+        col_customs1, col_customs2 = st.columns(2)
+        with col_customs1:
+            customs_in = st.text_input("Customs In", value="", placeholder="HH:MM", key="customs_in")
+        with col_customs2:
+            customs_out = st.text_input("Customs Out", value="", placeholder="HH:MM", key="customs_out")
 
-        st.subheader("💬 WCHR y Comentarios")
-        col7, col8 = st.columns(2)
-        with col7:
-            WCHR = st.text_area("WCHR", value="", height=150, key="WCHR")
-        with col8:
-            comments = st.text_area("Comentarios", value="", height=150, key="comments")
+        st.subheader("👥 Información de Pasajeros")
+        col_pax1, col_pax2 = st.columns(2)
+        with col_pax1:
+            total_pax = st.text_input("Total Pax", value="", placeholder="Cantidad de pasajeros a bordo",key="total_pax").strip()
+            pax_c = st.text_input("PAX C", placeholder="Cantidad de pasajeros en cabina C",value="", key="pax_c").strip()
+        with col_pax2:
+            pax_y = st.text_input("PAX Y", placeholder="Cantidad de pasajeros en cabina Y",value="", key="pax_y").strip()
+            infants = st.text_input("Infantes", placeholder="Cantidad de infantes a bordo",value="", key="infants").strip()
+
+        st.subheader("⏳ Información por Demoras")
+        col_delay1, col_delay2 = st.columns(2)
+        with col_delay1:
+            delay = st.text_area("Delay (Ingresar minutos)",placeholder="Ingresar unicamente la cantidad de minutos de delay", value="", key="delay")
+        with col_delay2:
+            delay_code = st.text_area("Delay Code (Reporte)", placeholder="Ingresar el reporte y codigos del retraso",value="", key="delay_code")
+
+        # Actualizar etiquetas de WCHR y Agentes con el número de vuelo seleccionado
+        wchr_current_label = f"WCHR Vuelo Actual ({flight_number})"
+        agents_current_label = f"Agentes Vuelo Actual ({flight_number})"
+
+        # Determinar el vuelo anterior basado en el número de vuelo seleccionado
+        previous_flight_mapping = {
+            "AV205": "AV204",
+            "AV627": "AV626",
+            "AV255": "AV254"
+        }
+        previous_flight = previous_flight_mapping.get(flight_number, "")
+        wchr_previous_label = f"WCHR Vuelo Anterior ({previous_flight})"
+        agents_previous_label = f"Agentes Vuelo Anterior ({previous_flight})"
+
+        st.subheader("💬 WCHR")
+        col_wchr1, col_wchr2 = st.columns(2)
+        with col_wchr1:
+            wchr_current_flight = st.text_area(wchr_current_label, value="", key="wchr_current_flight")
+            wchr_previous_flight = st.text_area(wchr_previous_label, value="", key="wchr_previous_flight")
+        with col_wchr2:
+            agents_current_flight = st.text_area(agents_current_label, value="", key="agents_current_flight")
+            agents_previous_flight = st.text_area(agents_previous_label, value="", key="agents_previous_flight")
+
+
+
+        st.subheader("📍 Información de Gate y Carrusel")
+        col_gate1, col_gate2 = st.columns(2)
+        with col_gate1:
+            gate = st.text_input("Gate", key="gate").strip()
+        with col_gate2:
+            carrousel = st.text_input("Carrousel", key="carrousel").strip()
+
+        st.subheader("💬 Comentarios")
+        comments = st.text_area("Comentarios", value="", height=150, key="comments")
 
         submitted = st.form_submit_button("🔍 Revisar")
 
     if submitted:
         return process_form_data(
-            flight_date, origin, destination, flight_number,
-            std, atd, groomers_in, groomers_out, crew_at_gate,
-            ok_to_board, flight_secure, cierre_de_puerta, push_back,
-            pax_ob_total, customs_in, delay, gate, carrousel,
-            delay_code, WCHR, comments
-        )
+                flight_date, origin, destination, flight_number,
+                std, atd, groomers_in, groomers_out, crew_at_gate,
+                ok_to_board, flight_secure, cierre_de_puerta, push_back,
+                total_pax, pax_c, pax_y, infants, customs_in, customs_out,
+                delay, gate, carrousel, delay_code,
+                wchr_current_flight, wchr_previous_flight,
+                agents_current_flight, agents_previous_flight, comments
+            )
     else:
         return False, None
 
@@ -79,8 +121,10 @@ def process_form_data(
     flight_date, origin, destination, flight_number,
     std, atd, groomers_in, groomers_out, crew_at_gate,
     ok_to_board, flight_secure, cierre_de_puerta, push_back,
-    pax_ob_total, customs_in, delay, gate, carrousel,
-    delay_code, WCHR, comments
+    total_pax, pax_c, pax_y, infants, customs_in, customs_out,
+    delay, gate, carrousel, delay_code,
+    wchr_current_flight, wchr_previous_flight,
+    agents_current_flight, agents_previous_flight, comments
 ) -> Tuple[bool, Dict[str, Any]]:
     """
     Procesa y valida los datos del formulario.
@@ -91,25 +135,25 @@ def process_form_data(
             - datos: dict con los datos procesados o None
     """
     logger.info("Procesando datos del formulario")
-    
+
     # Validar campos obligatorios
     required_fields = {
         "Fecha de vuelo": flight_date,
         "Origen": origin,
         "Destino": destination,
         "Número de vuelo": flight_number,
-        "PAX OB Total": pax_ob_total,
+        "Total Pax": total_pax,
         "Customs In": customs_in,
         "Gate": gate,
         "Carrousel": carrousel,
-        "WCHR": WCHR,
+        "WCHR": wchr_current_flight,
     }
     missing = [k for k, v in required_fields.items() if not v or str(v).strip() == ""]
     if missing:
         st.error("Complete los siguientes campos: " + ", ".join(missing))
         logger.warning(f"Faltan campos obligatorios: {missing}")
         return False, None
-        
+
     # Validar campos de tiempo
     time_fields = {
         "STD": std,
@@ -122,7 +166,7 @@ def process_form_data(
         "Cierre de Puerta": cierre_de_puerta,
         "Push Back": push_back
     }
-    
+
     all_valid = True
     normalized_times = {}
     for label, value in time_fields.items():
@@ -136,6 +180,44 @@ def process_form_data(
 
     if not all_valid:
         return False, None
+
+    # Validar campos obligatorios y numéricos para pasajeros
+    passenger_fields = {
+        "Total Pax": total_pax,
+        "PAX C": pax_c,
+        "PAX Y": pax_y,
+        "Infantes": infants
+    }
+
+    for field_name, value in passenger_fields.items():
+        if not value.strip():
+            st.error(f"El campo '{field_name}' es obligatorio.")
+            logger.warning(f"Campo obligatorio faltante: {field_name}")
+            return False, None
+        if not value.isdigit():
+            st.error(f"El campo '{field_name}' debe contener únicamente números.")
+            logger.warning(f"Campo no numérico: {field_name} - Valor ingresado: {value}")
+            return False, None
+
+    # Validar campo opcional y numérico para delay
+    if delay.strip() and not delay.isdigit():
+        st.error("El campo 'Delay (Ingresar minutos)' debe contener únicamente números si se completa.")
+        logger.warning(f"Campo no numérico: Delay - Valor ingresado: {delay}")
+        return False, None
+
+    # Validar campos opcionales y numéricos para WCHR y agentes
+    wchr_fields = {
+        "WCHR Vuelo Actual": wchr_current_flight,
+        "WCHR Vuelo Anterior": wchr_previous_flight,
+        "Agentes Vuelo Actual": agents_current_flight,
+        "Agentes Vuelo Anterior": agents_previous_flight
+    }
+
+    for field_name, value in wchr_fields.items():
+        if value.strip() and not value.isdigit():
+            st.error(f"El campo '{field_name}' debe contener únicamente números si se completa.")
+            logger.warning(f"Campo no numérico: {field_name} - Valor ingresado: {value}")
+            return False, None
 
     # Preparar datos para la base de datos y visualización
     database_data = {
@@ -152,24 +234,34 @@ def process_form_data(
         "flight_secure": format_time_for_database(normalized_times["Flight Secure"]),
         "cierre_de_puerta": format_time_for_database(normalized_times["Cierre de Puerta"]),
         "push_back": format_time_for_database(normalized_times["Push Back"]),
-        "pax_ob_total": pax_ob_total,
+        "total_pax": total_pax,
         "customs_in": customs_in,
+        "customs_out": customs_out,
         "delay": delay,
         "gate": gate,
         "carrousel": carrousel,
         "delay_code": delay_code,
-        "WCHR": WCHR,
+        "wchr_current_flight": wchr_current_flight,
+        "wchr_previous_flight": wchr_previous_flight,
+        "agents_current_flight": agents_current_flight,
+        "agents_previous_flight": agents_previous_flight,
         "comments": comments
     }
-    
+
     # Revertir formato de tiempo para visualización
     display_data = database_data.copy()
     for key in normalized_times.keys():
         field_name = key.lower().replace(" ", "_")
         if display_data[field_name]:
             display_data[field_name] = normalized_times[key]
-            
+
+    # Asegurar que los valores de pasajeros se transfieran correctamente a display_data
+    display_data["pax_c"] = pax_c
+    display_data["pax_y"] = pax_y
+    display_data["infants"] = infants
+
     logger.info("Datos del formulario procesados y validados correctamente")
+
     return True, {
         "data_to_display": display_data,
         "data_for_database": database_data

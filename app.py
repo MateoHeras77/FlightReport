@@ -95,7 +95,19 @@ with tab1:
                 'ok_to_board', 'flight_secure', 'cierre_de_puerta', 'push_back'
             ]}
             flight_info = {k: v for k, v in display_data.items() if any(x in k.lower() for x in ['flight', 'route', 'aircraft']) and k not in operation_times}
-            other_info = {k: v for k, v in display_data.items() if k not in operation_times and k not in flight_info}
+            customs_info = {k: v for k, v in display_data.items() if k in ['customs_in', 'customs_out']}
+            passenger_info = {k: v for k, v in display_data.items() if k in ['total_pax', 'pax_c', 'pax_y', 'infants']}
+            delay_info = {k: v for k, v in display_data.items() if k in ['delay', 'delay_code']}
+            wchr_info = {k: v for k, v in display_data.items() if k in ['wchr_current_flight', 'wchr_previous_flight', 'agents_current_flight', 'agents_previous_flight']}
+            gate_carrousel_info = {k: v for k, v in display_data.items() if k in ['gate', 'carrousel']}
+            other_info = {k: v for k, v in display_data.items() if k not in operation_times and k not in flight_info and k not in customs_info and k not in passenger_info and k not in delay_info and k not in wchr_info and k not in gate_carrousel_info}
+
+            # Combinar información adicional e información del vuelo
+            st.subheader("✈️ Información del Vuelo")
+            combined_info = {**flight_info, **other_info}
+            cols = st.columns(3)
+            for i, (key, value) in enumerate(combined_info.items()):
+                cols[i % 3].write(f"*{key}:* {value}")
 
             # Mostrar información de tiempos de operación
             st.subheader("⏰ Tiempos de Operación")
@@ -103,31 +115,86 @@ with tab1:
             for i, (key, value) in enumerate(operation_times.items()):
                 cols[i % 3].write(f"*{key}:* {value}")
 
-            # Mostrar información del vuelo
-            st.subheader("✈️ Información del Vuelo")
-            cols = st.columns(3)
-            for i, (key, value) in enumerate(flight_info.items()):
-                cols[i % 3].write(f"*{key}:* {value}")
 
-            # Mostrar información adicional
-            if other_info:
-                st.subheader("📝 Otros Detalles")
-                cols = st.columns(3)
-                for i, (key, value) in enumerate(other_info.items()):
-                    cols[i % 3].write(f"*{key}:* {value}")
+            # Mostrar información de customs
+            st.subheader("📋 Información de Customs")
+            cols = st.columns(2)
+            for i, (key, value) in enumerate(customs_info.items()):
+                cols[i % 2].write(f"*{key}:* {value}")
 
-            # Mostrar el reporte completo y botón para copiar
-            st.subheader("📋 Reporte Final")
-            report_text = "\n".join([
-                "⏰ TIEMPOS DE OPERACIÓN",
-                *[f"*{k}:* {v}" for k, v in operation_times.items()],
-                "\n✈️ INFORMACIÓN DEL VUELO",
-                *[f"*{k}:* {v}" for k, v in flight_info.items()],
-                "\n📝 OTROS DETALLES",
-                *[f"*{k}:* {v}" for k, v in other_info.items()]
-            ])
-            st.text_area("Reporte Final", value=report_text, height=200)
-            create_copy_button(report_text)
+            # Mostrar información de pasajeros
+            st.subheader("👥 Información de Pasajeros")
+            cols = st.columns(2)
+            for i, (key, value) in enumerate(passenger_info.items()):
+                cols[i % 2].write(f"*{key}:* {value}")
+
+            # Mostrar información de demoras
+            st.subheader("⏳ Información por Demoras")
+            cols = st.columns(2)
+            for i, (key, value) in enumerate(delay_info.items()):
+                cols[i % 2].write(f"*{key}:* {value}")
+
+            # Mostrar información de WCHR
+            st.subheader("💬 WCHR")
+            cols = st.columns(2)
+            for i, (key, value) in enumerate(wchr_info.items()):
+                cols[i % 2].write(f"*{key}:* {value}")
+
+            # Mostrar información de Gate y Carrusel
+            st.subheader("📍 Información de Gate y Carrusel")
+            cols = st.columns(2)
+            for i, (key, value) in enumerate(gate_carrousel_info.items()):
+                cols[i % 2].write(f"*{key}:* {value}")
+
+
+            # Mostrar el reporte generado en lugar del "Reporte Final"
+            st.subheader("📋 Reporte Generado")
+            report_text = f"""
+🚀 *Datos Básicos*:
+*Fecha de vuelo:* {display_data.get('flight_date', '')}
+*Origen:* {display_data.get('origin', '')}
+*Destino:* {display_data.get('destination', '')}
+*Número de vuelo:* {display_data.get('flight_number', '')}
+
+⏰ *Tiempos:*
+*STD:* {display_data.get('std', '')}
+*ATD:* {display_data.get('atd', '')}
+*Groomers In:* {display_data.get('groomers_in', '')}
+*Groomers Out:* {display_data.get('groomers_out', '')}
+*Crew at Gate:* {display_data.get('crew_at_gate', '')}
+*OK to Board:* {display_data.get('ok_to_board', '')}
+*Flight Secure:* {display_data.get('flight_secure', '')}
+*Cierre de Puerta:* {display_data.get('cierre_de_puerta', '')}
+*Push Back:* {display_data.get('push_back', '')}
+
+📋 *Información de Customs:*
+*Customs In:* {display_data.get('customs_in', '')}
+*Customs Out:* {display_data.get('customs_out', '')}
+
+👥 *Información de Pasajeros:*
+*Total Pax:* {display_data.get('total_pax', '')}
+*PAX C:* {display_data.get('pax_c', '')}
+*PAX Y:* {display_data.get('pax_y', '')}
+*Infantes:* {display_data.get('infants', '')}
+
+⏳ *Información por Demoras:*
+*Delay:* {display_data.get('delay', '')}
+*Delay Code:* {display_data.get('delay_code', '')}
+
+💬 *WCHR:*
+*WCHR Vuelo Actual:* {display_data.get('wchr_current_flight', '')}
+*Agentes Vuelo Actual:* {display_data.get('agents_current_flight', '')}
+*WCHR Vuelo Anterior:* {display_data.get('wchr_previous_flight', '')}
+*Agentes Vuelo Anterior:* {display_data.get('agents_previous_flight', '')}
+
+📍 *Información de Gate y Carrusel:*
+*Gate:* {display_data.get('gate', '')}
+*Carrousel:* {display_data.get('carrousel', '')}
+
+💬 *Comentarios:*
+{display_data.get('comments', '')}
+"""
+            st.text_area("Reporte Generado", value=report_text.strip(), height=300)
 
             # Botón para enviar a Supabase
             if st.button("Enviar y Finalizar"):
@@ -144,6 +211,9 @@ with tab1:
                 except Exception as e:
                     st.error("Error al procesar el envío de datos")
                     logger.error(f"Error en envío de datos: {str(e)}", exc_info=True)
+
+            # Botón para copiar el reporte generado
+            create_copy_button(report_text)
 
     except Exception as e:
         logger.error(f"Error en Tab 1: {str(e)}", exc_info=True)

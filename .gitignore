@@ -4,7 +4,7 @@
 *.env
 credenciales.json
 secrets.toml
-
+Analisis*/
 # Archivos de logs
 logs/
 *.log
