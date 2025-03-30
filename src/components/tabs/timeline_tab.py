@@ -296,71 +296,76 @@ def display_flight_details(flights):
     
     # Crear contenedores para diferentes secciones de información
     for flight in flights:
-        # Información básica del vuelo
+        # Información básica del vuelo con emojis
         with st.container():
-            st.markdown("##### Información Básica")
+            st.markdown("##### ✈️ Información Básica")
             col1, col2, col3 = st.columns(3)
             with col1:
-                st.write(f"**Fecha:** {flight.get('flight_date', 'N/A')}")
-                st.write(f"**Número de Vuelo:** {flight.get('flight_number', 'N/A')}")
-                st.write(f"**Gate:** {flight.get('gate', 'N/A')}")
+                st.write(f"📅 **Fecha:** {flight.get('flight_date', 'N/A')}")
+                st.write(f"🔢 **Número de Vuelo:** {flight.get('flight_number', 'N/A')}")
+                st.write(f"📍 **Gate:** {flight.get('gate', 'N/A')}")
             with col2:
-                st.write(f"**Origen:** {flight.get('origin', 'N/A')}")
-                st.write(f"**Destino:** {flight.get('destination', 'N/A')}")
-                st.write(f"**Carrusel:** {flight.get('carrousel', 'N/A')}")
+                st.write(f"🌍 **Origen:** {flight.get('origin', 'N/A')}")
+                st.write(f"✈️ **Destino:** {flight.get('destination', 'N/A')}")
+                st.write(f"🎡 **Carrusel:** {flight.get('carrousel', 'N/A')}")
             with col3:
-                st.write(f"**STD:** {flight.get('std', 'N/A')}")
-                st.write(f"**ATD:** {flight.get('atd', 'N/A')}")
-                st.write(f"**Delay:** {flight.get('delay', 'N/A')} min")
-        
-        # Información de pasajeros y servicios especiales
+                st.write(f"⏰ **STD:** {flight.get('std', 'N/A')}")
+                st.write(f"⏰ **ATD:** {flight.get('atd', 'N/A')}")
+                st.write(f"⏳ **Delay:** {flight.get('delay', 'N/A')} min")
+
+        # Información de pasajeros y servicios especiales con emojis
         with st.container():
-            st.markdown("##### Información de Pasajeros y Servicios")
+            st.markdown("##### 👥 Información de Pasajeros y Servicios")
             col1, col2, col3 = st.columns(3)
             with col1:
-                st.write(f"**PAX OB Total:** {flight.get('pax_ob_total', 'N/A')}")
-                st.write(f"**WCHR:** {flight.get('WCHR', 'N/A')}")
+                st.write(f"👥 **Total Pax:** {flight.get('pax_ob_total', 'N/A')}")
+                st.write(f"👤 **PAX C:** {flight.get('pax_c', 'N/A')}")
+                st.write(f"👥 **PAX Y:** {flight.get('pax_y', 'N/A')}")
+                st.write(f"👶 **Infantes:** {flight.get('infants', 'N/A')}")
             with col2:
-                st.write(f"**Customs:** {flight.get('customs_in', 'N/A')}")
-                st.write(f"**Delay Code:** {flight.get('delay_code', 'N/A')}")
+                st.write(f"♿ **WCHR Vuelo Actual:** {flight.get('wchr_current_flight', 'N/A')}")
+                st.write(f"👨‍✈️ **Agentes Vuelo Actual:** {flight.get('agents_current_flight', 'N/A')}")
+                st.write(f"♿ **WCHR Vuelo Anterior:** {flight.get('wchr_previous_flight', 'N/A')}")
+                st.write(f"👨‍✈️ **Agentes Vuelo Anterior:** {flight.get('agents_previous_flight', 'N/A')}")
             with col3:
-                if flight.get('delay'):
-                    st.write(f"**Delay:** {flight.get('delay', 'N/A')} min")
-        
-        # Eventos temporales
+                st.write(f"📋 **Customs In:** {flight.get('customs_in', 'N/A')}")
+                st.write(f"📋 **Customs Out:** {flight.get('customs_out', 'N/A')}")
+                st.write(f"📋 **Delay Code:** {flight.get('delay_code', 'N/A')}")
+
+        # Eventos temporales con emojis
         with st.container():
-            st.markdown("##### Eventos Temporales")
+            st.markdown("##### ⏰ Eventos Temporales")
             col1, col2 = st.columns(2)
             with col1:
-                st.write(f"**Groomers In:** {flight.get('groomers_in', 'N/A')}")
-                st.write(f"**Groomers Out:** {flight.get('groomers_out', 'N/A')}")
-                st.write(f"**Crew at Gate:** {flight.get('crew_at_gate', 'N/A')}")
-                st.write(f"**OK to Board:** {flight.get('ok_to_board', 'N/A')}")
+                st.write(f"🧹 **Groomers In:** {flight.get('groomers_in', 'N/A')}")
+                st.write(f"🧹 **Groomers Out:** {flight.get('groomers_out', 'N/A')}")
+                st.write(f"👨‍✈️ **Crew at Gate:** {flight.get('crew_at_gate', 'N/A')}")
+                st.write(f"✅ **OK to Board:** {flight.get('ok_to_board', 'N/A')}")
             with col2:
-                st.write(f"**Flight Secure:** {flight.get('flight_secure', 'N/A')}")
-                st.write(f"**Cierre de Puerta:** {flight.get('cierre_de_puerta', 'N/A')}")
-                st.write(f"**Push Back:** {flight.get('push_back', 'N/A')}")
-        
-        # Información adicional
+                st.write(f"🔒 **Flight Secure:** {flight.get('flight_secure', 'N/A')}")
+                st.write(f"🚪 **Cierre de Puerta:** {flight.get('cierre_de_puerta', 'N/A')}")
+                st.write(f"🚜 **Push Back:** {flight.get('push_back', 'N/A')}")
+
+        # Información adicional con emojis
         with st.container():
-            st.markdown("##### Información Adicional")
+            st.markdown("##### 📝 Información Adicional")
             if flight.get('comments'):
-                st.write(f"**Comentarios:** {flight.get('comments')}")
+                st.write(f"💬 **Comentarios:** {flight.get('comments')}")
             col1, col2 = st.columns(2)
             with col1:
                 if flight.get('created_at'):
                     try:
                         created_dt = datetime.fromisoformat(flight['created_at'].replace('Z', '+00:00'))
-                        st.write(f"**Creado:** {created_dt.strftime('%Y-%m-%d %H:%M:%S')}")
+                        st.write(f"🕒 **Creado:** {created_dt.strftime('%Y-%m-%d %H:%M:%S')}")
                     except:
-                        st.write(f"**Creado:** {flight.get('created_at', 'N/A')}")
+                        st.write(f"🕒 **Creado:** {flight.get('created_at', 'N/A')}")
             with col2:
                 if flight.get('updated_at'):
                     try:
                         updated_dt = datetime.fromisoformat(flight['updated_at'].replace('Z', '+00:00'))
-                        st.write(f"**Actualizado:** {updated_dt.strftime('%Y-%m-%d %H:%M:%S')}")
+                        st.write(f"🕒 **Actualizado:** {updated_dt.strftime('%Y-%m-%d %H:%M:%S')}")
                     except:
-                        st.write(f"**Actualizado:** {flight.get('updated_at', 'N/A')}")
+                        st.write(f"🕒 **Actualizado:** {flight.get('updated_at', 'N/A')}")
         
         # Línea divisoria entre vuelos si hay múltiples
         if len(flights) > 1:
@@ -375,6 +380,7 @@ def display_flight_schedule(flight):
     """
     st.subheader("Horarios de Eventos")
     
+    # Tabla de horarios sin incluir 'Customs'
     time_fields = {
         "STD": flight.get('std'),
         "ATD": flight.get('atd'),
@@ -384,24 +390,22 @@ def display_flight_schedule(flight):
         "OK to Board": flight.get('ok_to_board'),
         "Flight Secure": flight.get('flight_secure'),
         "Cierre de Puerta": flight.get('cierre_de_puerta'),
-        "Push Back": flight.get('push_back'),
-        "Customs": flight.get('customs_in')
+        "Push Back": flight.get('push_back')
     }
-    
+
     # Crear un DataFrame para mostrar los horarios como tabla
     time_data = []
     for event, time_val in time_fields.items():
         # Formatear el tiempo para mostrarlo de manera legible
         if time_val is not None:
-            # Usar type() en lugar de isinstance()
             if hasattr(time_val, 'strftime'):
                 formatted_time = time_val.strftime("%H:%M")
             else:
                 formatted_time = time_val
         else:
             formatted_time = "N/A"
-            
+
         time_data.append({"Evento": event, "Hora": formatted_time})
-    
+
     # Mostrar tabla de horarios
     st.dataframe(time_data, hide_index=True)
