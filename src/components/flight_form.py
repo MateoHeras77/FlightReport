@@ -66,9 +66,9 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
         with col_delay2:
             delay_code = st.text_area("Delay Code (Reporte)", placeholder="Ingresar el reporte y codigos del retraso",value="", key="delay_code")
 
-        # Actualizar etiquetas de WCHR y Agentes con el número de vuelo seleccionado
-        wchr_current_label = f"WCHR Vuelo Actual ({flight_number})"
-        agents_current_label = f"Agentes Vuelo Actual ({flight_number})"
+        # Actualizar etiquetas de WCHR y Agentes eliminando "AV2**" y simplificando el código
+        wchr_current_label = "WCHR Vuelo Actual"
+        agents_current_label = "Agentes Vuelo Actual"
 
         # Determinar el vuelo anterior basado en el número de vuelo seleccionado
         previous_flight_mapping = {
@@ -77,8 +77,8 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
             "AV255": "AV254"
         }
         previous_flight = previous_flight_mapping.get(flight_number, "")
-        wchr_previous_label = f"WCHR Vuelo Anterior ({previous_flight})"
-        agents_previous_label = f"Agentes Vuelo Anterior ({previous_flight})"
+        wchr_previous_label = "WCHR Vuelo Anterior"
+        agents_previous_label = "Agentes Vuelo Anterior"
 
         st.subheader("💬 WCHR")
         col_wchr1, col_wchr2 = st.columns(2)
@@ -219,7 +219,7 @@ def process_form_data(
             logger.warning(f"Campo no numérico: {field_name} - Valor ingresado: {value}")
             return False, None
 
-    # Preparar datos para la base de datos y visualización
+    # Actualizar el esquema de datos para reflejar los cambios en la base de datos
     database_data = {
         "flight_date": flight_date.isoformat(),
         "origin": origin,
@@ -234,17 +234,19 @@ def process_form_data(
         "flight_secure": format_time_for_database(normalized_times["Flight Secure"]),
         "cierre_de_puerta": format_time_for_database(normalized_times["Cierre de Puerta"]),
         "push_back": format_time_for_database(normalized_times["Push Back"]),
-        "total_pax": total_pax,
+        "pax_c": pax_c,
+        "pax_y": pax_y,
+        "infants": infants,
         "customs_in": customs_in,
         "customs_out": customs_out,
         "delay": delay,
         "gate": gate,
         "carrousel": carrousel,
         "delay_code": delay_code,
-        "wchr_current_flight": wchr_current_flight,
         "wchr_previous_flight": wchr_previous_flight,
-        "agents_current_flight": agents_current_flight,
         "agents_previous_flight": agents_previous_flight,
+        "agents_current_flight": agents_current_flight,
+        "wchr_current_flight": wchr_current_flight,
         "comments": comments
     }
 
@@ -255,10 +257,9 @@ def process_form_data(
         if display_data[field_name]:
             display_data[field_name] = normalized_times[key]
 
-    # Asegurar que los valores de pasajeros se transfieran correctamente a display_data
-    display_data["pax_c"] = pax_c
-    display_data["pax_y"] = pax_y
-    display_data["infants"] = infants
+    # Asegurar que el valor de Total Pax se incluya en los datos enviados y en el reporte
+    database_data["pax_ob_total"] = total_pax
+    display_data["pax_ob_total"] = total_pax
 
     logger.info("Datos del formulario procesados y validados correctamente")
 

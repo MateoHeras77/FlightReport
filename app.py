@@ -128,27 +128,7 @@ with tab1:
             for i, (key, value) in enumerate(passenger_info.items()):
                 cols[i % 2].write(f"*{key}:* {value}")
 
-            # Mostrar información de demoras
-            st.subheader("⏳ Información por Demoras")
-            cols = st.columns(2)
-            for i, (key, value) in enumerate(delay_info.items()):
-                cols[i % 2].write(f"*{key}:* {value}")
-
-            # Mostrar información de WCHR
-            st.subheader("💬 WCHR")
-            cols = st.columns(2)
-            for i, (key, value) in enumerate(wchr_info.items()):
-                cols[i % 2].write(f"*{key}:* {value}")
-
-            # Mostrar información de Gate y Carrusel
-            st.subheader("📍 Información de Gate y Carrusel")
-            cols = st.columns(2)
-            for i, (key, value) in enumerate(gate_carrousel_info.items()):
-                cols[i % 2].write(f"*{key}:* {value}")
-
-
-            # Mostrar el reporte generado en lugar del "Reporte Final"
-            st.subheader("📋 Reporte Generado")
+            # Asegurar que Total Pax se muestre correctamente en el reporte generado
             report_text = f"""
 🚀 *Datos Básicos*:
 *Fecha de vuelo:* {display_data.get('flight_date', '')}
@@ -172,7 +152,7 @@ with tab1:
 *Customs Out:* {display_data.get('customs_out', '')}
 
 👥 *Información de Pasajeros:*
-*Total Pax:* {display_data.get('total_pax', '')}
+*Total Pax:* {display_data.get('pax_ob_total', '')}
 *PAX C:* {display_data.get('pax_c', '')}
 *PAX Y:* {display_data.get('pax_y', '')}
 *Infantes:* {display_data.get('infants', '')}
@@ -182,10 +162,10 @@ with tab1:
 *Delay Code:* {display_data.get('delay_code', '')}
 
 💬 *WCHR:*
-*WCHR Vuelo Actual:* {display_data.get('wchr_current_flight', '')}
-*Agentes Vuelo Actual:* {display_data.get('agents_current_flight', '')}
 *WCHR Vuelo Anterior:* {display_data.get('wchr_previous_flight', '')}
 *Agentes Vuelo Anterior:* {display_data.get('agents_previous_flight', '')}
+*WCHR Vuelo Actual:* {display_data.get('wchr_current_flight', '')}
+*Agentes Vuelo Actual:* {display_data.get('agents_current_flight', '')}
 
 📍 *Información de Gate y Carrusel:*
 *Gate:* {display_data.get('gate', '')}
