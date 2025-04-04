@@ -25,6 +25,7 @@ try:
     from src.components.tabs.flight_status_tab import render_flight_status_tab  # Importar la pestaña de estado de vuelo
     from src.utils.form_utils import create_copy_button
     from src.services.supabase_service import send_data_to_supabase
+    from src.components.anuncios_textos import anuncios  # Importar el archivo de textos de anuncios
 
     # Configurar logger
     logger = setup_logger()
@@ -59,9 +60,9 @@ except Exception as e:
     logger.error(f"Error de conexión Supabase: {str(e)}", exc_info=True)
     st.stop()
 
-# Crear tabs para las diferentes funcionalidades - Ahora con tres pestañas principales
+# Crear tabs para las diferentes funcionalidades - Ahora con cuatro pestañas principales
 try:
-    tab1, tab2, tab3 = st.tabs(["🛫 Ingreso de Datos", "📊 Visualizador", "🛬 Estado de Vuelo"])
+    tab1, tab2, tab3, tab4 = st.tabs(["🛫 Ingreso de Datos", "📊 Visualizador", "🛬 Estado de Vuelo", "📢 Anuncios"])
 except Exception as e:
     logger.error(f"Error al crear tabs: {str(e)}", exc_info=True)
     st.error("Error al cargar la interfaz de usuario")
@@ -216,3 +217,56 @@ with tab3:
     except Exception as e:
         logger.error(f"Error en Tab 3: {str(e)}", exc_info=True)
         st.error("Error al cargar la información de estado de vuelo")
+
+# Tab 4: Anuncios
+with tab4:
+    try:
+        st.title("✈️ Anuncio de Arrivals")
+
+        # Anuncio de Arrivals
+        st.markdown(anuncios['arrivals']['es'], unsafe_allow_html=True)
+        st.markdown(anuncios['arrivals']['en'], unsafe_allow_html=True)
+
+        # Inicio de abordaje
+        st.title("👪🏽  Anuncio de Abordaje")
+        st.markdown(anuncios['boarding_details']['inicio_abordaje']['es'], unsafe_allow_html=True)
+        st.markdown(anuncios['boarding_details']['inicio_abordaje']['en'], unsafe_allow_html=True)
+
+        # Preabordaje
+        st.subheader("🛡️ Preabordaje")
+        st.markdown(anuncios['boarding_details']['preboarding']['es'], unsafe_allow_html=True)
+        st.markdown(anuncios['boarding_details']['preboarding']['en'], unsafe_allow_html=True)
+
+        # Grupo A
+        st.subheader("🌟 Grupo A")
+        st.markdown(anuncios['boarding_details']['group_a']['es'], unsafe_allow_html=True)
+        st.markdown(anuncios['boarding_details']['group_a']['en'], unsafe_allow_html=True)
+
+        # Abordaje Familia con Niños
+        st.subheader("👶 Abordaje Familia con Niños")
+        st.markdown(anuncios['boarding_details']['family_boarding']['es'], unsafe_allow_html=True)
+        st.markdown(anuncios['boarding_details']['family_boarding']['en'], unsafe_allow_html=True)
+
+        # Grupo B
+        st.subheader("🛫 Grupo B")
+        st.markdown(anuncios['boarding_details']['group_b']['es'], unsafe_allow_html=True)
+        st.markdown(anuncios['boarding_details']['group_b']['en'], unsafe_allow_html=True)
+
+        # Grupo C
+        st.subheader("🎒 Grupo C")
+        st.markdown(anuncios['boarding_details']['group_c']['es'], unsafe_allow_html=True)
+        st.markdown(anuncios['boarding_details']['group_c']['en'], unsafe_allow_html=True)
+
+        # Grupo D y E
+        st.subheader("📜 Grupo D y E")
+        st.markdown(anuncios['boarding_details']['group_d_e']['es'], unsafe_allow_html=True)
+        st.markdown(anuncios['boarding_details']['group_d_e']['en'], unsafe_allow_html=True)
+
+        # Grupo F
+        st.subheader("📦 Grupo F (Pasajeros XS o BASIC)")
+        st.markdown(anuncios['boarding_details']['group_f']['es'], unsafe_allow_html=True)
+        st.markdown(anuncios['boarding_details']['group_f']['en'], unsafe_allow_html=True)
+
+    except Exception as e:
+        logger.error(f"Error en la pestaña de anuncios: {str(e)}", exc_info=True)
+        st.error("Error al procesar los anuncios")
