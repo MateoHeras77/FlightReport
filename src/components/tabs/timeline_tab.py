@@ -85,7 +85,15 @@ def render_timeline_tab(client):
     if not client:
         st.error("No hay conexión con Supabase. Verifique la configuración.")
         return
-    
+
+    # Inicializar session_state para datos preliminares y finales
+    if "preliminary_data" not in st.session_state:
+        st.session_state.preliminary_data = None
+    if "created_at_filter" not in st.session_state:
+        st.session_state.created_at_filter = None
+    if "flights_data" not in st.session_state:
+        st.session_state.flights_data = None
+
     # Obtener todas las fechas y números de vuelo disponibles para los filtros
     try:
         # Consulta para fechas únicas
@@ -100,21 +108,15 @@ def render_timeline_tab(client):
             logger.error(f"Error al obtener fechas: {dates_response.error}")
             dates = []
         else:
-            # Extraer fechas únicas
-            logger.info(f"Datos de fechas obtenidos: {len(dates_response.data)}")
             all_dates = [item['flight_date'] for item in dates_response.data]
             dates = sorted(list(set(all_dates)), reverse=True)
-            logger.info(f"Fechas únicas encontradas: {dates}")
         
         if hasattr(flights_response, 'error') and flights_response.error is not None:
             logger.error(f"Error al obtener números de vuelo: {flights_response.error}")
             flight_numbers = []
         else:
-            # Extraer números de vuelo únicos
-            logger.info(f"Datos de vuelos obtenidos: {len(flights_response.data)}")
             all_flights = [item['flight_number'] for item in flights_response.data]
             flight_numbers = sorted(list(set(all_flights)))
-            logger.info(f"Números de vuelo únicos encontrados: {flight_numbers}")
         
         # Filtros para seleccionar fecha y vuelo
         col1, col2 = st.columns(2)
@@ -137,20 +139,18 @@ def render_timeline_tab(client):
         date_filter = None if selected_date == "Todas" else selected_date
         flight_filter = None if selected_flight == "Todos" else selected_flight
         
-        # Mostrar filtros aplicados para depuración
-        logger.info(f"Filtros aplicados - Fecha: {date_filter}, Vuelo: {flight_filter}")
+        # Botón para buscar datos iniciales
+        if st.button("Buscar Datos Iniciales"):
+            logger.info(f"Filtros aplicados - Fecha: {date_filter}, Vuelo: {flight_filter}")
+            st.session_state.preliminary_data = fetch_flight_data_for_chart(client, date_filter, flight_filter)
+            st.session_state.created_at_filter = None  # Reiniciar filtro de timestamp
+            st.session_state.flights_data = None  # Reiniciar datos finales
         
-        # Obtener datos preliminares según los dos primeros filtros para el tercer filtro
-        preliminary_data = fetch_flight_data_for_chart(client, date_filter, flight_filter)
-        
-        # Tercer filtro: created_at (condicionado a los dos primeros filtros)
-        created_at_filter = None
-        if preliminary_data:
-            # Extraer timestamps de creación únicos
+        # Mostrar selectbox para timestamp si hay datos preliminares
+        if st.session_state.preliminary_data:
             created_at_values = []
-            for item in preliminary_data:
+            for item in st.session_state.preliminary_data:
                 if 'created_at' in item and item['created_at']:
-                    # Formatear el timestamp para mostrar fecha y hora completa
                     try:
                         dt = datetime.fromisoformat(item['created_at'].replace('Z', '+00:00'))
                         formatted_dt = dt.strftime("%Y-%m-%d %H:%M:%S")
@@ -159,128 +159,69 @@ def render_timeline_tab(client):
                         logger.error(f"Error al formatear timestamp: {e}")
                         created_at_values.append((str(item['created_at']), item['created_at']))
             
-            # Ordenar por timestamp (más reciente primero)
             created_at_values = sorted(set(created_at_values), key=lambda x: x[0], reverse=True)
+            display_values = ["Todos"] + [dt[0] for dt in created_at_values]
+            raw_values = [None] + [dt[1] for dt in created_at_values]
             
-            # Si hay timestamps disponibles, mostrar el filtro
-            if created_at_values:
-                display_values = ["Todos"] + [dt[0] for dt in created_at_values]
-                raw_values = [None] + [dt[1] for dt in created_at_values]
-                
-                selected_index = st.selectbox(
-                    "Seleccione timestamp de creación:",
-                    options=display_values,
-                    index=0
-                )
-                
-                # Obtener el valor raw correspondiente al valor seleccionado
-                if selected_index != "Todos":
-                    selected_idx = display_values.index(selected_index)
-                    created_at_filter = raw_values[selected_idx]
-                    logger.info(f"Filtrando por timestamp de creación: {created_at_filter}")
-        
-        # Obtener datos finales con los tres filtros
-        flights_data = fetch_flight_data_for_chart(client, date_filter, flight_filter, created_at_filter)
-        
-        if not flights_data:
-            st.warning("No se encontraron vuelos con los filtros seleccionados.")
-            return
-            
-        # Si hay más de un vuelo, permitir seleccionar cuál visualizar
-        if len(flights_data) > 1:
-            # Crear opciones para mostrar en selectbox
-            flight_options = ["Todos los vuelos"]  # Añadir opción para visualizar todos
-            for flight in flights_data:
-                option_text = f"{flight.get('flight_date')} - {flight.get('flight_number')} ({flight.get('origin', 'N/A')} → {flight.get('destination', 'N/A')})"
-                
-                # Añadir timestamp de creación si existe
-                if 'created_at' in flight and flight['created_at']:
-                    try:
-                        dt = datetime.fromisoformat(flight['created_at'].replace('Z', '+00:00'))
-                        created_at_str = dt.strftime("%Y-%m-%d %H:%M:%S")
-                        option_text += f" - Creado: {created_at_str}"
-                    except Exception as e:
-                        option_text += f" - Creado: {str(flight['created_at'])}"
-                        
-                flight_options.append(option_text)
-            
-            selected_flight_idx = st.selectbox(
-                "Seleccione el vuelo a visualizar:",
-                options=range(len(flight_options)),
-                format_func=lambda i: flight_options[i]
+            selected_index = st.selectbox(
+                "Seleccione timestamp de creación:",
+                options=display_values,
+                index=0
             )
             
-            if selected_flight_idx == 0:  # Si seleccionó "Todos los vuelos"
-                # Mostrar información resumida de todos los vuelos
-                st.subheader("Información Resumida de Todos los Vuelos")
+            if selected_index != "Todos":
+                selected_idx = display_values.index(selected_index)
+                st.session_state.created_at_filter = raw_values[selected_idx]
+
+        # Botón para buscar datos finales
+        if st.button("Buscar Datos Finales"):
+            st.session_state.flights_data = fetch_flight_data_for_chart(
+                client,
+                date_filter,
+                flight_filter,
+                st.session_state.created_at_filter
+            )
+        
+        # Mostrar resultados finales si existen
+        if st.session_state.flights_data:
+            flights_data = st.session_state.flights_data
+            if not flights_data:
+                st.warning("No se encontraron vuelos con los filtros seleccionados.")
+                return
                 
-                # Crear una tabla con información básica de todos los vuelos
-                flight_summary = []
-                for flight in flights_data:
-                    flight_summary.append({
-                        "Fecha": flight.get('flight_date', 'N/A'),
-                        "Vuelo": flight.get('flight_number', 'N/A'),
-                        "Origen": flight.get('origin', 'N/A'),
-                        "Destino": flight.get('destination', 'N/A'),
-                        "STD": flight.get('std', 'N/A'),
-                        "ATD": flight.get('atd', 'N/A'),
-                        "Delay": flight.get('delay', 'N/A'),
-                        "PAX OB": flight.get('pax_ob_total', 'N/A'),
-                        "WCHR": flight.get('WCHR', 'N/A'),
-                        "Customs": flight.get('customs_in', 'N/A'),
-                        "Delay Code": flight.get('delay_code', 'N/A')
-                    })
-                
-                st.dataframe(flight_summary)
-                
-                # Usar todos los vuelos para visualización
-                flights_to_display = flights_data
-            else:
-                # Ajustar el índice para compensar la opción "Todos los vuelos"
-                flight_to_display = flights_data[selected_flight_idx - 1]
-                flights_to_display = [flight_to_display]
-                
-                # Mostrar información del vuelo seleccionado
-                display_flight_details(flights_to_display)
-        else:
-            flight_to_display = flights_data[0]
-            flights_to_display = [flight_to_display]
-            
             # Mostrar información del vuelo
-            display_flight_details(flights_to_display)
-        
-        # Tabla de horarios
-        if len(flights_to_display) == 1:
-            display_flight_schedule(flights_to_display[0])
-        
-        # Radio para elegir el tipo de visualización
-        chart_type = st.radio(
-            "Seleccione el tipo de visualización:",
-            options=["Gráfico de Gantt (Cascada)", "Gráfico de Barras", "Gráfico de Eventos Combinados"],
-            horizontal=True
-        )
-        
-        # Crear y mostrar el gráfico según selección
-        st.subheader("Visualización de Eventos")
-        
-        try:
-            if chart_type == "Gráfico de Gantt (Cascada)":
-                # Pasar la lista completa de vuelos al gráfico de Gantt
-                fig = create_gantt_chart(flights_to_display)
-                if fig:
-                    st.plotly_chart(fig, use_container_width=True)
-            elif chart_type == "Gráfico de Eventos Combinados":
-                fig = create_combined_events_chart(flights_to_display[0] if len(flights_to_display) == 1 else flights_to_display)
-                if fig:
-                    st.plotly_chart(fig, use_container_width=True)
-            else:
-                # Usar el gráfico de puntos original
-                fig = create_cascade_timeline_chart(flights_to_display[0] if len(flights_to_display) == 1 else flights_to_display)
-                if fig:
-                    st.plotly_chart(fig, use_container_width=True)
-        except Exception as e:
-            logger.exception(f"Error al mostrar gráfico: {e}")
-            st.error(f"Error al generar el gráfico: {str(e)}")
+            display_flight_details(flights_data)
+            
+            # Tabla de horarios
+            if len(flights_data) == 1:
+                display_flight_schedule(flights_data[0])
+            
+            # Radio para elegir el tipo de visualización
+            chart_type = st.radio(
+                "Seleccione el tipo de visualización:",
+                options=["Gráfico de Gantt (Cascada)", "Gráfico de Barras", "Gráfico de Eventos Combinados"],
+                horizontal=True
+            )
+            
+            # Crear y mostrar el gráfico según selección
+            st.subheader("Visualización de Eventos")
+            
+            try:
+                if chart_type == "Gráfico de Gantt (Cascada)":
+                    fig = create_gantt_chart(flights_data)
+                    if fig:
+                        st.plotly_chart(fig, use_container_width=True)
+                elif chart_type == "Gráfico de Eventos Combinados":
+                    fig = create_combined_events_chart(flights_data)
+                    if fig:
+                        st.plotly_chart(fig, use_container_width=True)
+                else:
+                    fig = create_cascade_timeline_chart(flights_data)
+                    if fig:
+                        st.plotly_chart(fig, use_container_width=True)
+            except Exception as e:
+                logger.exception(f"Error al mostrar gráfico: {e}")
+                st.error(f"Error al generar el gráfico: {str(e)}")
     except Exception as e:
         logger.exception(f"Error al renderizar la pestaña de línea de tiempo: {e}")
         st.error(f"Error en la visualización: {str(e)}")
