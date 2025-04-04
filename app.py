@@ -131,7 +131,11 @@ with tab1:
             for i, (key, value) in enumerate(passenger_info.items()):
                 cols[i % 2].write(f"*{key}:* {value}")
 
-            # Asegurar que Total Pax se muestre correctamente en el reporte generado
+            # Mostrar información de Gate Bag
+            st.subheader("📍 Información de Gate Bag")
+            st.write(f"*Gate Bag:* {display_data.get('gate_bag', '')}")
+
+            # Asegurar que Total Pax y Gate Bag se muestren correctamente en el reporte generado
             report_text = f"""
 🚀 *Datos Básicos*:
 *Fecha de vuelo:* {display_data.get('flight_date', '')}
@@ -165,14 +169,17 @@ with tab1:
 *Delay Code:* {display_data.get('delay_code', '')}
 
 💬 *WCHR:*
-*WCHR Vuelo Anterior:* {display_data.get('wchr_previous_flight', '')}
-*Agentes Vuelo Anterior:* {display_data.get('agents_previous_flight', '')}
-*WCHR Vuelo Actual:* {display_data.get('wchr_current_flight', '')}
-*Agentes Vuelo Actual:* {display_data.get('agents_current_flight', '')}
+*WCHR Vuelo Llegada:* {display_data.get('wchr_previous_flight', '')}
+*Agentes Vuelo Llegada:* {display_data.get('agents_previous_flight', '')}
+*WCHR Vuelo Salida:* {display_data.get('wchr_current_flight', '')}
+*Agentes Vuelo Salida:* {display_data.get('agents_current_flight', '')}
 
 📍 *Información de Gate y Carrusel:*
 *Gate:* {display_data.get('gate', '')}
 *Carrousel:* {display_data.get('carrousel', '')}
+
+📍 *Información de Gate Bag:*
+*Gate Bag:* {display_data.get('gate_bag', '')}
 
 💬 *Comentarios:*
 {display_data.get('comments', '')}

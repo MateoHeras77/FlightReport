@@ -304,6 +304,7 @@ def display_flight_details(flights):
                 st.write(f"📅 **Fecha:** {flight.get('flight_date', 'N/A')}")
                 st.write(f"🔢 **Número de Vuelo:** {flight.get('flight_number', 'N/A')}")
                 st.write(f"📍 **Gate:** {flight.get('gate', 'N/A')}")
+                st.write(f"📍 **Gate Bag Cometarios:** {flight.get('gate_bag', 'N/A')}")
             with col2:
                 st.write(f"🌍 **Origen:** {flight.get('origin', 'N/A')}")
                 st.write(f"✈️ **Destino:** {flight.get('destination', 'N/A')}")
@@ -323,10 +324,10 @@ def display_flight_details(flights):
                 st.write(f"👥 **PAX Y:** {flight.get('pax_y', 'N/A')}")
                 st.write(f"👶 **Infantes:** {flight.get('infants', 'N/A')}")
             with col2:
-                st.write(f"♿ **WCHR Vuelo Actual:** {flight.get('wchr_current_flight', 'N/A')}")
-                st.write(f"👨‍✈️ **Agentes Vuelo Actual:** {flight.get('agents_current_flight', 'N/A')}")
-                st.write(f"♿ **WCHR Vuelo Anterior:** {flight.get('wchr_previous_flight', 'N/A')}")
-                st.write(f"👨‍✈️ **Agentes Vuelo Anterior:** {flight.get('agents_previous_flight', 'N/A')}")
+                st.write(f"♿ **WCHR Vuelo Salida:** {flight.get('wchr_current_flight', 'N/A')}")
+                st.write(f"👨‍✈️ **Agentes Vuelo Salida:** {flight.get('agents_current_flight', 'N/A')}")
+                st.write(f"♿ **WCHR Vuelo Llegada:** {flight.get('wchr_previous_flight', 'N/A')}")
+                st.write(f"👨‍✈️ **Agentes Vuelo Llegada:** {flight.get('agents_previous_flight', 'N/A')}")
             with col3:
                 st.write(f"📋 **Customs In:** {flight.get('customs_in', 'N/A')}")
                 st.write(f"📋 **Customs Out:** {flight.get('customs_out', 'N/A')}")

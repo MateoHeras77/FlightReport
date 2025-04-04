@@ -77,8 +77,8 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
             "AV255": "AV254"
         }
         previous_flight = previous_flight_mapping.get(flight_number, "")
-        wchr_previous_label = "WCHR Vuelo Anterior"
-        agents_previous_label = "Agentes Vuelo Anterior"
+        wchr_previous_label = "WCHR Vuelo Llegada"
+        agents_previous_label = "Agentes Vuelo Llegada"
 
         st.subheader("💬 WCHR")
         col_wchr1, col_wchr2 = st.columns(2)
@@ -88,8 +88,6 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
         with col_wchr2:
             agents_current_flight = st.text_area(agents_current_label, value="", key="agents_current_flight")
             agents_previous_flight = st.text_area(agents_previous_label, value="", key="agents_previous_flight")
-
-
 
         st.subheader("📍 Información de Gate y Carrusel")
         col_gate1, col_gate2 = st.columns(2)
@@ -101,6 +99,10 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
         st.subheader("💬 Comentarios")
         comments = st.text_area("Comentarios", value="", height=150, key="comments")
 
+        # Nuevo campo para Información de Gate Bag
+        st.subheader("📍 Información del Gate Bag")
+        gate_bag = st.text_area("Información de Gate Bag", value="", height=150, placeholder="Ingresar status del gate bag. (Ejm: Faltan boarding pass, hojas del reporte, etc)", key="gate_bag")
+
         submitted = st.form_submit_button("🔍 Revisar")
 
     if submitted:
@@ -111,7 +113,7 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
                 total_pax, pax_c, pax_y, infants, customs_in, customs_out,
                 delay, gate, carrousel, delay_code,
                 wchr_current_flight, wchr_previous_flight,
-                agents_current_flight, agents_previous_flight, comments
+                agents_current_flight, agents_previous_flight, comments, gate_bag
             )
     else:
         return False, None
@@ -124,7 +126,7 @@ def process_form_data(
     total_pax, pax_c, pax_y, infants, customs_in, customs_out,
     delay, gate, carrousel, delay_code,
     wchr_current_flight, wchr_previous_flight,
-    agents_current_flight, agents_previous_flight, comments
+    agents_current_flight, agents_previous_flight, comments, gate_bag
 ) -> Tuple[bool, Dict[str, Any]]:
     """
     Procesa y valida los datos del formulario.
@@ -207,10 +209,10 @@ def process_form_data(
 
     # Validar campos opcionales y numéricos para WCHR y agentes
     wchr_fields = {
-        "WCHR Vuelo Actual": wchr_current_flight,
-        "WCHR Vuelo Anterior": wchr_previous_flight,
-        "Agentes Vuelo Actual": agents_current_flight,
-        "Agentes Vuelo Anterior": agents_previous_flight
+        "WCHR Vuelo Salida": wchr_current_flight,
+        "WCHR Vuelo Llegada": wchr_previous_flight,
+        "Agentes Vuelo Salida": agents_current_flight,
+        "Agentes Vuelo Llegadas": agents_previous_flight
     }
 
     for field_name, value in wchr_fields.items():
@@ -247,7 +249,8 @@ def process_form_data(
         "agents_previous_flight": agents_previous_flight,
         "agents_current_flight": agents_current_flight,
         "wchr_current_flight": wchr_current_flight,
-        "comments": comments
+        "comments": comments,
+        "gate_bag": gate_bag
     }
 
     # Revertir formato de tiempo para visualización
