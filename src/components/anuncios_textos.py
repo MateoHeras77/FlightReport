@@ -13,8 +13,7 @@ anuncios = {
             <h3>🛬 Welcome to Toronto.</h3>
             <p>Welcome to Toronto, for your convenience, the carousel assigned to pick up your luggage is number ____.</p>
             <p>All passengers with a connecting domestic flight within Canada must pick up their bag and drop it off at the connection baggage belt.</p>
-        </div>
-        """
+        </div>"""
     },
     "boarding": [
         "<div style='background-color:#e8f5e9; padding:10px; border-radius:5px;'><h3 style='color:#1b5e20;'>Preabordaje</h3></div>",

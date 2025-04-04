@@ -223,49 +223,53 @@ with tab4:
     try:
         st.title("✈️ Anuncio de Arrivals")
 
-        # Anuncio de Arrivals
-        st.markdown(anuncios['arrivals']['es'], unsafe_allow_html=True)
-        st.markdown(anuncios['arrivals']['en'], unsafe_allow_html=True)
+        # Sección de Arrivals con diseño mejorado
+        st.markdown(
+            f"""
+            <div style='background-color:#f0f8ff; padding:15px; border-radius:10px; margin-bottom:20px;'>
+                {anuncios['arrivals']['es']}
+                {anuncios['arrivals']['en']}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
-        # Inicio de abordaje
-        st.title("👪🏽  Anuncio de Abordaje")
-        st.markdown(anuncios['boarding_details']['inicio_abordaje']['es'], unsafe_allow_html=True)
-        st.markdown(anuncios['boarding_details']['inicio_abordaje']['en'], unsafe_allow_html=True)
+        st.title("👪🏽 Anuncio de Abordaje")
 
-        # Preabordaje
-        st.subheader("🛡️ Preabordaje")
-        st.markdown(anuncios['boarding_details']['preboarding']['es'], unsafe_allow_html=True)
-        st.markdown(anuncios['boarding_details']['preboarding']['en'], unsafe_allow_html=True)
+        # Sección de Inicio de Abordaje
+        st.markdown(
+            f"""
+            <div style='background-color:#e8f5e9; padding:15px; border-radius:10px; margin-bottom:20px;'>
+                {anuncios['boarding_details']['inicio_abordaje']['es']}
+                {anuncios['boarding_details']['inicio_abordaje']['en']}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
-        # Grupo A
-        st.subheader("🌟 Grupo A")
-        st.markdown(anuncios['boarding_details']['group_a']['es'], unsafe_allow_html=True)
-        st.markdown(anuncios['boarding_details']['group_a']['en'], unsafe_allow_html=True)
+        # Subsecciones de abordaje con diseño mejorado
+        sections = [
+            ("🛡️ Preabordaje", "preboarding"),
+            ("🌟 Grupo A", "group_a"),
+            ("👶 Abordaje Familia con Niños", "family_boarding"),
+            ("🛫 Grupo B", "group_b"),
+            ("🎒 Grupo C", "group_c"),
+            ("📜 Grupo D y E", "group_d_e"),
+            ("📦 Grupo F (Pasajeros XS o BASIC)", "group_f")
+        ]
 
-        # Abordaje Familia con Niños
-        st.subheader("👶 Abordaje Familia con Niños")
-        st.markdown(anuncios['boarding_details']['family_boarding']['es'], unsafe_allow_html=True)
-        st.markdown(anuncios['boarding_details']['family_boarding']['en'], unsafe_allow_html=True)
-
-        # Grupo B
-        st.subheader("🛫 Grupo B")
-        st.markdown(anuncios['boarding_details']['group_b']['es'], unsafe_allow_html=True)
-        st.markdown(anuncios['boarding_details']['group_b']['en'], unsafe_allow_html=True)
-
-        # Grupo C
-        st.subheader("🎒 Grupo C")
-        st.markdown(anuncios['boarding_details']['group_c']['es'], unsafe_allow_html=True)
-        st.markdown(anuncios['boarding_details']['group_c']['en'], unsafe_allow_html=True)
-
-        # Grupo D y E
-        st.subheader("📜 Grupo D y E")
-        st.markdown(anuncios['boarding_details']['group_d_e']['es'], unsafe_allow_html=True)
-        st.markdown(anuncios['boarding_details']['group_d_e']['en'], unsafe_allow_html=True)
-
-        # Grupo F
-        st.subheader("📦 Grupo F (Pasajeros XS o BASIC)")
-        st.markdown(anuncios['boarding_details']['group_f']['es'], unsafe_allow_html=True)
-        st.markdown(anuncios['boarding_details']['group_f']['en'], unsafe_allow_html=True)
+        for title, key in sections:
+            st.markdown(
+                f"""
+                <div style='background-color:#f9fbe7; padding:15px; border-radius:10px; margin-bottom:20px;'>
+                    <h3>{title}</h3>
+                    <p>{anuncios['boarding_details'][key]['es']}</p>
+                    <hr style='border:1px solid #ccc;'>
+                    <p>{anuncios['boarding_details'][key]['en']}</p>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
 
     except Exception as e:
         logger.error(f"Error en la pestaña de anuncios: {str(e)}", exc_info=True)
