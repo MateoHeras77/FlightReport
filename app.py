@@ -26,6 +26,8 @@ try:
     from src.utils.form_utils import create_copy_button
     from src.services.supabase_service import send_data_to_supabase
     from src.components.anuncios_textos import anuncios  # Importar el archivo de textos de anuncios
+    from src.services.api_service import fetch_flight_status  # Importar servicio para obtener estado de vuelo
+    from datetime import date
 
     # Configurar logger
     logger = setup_logger()
@@ -223,12 +225,54 @@ with tab4:
     try:
         st.title("✈️ Anuncio de Arrivals")
 
-        # Sección de Arrivals con diseño mejorado
+        # Botones para seleccionar vuelo
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            av254_button = st.button("AV254")
+        with col2:
+            av626_button = st.button("AV626")
+        with col3:
+            av204_button = st.button("AV204")
+
+        # Variable para almacenar el número de banda
+        baggage_belt_number = "____"
+
+        # Llamar a la API según el botón presionado
+        if av254_button:
+            flight_data = fetch_flight_status("AV254", date.today().strftime("%Y-%m-%d"))
+        elif av626_button:
+            logger.info(f"Consultando API para vuelo AV626 en la fecha {date.today().strftime('%Y-%m-%d')}")
+            flight_data = fetch_flight_status("AV626", date.today().strftime("%Y-%m-%d"))
+            logger.info(f"Datos devueltos por la API: {flight_data}")
+        elif av204_button:
+            flight_data = fetch_flight_status("AV204", date.today().strftime("%Y-%m-%d"))
+        else:
+            flight_data = None
+
+        # Ajustar la lógica para buscar la entrada correcta en los datos devueltos por la API
+        if flight_data:
+            for entry in flight_data:
+                arrival_info = entry.get('arrival', {})
+                if 'baggageBelt' in arrival_info:
+                    logger.info(f"Entrada seleccionada con número de banda: {arrival_info}")
+                    baggage_belt_number = arrival_info.get('baggageBelt', "____")
+                    break
+            else:
+                logger.warning("No se encontró ninguna entrada con número de banda en los datos devueltos por la API.")
+        else:
+            logger.warning("No se encontraron datos para el vuelo AV626 o la respuesta de la API está vacía.")
+
+        # Sección de Arrivals con el número de banda actualizado
         st.markdown(
             f"""
             <div style='background-color:#f0f8ff; padding:15px; border-radius:10px; margin-bottom:20px;'>
-                {anuncios['arrivals']['es']}
-                {anuncios['arrivals']['en']}
+                🛬 Bienvenida a la ciudad de Toronto.
+                Les damos la bienvenida a la ciudad de Toronto. Para su comodidad, les informamos que la banda asignada para recoger su equipaje es la número {baggage_belt_number}.
+                Si tiene conexión dentro de Canadá en un vuelo doméstico, deberá recoger su equipaje y llevarlo a la banda de equipaje de conexión.
+                <hr style='border:1px solid #ccc;'>
+                🛬 Welcome to Toronto.
+                Welcome to Toronto. For your convenience, the carousel assigned to pick up your luggage is number {baggage_belt_number}.
+                All passengers with a connecting domestic flight within Canada must pick up their bag and drop it off at the connection baggage belt.
             </div>
             """,
             unsafe_allow_html=True
@@ -236,7 +280,7 @@ with tab4:
 
         st.title("👪🏽 Anuncio de Abordaje")
 
-        # Sección de Inicio de Abordaje
+        # Sección de Inicio de Abordaje con texto interpolado
         st.markdown(
             f"""
             <div style='background-color:#e8f5e9; padding:15px; border-radius:10px; margin-bottom:20px;'>
