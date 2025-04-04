@@ -132,7 +132,7 @@ with tab1:
                 cols[i % 2].write(f"*{key}:* {value}")
 
             # Mostrar información de Gate Bag
-            st.subheader("📍 Información de Gate Bag")
+            st.subheader("🧳 Información de Gate Bag")
             st.write(f"*Gate Bag:* {display_data.get('gate_bag', '')}")
 
             # Asegurar que Total Pax y Gate Bag se muestren correctamente en el reporte generado
@@ -178,7 +178,7 @@ with tab1:
 *Gate:* {display_data.get('gate', '')}
 *Carrousel:* {display_data.get('carrousel', '')}
 
-📍 *Información de Gate Bag:*
+🧳 *Información de Gate Bag:*
 *Gate Bag:* {display_data.get('gate_bag', '')}
 
 💬 *Comentarios:*
