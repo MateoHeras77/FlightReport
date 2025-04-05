@@ -145,7 +145,6 @@ def process_form_data(
         "Destino": destination,
         "Número de vuelo": flight_number,
         "Total Pax": total_pax,
-        "Customs In": customs_in,
         "Gate": gate,
         "Carrousel": carrousel,
         "WCHR": wchr_current_flight,
