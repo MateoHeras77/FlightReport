@@ -36,13 +36,8 @@ def render_analytics_tab(client):
     st.info("Esta funcionalidad está en desarrollo. Pronto podrás ver análisis estadísticos de los eventos de vuelo.")
     
     # Aquí se pueden agregar visualizaciones y análisis estadísticos
-    st.write("En esta sección se incluirán:")
-    st.markdown("""
-    - Análisis de tiempos promedio entre eventos
-    - Distribución de retrasos y sus causas
-    - Correlación entre variables operativas
-    - Tendencias a lo largo del tiempo
-    """)
+    st.write("Trabajando en esta sección ....")
+
     
 def render_summary_tab(client):
     """
@@ -57,10 +52,4 @@ def render_summary_tab(client):
     st.info("Esta funcionalidad está en desarrollo. Pronto podrás ver un resumen general de los vuelos.")
     
     # Aquí se pueden agregar resúmenes y estadísticas generales
-    st.write("En esta sección se incluirán:")
-    st.markdown("""
-    - Total de vuelos por ruta y fecha
-    - Estadísticas de puntualidad
-    - Indicadores de rendimiento operativo
-    - Métricas clave de desempeño
-    """)
+    st.write("Trabanjando en esta sección ....")

@@ -67,8 +67,8 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
             delay_code = st.text_area("Delay Code (Reporte)", placeholder="Ingresar el reporte y codigos del retraso",value="", key="delay_code")
 
         # Actualizar etiquetas de WCHR y Agentes eliminando "AV2**" y simplificando el código
-        wchr_current_label = "WCHR Vuelo Actual"
-        agents_current_label = "Agentes Vuelo Actual"
+        wchr_current_label = "WCHR Vuelo Salida"
+        agents_current_label = "Agentes Vuelo Salida"
 
         # Determinar el vuelo anterior basado en el número de vuelo seleccionado
         previous_flight_mapping = {
@@ -83,8 +83,8 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
         st.subheader("💬 WCHR")
         col_wchr1, col_wchr2 = st.columns(2)
         with col_wchr1:
-            wchr_current_flight = st.text_area(wchr_current_label, value="", key="wchr_current_flight")
-            wchr_previous_flight = st.text_area(wchr_previous_label, value="", key="wchr_previous_flight")
+            wchr_current_flight = st.text_area(wchr_current_label, value="", placeholder="Ingresar cantidad de WCHR / WCHC / DEAF etc",key="wchr_current_flight")
+            wchr_previous_flight = st.text_area(wchr_previous_label, value="",placeholder="Ingresar cantidad de WCHR / WCHC / DEAF etc", key="wchr_previous_flight")
         with col_wchr2:
             agents_current_flight = st.text_area(agents_current_label, value="", key="agents_current_flight")
             agents_previous_flight = st.text_area(agents_previous_label, value="", key="agents_previous_flight")
@@ -97,7 +97,7 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
             carrousel = st.text_input("Carrousel", key="carrousel").strip()
 
         st.subheader("💬 Comentarios")
-        comments = st.text_area("Comentarios", value="", height=150, key="comments")
+        comments = st.text_area("Comentarios", value="", height=150,placeholder="Ingresar comentarios generales", key="comments")
 
         # Nuevo campo para Información de Gate Bag
         st.subheader("🧳  Información del Gate Bag")
@@ -207,15 +207,13 @@ def process_form_data(
         logger.warning(f"Campo no numérico: Delay - Valor ingresado: {delay}")
         return False, None
 
-    # Validar campos opcionales y numéricos para WCHR y agentes
-    wchr_fields = {
-        "WCHR Vuelo Salida": wchr_current_flight,
-        "WCHR Vuelo Llegada": wchr_previous_flight,
+    # Validar campos opcionales y numéricos para agentes
+    agent_fields = {
         "Agentes Vuelo Salida": agents_current_flight,
         "Agentes Vuelo Llegadas": agents_previous_flight
     }
 
-    for field_name, value in wchr_fields.items():
+    for field_name, value in agent_fields.items():
         if value.strip() and not value.isdigit():
             st.error(f"El campo '{field_name}' debe contener únicamente números si se completa.")
             logger.warning(f"Campo no numérico: {field_name} - Valor ingresado: {value}")
