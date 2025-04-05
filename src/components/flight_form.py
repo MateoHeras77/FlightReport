@@ -100,7 +100,7 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
         comments = st.text_area("Comentarios", value="", height=150, key="comments")
 
         # Nuevo campo para Información de Gate Bag
-        st.subheader("📍 Información del Gate Bag")
+        st.subheader("🧳  Información del Gate Bag")
         gate_bag = st.text_area("Información de Gate Bag", value="", height=150, placeholder="Ingresar status del gate bag. (Ejm: Faltan boarding pass, hojas del reporte, etc)", key="gate_bag")
 
         submitted = st.form_submit_button("🔍 Revisar")
