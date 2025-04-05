@@ -5,6 +5,8 @@
 credenciales.json
 secrets.toml
 Analisis*/
+*.pyc
+*.cpython-*
 # Archivos de logs
 logs/
 *.log

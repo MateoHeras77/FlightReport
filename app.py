@@ -25,6 +25,9 @@ try:
     from src.components.tabs.flight_status_tab import render_flight_status_tab  # Importar la pestaña de estado de vuelo
     from src.utils.form_utils import create_copy_button
     from src.services.supabase_service import send_data_to_supabase
+    from src.components.anuncios_textos import anuncios  # Importar el archivo de textos de anuncios
+    from src.services.api_service import fetch_flight_status  # Importar servicio para obtener estado de vuelo
+    from datetime import date
 
     # Configurar logger
     logger = setup_logger()
@@ -59,9 +62,9 @@ except Exception as e:
     logger.error(f"Error de conexión Supabase: {str(e)}", exc_info=True)
     st.stop()
 
-# Crear tabs para las diferentes funcionalidades - Ahora con tres pestañas principales
+# Crear tabs para las diferentes funcionalidades - Ahora con cuatro pestañas principales
 try:
-    tab1, tab2, tab3 = st.tabs(["🛫 Ingreso de Datos", "📊 Visualizador", "🛬 Estado de Vuelo"])
+    tab1, tab2, tab3, tab4 = st.tabs(["🛫 Ingreso de Datos", "📊 Visualizador", "🛬 Estado de Vuelo", "📢 Anuncios"])
 except Exception as e:
     logger.error(f"Error al crear tabs: {str(e)}", exc_info=True)
     st.error("Error al cargar la interfaz de usuario")
@@ -128,7 +131,11 @@ with tab1:
             for i, (key, value) in enumerate(passenger_info.items()):
                 cols[i % 2].write(f"*{key}:* {value}")
 
-            # Asegurar que Total Pax se muestre correctamente en el reporte generado
+            # Mostrar información de Gate Bag
+            st.subheader("🧳 Información de Gate Bag")
+            st.write(f"*Gate Bag:* {display_data.get('gate_bag', '')}")
+
+            # Asegurar que Total Pax y Gate Bag se muestren correctamente en el reporte generado
             report_text = f"""
 🚀 *Datos Básicos*:
 *Fecha de vuelo:* {display_data.get('flight_date', '')}
@@ -162,14 +169,17 @@ with tab1:
 *Delay Code:* {display_data.get('delay_code', '')}
 
 💬 *WCHR:*
-*WCHR Vuelo Anterior:* {display_data.get('wchr_previous_flight', '')}
-*Agentes Vuelo Anterior:* {display_data.get('agents_previous_flight', '')}
-*WCHR Vuelo Actual:* {display_data.get('wchr_current_flight', '')}
-*Agentes Vuelo Actual:* {display_data.get('agents_current_flight', '')}
+*WCHR Vuelo Llegada:* {display_data.get('wchr_previous_flight', '')}
+*Agentes Vuelo Llegada:* {display_data.get('agents_previous_flight', '')}
+*WCHR Vuelo Salida:* {display_data.get('wchr_current_flight', '')}
+*Agentes Vuelo Salida:* {display_data.get('agents_current_flight', '')}
 
 📍 *Información de Gate y Carrusel:*
 *Gate:* {display_data.get('gate', '')}
 *Carrousel:* {display_data.get('carrousel', '')}
+
+🧳 *Información de Gate Bag:*
+*Gate Bag:* {display_data.get('gate_bag', '')}
 
 💬 *Comentarios:*
 {display_data.get('comments', '')}
@@ -216,3 +226,102 @@ with tab3:
     except Exception as e:
         logger.error(f"Error en Tab 3: {str(e)}", exc_info=True)
         st.error("Error al cargar la información de estado de vuelo")
+
+# Tab 4: Anuncios
+with tab4:
+    try:
+        st.title("✈️ Anuncio de Arrivals")
+
+        # Botones para seleccionar vuelo
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            av254_button = st.button("AV254")
+        with col2:
+            av626_button = st.button("AV626")
+        with col3:
+            av204_button = st.button("AV204")
+
+        # Variable para almacenar el número de banda
+        baggage_belt_number = "____"
+
+        # Llamar a la API según el botón presionado
+        if av254_button:
+            flight_data = fetch_flight_status("AV254", date.today().strftime("%Y-%m-%d"))
+        elif av626_button:
+            logger.info(f"Consultando API para vuelo AV626 en la fecha {date.today().strftime('%Y-%m-%d')}")
+            flight_data = fetch_flight_status("AV626", date.today().strftime("%Y-%m-%d"))
+            logger.info(f"Datos devueltos por la API: {flight_data}")
+        elif av204_button:
+            flight_data = fetch_flight_status("AV204", date.today().strftime("%Y-%m-%d"))
+        else:
+            flight_data = None
+
+        # Ajustar la lógica para buscar la entrada correcta en los datos devueltos por la API
+        if flight_data:
+            for entry in flight_data:
+                arrival_info = entry.get('arrival', {})
+                if 'baggageBelt' in arrival_info:
+                    logger.info(f"Entrada seleccionada con número de banda: {arrival_info}")
+                    baggage_belt_number = arrival_info.get('baggageBelt', "____")
+                    break
+            else:
+                logger.warning("No se encontró ninguna entrada con número de banda en los datos devueltos por la API.")
+        else:
+            logger.warning("No se encontraron datos para el vuelo AV626 o la respuesta de la API está vacía.")
+
+        # Sección de Arrivals con el número de banda actualizado
+        st.markdown(
+            f"""
+            <div style='background-color:#f0f8ff; padding:15px; border-radius:10px; margin-bottom:20px;'>
+                🛬 Bienvenida a la ciudad de Toronto.
+                Les damos la bienvenida a la ciudad de Toronto. Para su comodidad, les informamos que la banda asignada para recoger su equipaje es la número {baggage_belt_number}.
+                Si tiene conexión dentro de Canadá en un vuelo doméstico, deberá recoger su equipaje y llevarlo a la banda de equipaje de conexión.
+                <hr style='border:1px solid #ccc;'>
+                🛬 Welcome to Toronto.
+                Welcome to Toronto. For your convenience, the carousel assigned to pick up your luggage is number {baggage_belt_number}.
+                All passengers with a connecting domestic flight within Canada must pick up their bag and drop it off at the connection baggage belt.
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        st.title("👪🏽 Anuncio de Abordaje")
+
+        # Sección de Inicio de Abordaje con texto interpolado
+        st.markdown(
+            f"""
+            <div style='background-color:#e8f5e9; padding:15px; border-radius:10px; margin-bottom:20px;'>
+                {anuncios['boarding_details']['inicio_abordaje']['es']}
+                {anuncios['boarding_details']['inicio_abordaje']['en']}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        # Subsecciones de abordaje con diseño mejorado
+        sections = [
+            ("🛡️ Preabordaje", "preboarding"),
+            ("🌟 Grupo A", "group_a"),
+            ("👶 Abordaje Familia con Niños", "family_boarding"),
+            ("🛫 Grupo B", "group_b"),
+            ("🎒 Grupo C", "group_c"),
+            ("📜 Grupo D y E", "group_d_e"),
+            ("📦 Grupo F (Pasajeros XS o BASIC)", "group_f")
+        ]
+
+        for title, key in sections:
+            st.markdown(
+                f"""
+                <div style='background-color:#f9fbe7; padding:15px; border-radius:10px; margin-bottom:20px;'>
+                    <h3>{title}</h3>
+                    <p>{anuncios['boarding_details'][key]['es']}</p>
+                    <hr style='border:1px solid #ccc;'>
+                    <p>{anuncios['boarding_details'][key]['en']}</p>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+    except Exception as e:
+        logger.error(f"Error en la pestaña de anuncios: {str(e)}", exc_info=True)
+        st.error("Error al procesar los anuncios")
