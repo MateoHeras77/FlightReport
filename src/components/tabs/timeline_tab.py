@@ -164,7 +164,7 @@ def render_timeline_tab(client):
             raw_values = [None] + [dt[1] for dt in created_at_values]
             
             selected_index = st.selectbox(
-                "Seleccione timestamp de creación:",
+                "Seleccione la fecha y hora de creación del reporte:",
                 options=display_values,
                 index=0
             )
