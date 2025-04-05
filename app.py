@@ -64,7 +64,7 @@ except Exception as e:
 
 # Crear tabs para las diferentes funcionalidades - Ahora con cuatro pestañas principales
 try:
-    tab1, tab2, tab3, tab4 = st.tabs(["🛫 Ingreso de Datos", "📊 Visualizador", "🛬 Estado de Vuelo", "📢 Anuncios"])
+    tab1, tab2, tab3, tab4 = st.tabs(["🛫 Ingreso de Datos", "📊 Visualizador (beta)", "🛬 Estado de Vuelo", "📢 Anuncios (beta)"])
 except Exception as e:
     logger.error(f"Error al crear tabs: {str(e)}", exc_info=True)
     st.error("Error al cargar la interfaz de usuario")

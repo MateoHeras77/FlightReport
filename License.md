@@ -22,7 +22,7 @@ Para utilizar este código o partes del mismo en proyectos personales o comercia
 📧 Contacta directamente con el autor:
 
 - **Wilmer Mateo Heras Vera**
-- ✉️ **Email:** wmateohv\@hotmail.com
+- ✉️ **Email:** wmateohv@hotmail.com
 
 ---
 
