@@ -64,7 +64,7 @@ except Exception as e:
 
 # Crear tabs para las diferentes funcionalidades - Ahora con cuatro pestañas principales
 try:
-    tab1, tab2, tab3, tab4 = st.tabs(["🛫 Ingreso de Datos", "📊 Visualizador (beta)", "🛬 Estado de Vuelo", "📢 Anuncios (beta)"])
+    tab1, tab4, tab3, tab2 = st.tabs(["🛫 Ingreso de Datos", "📢 Anuncios (beta)", "🛬 Estado de Vuelo", "📊 Visualizador (beta)"])
 except Exception as e:
     logger.error(f"Error al crear tabs: {str(e)}", exc_info=True)
     st.error("Error al cargar la interfaz de usuario")
@@ -209,24 +209,6 @@ with tab1:
         logger.error(f"Error en Tab 1: {str(e)}", exc_info=True)
         st.error("Error al procesar los datos del formulario")
 
-# Tab 2: Visualizador (ahora solo incluye Line de Tiempo, Análisis y Resumen)
-with tab2:
-    try:
-        # Usar el sistema de pestañas modular para visualización
-        render_tabs(client)
-    except Exception as e:
-        logger.error(f"Error en Tab 2: {str(e)}", exc_info=True)
-        st.error("Error al cargar la visualización de eventos")
-
-# Tab 3: Estado de Vuelo (nueva pestaña principal)
-with tab3:
-    try:
-        # Renderizar directamente la pestaña de estado de vuelo
-        render_flight_status_tab(client)
-    except Exception as e:
-        logger.error(f"Error en Tab 3: {str(e)}", exc_info=True)
-        st.error("Error al cargar la información de estado de vuelo")
-
 # Tab 4: Anuncios
 with tab4:
     try:
@@ -272,11 +254,9 @@ with tab4:
         st.markdown(
             f"""
             <div style='background-color:#f0f8ff; padding:15px; border-radius:10px; margin-bottom:20px;'>
-                🛬 Bienvenida a la ciudad de Toronto.
                 Les damos la bienvenida a la ciudad de Toronto. Para su comodidad, les informamos que la banda asignada para recoger su equipaje es la número {baggage_belt_number}.
                 Si tiene conexión dentro de Canadá en un vuelo doméstico, deberá recoger su equipaje y llevarlo a la banda de equipaje de conexión.
                 <hr style='border:1px solid #ccc;'>
-                🛬 Welcome to Toronto.
                 Welcome to Toronto. For your convenience, the carousel assigned to pick up your luggage is number {baggage_belt_number}.
                 All passengers with a connecting domestic flight within Canada must pick up their bag and drop it off at the connection baggage belt.
             </div>
@@ -324,3 +304,21 @@ with tab4:
     except Exception as e:
         logger.error(f"Error en la pestaña de anuncios: {str(e)}", exc_info=True)
         st.error("Error al procesar los anuncios")
+
+# Tab 3: Estado de Vuelo (nueva pestaña principal)
+with tab3:
+    try:
+        # Renderizar directamente la pestaña de estado de vuelo
+        render_flight_status_tab(client)
+    except Exception as e:
+        logger.error(f"Error en Tab 3: {str(e)}", exc_info=True)
+        st.error("Error al cargar la información de estado de vuelo")
+
+# Tab 2: Visualizador (ahora solo incluye Line de Tiempo, Análisis y Resumen)
+with tab2:
+    try:
+        # Usar el sistema de pestañas modular para visualización
+        render_tabs(client)
+    except Exception as e:
+        logger.error(f"Error en Tab 2: {str(e)}", exc_info=True)
+        st.error("Error al cargar la visualización de eventos")
