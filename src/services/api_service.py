@@ -6,6 +6,7 @@ from typing import Optional, List, Dict
 def fetch_flight_status(flight_number: str, custom_date: Optional[str] = None) -> Optional[List[Dict]]:
     """
     Consulta la API de AeroDataBox para obtener el estado actual de un vuelo.
+    Si la primera clave API falla, se intenta con la segunda clave API.
 
     Args:
         flight_number: Número de vuelo (ej: AV204)
@@ -18,27 +19,49 @@ def fetch_flight_status(flight_number: str, custom_date: Optional[str] = None) -
         # Formatear el número de vuelo eliminando espacios
         flight_number = flight_number.replace(" ", "").lower()
 
-        # URL de la API con el número de vuelo
-        url = f"https://aerodatabox.p.rapidapi.com/flights/number/{flight_number}"
+        # URL base de la API
+        base_url = "https://aerodatabox.p.rapidapi.com/flights/number/"
 
-        # Parámetros de la consulta
+        # Fecha de consulta
         today = date.today().strftime("%Y-%m-%d")
-        querystring = {"withAircraftImage": "false", "withLocation": "false", "scheduledDepartureDate": custom_date or today}
+        flight_date = custom_date or today
 
-        # Headers con la clave de API desde secrets.toml
-        api_key = st.secrets["aerodatabox"]["api_key"]
+        # Cargar claves API desde secrets.toml
+        api_key_1 = st.secrets["aerodatabox"]["api_key"]
+        api_key_2 = st.secrets["aerodatabox"]["api_key_2"]
+
+        # Headers para la petición
         headers = {
-            "x-rapidapi-key": api_key,
-            "x-rapidapi-host": "aerodatabox.p.rapidapi.com"
+            "x-rapidapi-host": "aerodatabox.p.rapidapi.com",
         }
 
-        # Realizar la petición a la API
-        response = requests.get(url, headers=headers, params=querystring)
+        # Intentar con la primera clave API
+        headers["x-rapidapi-key"] = api_key_1
+        try:
+            response = requests.get(f"{base_url}{flight_number}/{flight_date}", headers=headers)
+            if response.status_code == 200:
+                print("API Key 1 used successfully.")
+                return response.json()
+            else:
+                print(f"API Key 1 failed with status code {response.status_code}. Trying API Key 2...")
+        except Exception as e:
+            print(f"Error with API Key 1: {e}. Trying API Key 2...")
 
-        # Verificar si la respuesta fue exitosa
-        if response.status_code == 200:
-            return response.json()
-        else:
-            return None
+        # Intentar con la segunda clave API
+        headers["x-rapidapi-key"] = api_key_2
+        try:
+            response = requests.get(f"{base_url}{flight_number}/{flight_date}", headers=headers)
+            if response.status_code == 200:
+                print("API Key 2 used successfully.")
+                return response.json()
+            else:
+                print(f"API Key 2 failed with status code {response.status_code}.")
+        except Exception as e:
+            print(f"Error with API Key 2: {e}.")
+
+        # Si ambas claves fallan, retornar None
+        print("Both API keys failed.")
+        return None
     except Exception as e:
+        print(f"Unexpected error: {e}")
         return None
