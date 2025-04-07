@@ -245,6 +245,7 @@ with tab4:
         baggage_belt_number = "____"
 
         # Llamar a la API según el botón presionado
+        flight_data = None  # Inicializar como None para evitar llamadas automáticas
         if av254_button:
             flight_data = fetch_flight_status("AV254", date.today().strftime("%Y-%m-%d"))
         elif av626_button:
@@ -253,8 +254,6 @@ with tab4:
             logger.info(f"Datos devueltos por la API: {flight_data}")
         elif av204_button:
             flight_data = fetch_flight_status("AV204", date.today().strftime("%Y-%m-%d"))
-        else:
-            flight_data = None
 
         # Ajustar la lógica para buscar la entrada correcta en los datos devueltos por la API
         if flight_data:
@@ -267,7 +266,7 @@ with tab4:
             else:
                 logger.warning("No se encontró ninguna entrada con número de banda en los datos devueltos por la API.")
         else:
-            logger.warning("No se encontraron datos para el vuelo AV626 o la respuesta de la API está vacía.")
+            logger.warning("No se encontraron datos para el vuelo seleccionado o la respuesta de la API está vacía.")
 
         # Sección de Arrivals con el número de banda actualizado
         st.markdown(
