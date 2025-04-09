@@ -22,11 +22,9 @@ try:
     from src.config.supabase_config import initialize_supabase_client, DEFAULT_TABLE_NAME
     from src.components.flight_form import render_flight_form
     from src.components.tabs_manager import render_tabs  # Importar el sistema de pestañas para visualización
-    from src.components.tabs.flight_status_tab import render_flight_status_tab  # Importar la pestaña de estado de vuelo
     from src.utils.form_utils import create_copy_button
     from src.services.supabase_service import send_data_to_supabase
     from src.components.anuncios_textos import anuncios  # Importar el archivo de textos de anuncios
-    from src.services.api_service import fetch_flight_status  # Importar servicio para obtener estado de vuelo
     from datetime import date
 
     # Configurar logger
@@ -62,9 +60,9 @@ except Exception as e:
     logger.error(f"Error de conexión Supabase: {str(e)}", exc_info=True)
     st.stop()
 
-# Crear tabs para las diferentes funcionalidades - Ahora con cuatro pestañas principales
+# Crear tabs para las diferentes funcionalidades - Ahora con tres pestañas principales
 try:
-    tab1, tab2, tab3, tab4 = st.tabs(["🛫 Ingreso de Datos", "📊 Visualizador", "🛬 Estado de Vuelo", "📢 Anuncios"])
+    tab1, tab2, tab3 = st.tabs(["🛫 Ingreso de Datos", "📊 Visualizador", "📢 Anuncios"])
 except Exception as e:
     logger.error(f"Error al crear tabs: {str(e)}", exc_info=True)
     st.error("Error al cargar la interfaz de usuario")
@@ -218,17 +216,8 @@ with tab2:
         logger.error(f"Error en Tab 2: {str(e)}", exc_info=True)
         st.error("Error al cargar la visualización de eventos")
 
-# Tab 3: Estado de Vuelo (nueva pestaña principal)
+# Tab 3: Anuncios
 with tab3:
-    try:
-        # Renderizar directamente la pestaña de estado de vuelo
-        render_flight_status_tab(client)
-    except Exception as e:
-        logger.error(f"Error en Tab 3: {str(e)}", exc_info=True)
-        st.error("Error al cargar la información de estado de vuelo")
-
-# Tab 4: Anuncios
-with tab4:
     try:
         st.title("✈️ Anuncio de Arrivals")
 
