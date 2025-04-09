@@ -22,11 +22,10 @@ try:
     from src.config.supabase_config import initialize_supabase_client, DEFAULT_TABLE_NAME
     from src.components.flight_form import render_flight_form
     from src.components.tabs_manager import render_tabs  # Importar el sistema de pestañas para visualización
-    from src.components.tabs.flight_status_tab import render_flight_status_tab  # Importar la pestaña de estado de vuelo
     from src.utils.form_utils import create_copy_button
     from src.services.supabase_service import send_data_to_supabase
     from src.components.anuncios_textos import anuncios  # Importar el archivo de textos de anuncios
-    from src.services.api_service import fetch_flight_status  # Importar servicio para obtener estado de vuelo
+    from src.services.api_service import fetch_flight_status
     from datetime import date
 
     # Configurar logger
@@ -62,9 +61,9 @@ except Exception as e:
     logger.error(f"Error de conexión Supabase: {str(e)}", exc_info=True)
     st.stop()
 
-# Crear tabs para las diferentes funcionalidades - Ahora con cuatro pestañas principales
+# Crear tabs para las diferentes funcionalidades - Ahora con tres pestañas principales
 try:
-    tab1, tab4, tab3, tab2 = st.tabs(["🛫 Ingreso de Datos", "📢 Anuncios (beta)", "🛬 Estado de Vuelo", "📊 Visualizador (beta)"])
+    tab1, tab2, tab3 = st.tabs(["🛫 Ingreso de Datos", "📊 Visualizador", "📢 Anuncios"])
 except Exception as e:
     logger.error(f"Error al crear tabs: {str(e)}", exc_info=True)
     st.error("Error al cargar la interfaz de usuario")
@@ -208,9 +207,17 @@ with tab1:
     except Exception as e:
         logger.error(f"Error en Tab 1: {str(e)}", exc_info=True)
         st.error("Error al procesar los datos del formulario")
+# Tab 2: Visualizador (ahora solo incluye Line de Tiempo, Análisis y Resumen)
+with tab2:
+    try:
+        # Usar el sistema de pestañas modular para visualización
+        render_tabs(client)
+    except Exception as e:
+        logger.error(f"Error en Tab 2: {str(e)}", exc_info=True)
+        st.error("Error al cargar la visualización de eventos")
 
-# Tab 4: Anuncios
-with tab4:
+# Tab 3: Anuncios
+with tab3:
     try:
         st.title("✈️ Anuncio de Arrivals")
 

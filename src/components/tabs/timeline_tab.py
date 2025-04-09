@@ -188,24 +188,17 @@ def render_timeline_tab(client):
             if not flights_data:
                 st.warning("No se encontraron vuelos con los filtros seleccionados.")
                 return
-                
-            # Mostrar información del vuelo
-            display_flight_details(flights_data)
-            
-            # Tabla de horarios
-            if len(flights_data) == 1:
-                display_flight_schedule(flights_data[0])
-            
+
             # Radio para elegir el tipo de visualización
             chart_type = st.radio(
                 "Seleccione el tipo de visualización:",
                 options=["Gráfico de Gantt (Cascada)", "Gráfico de Barras", "Gráfico de Eventos Combinados"],
                 horizontal=True
             )
-            
+
             # Crear y mostrar el gráfico según selección
             st.subheader("Visualización de Eventos")
-            
+
             try:
                 if chart_type == "Gráfico de Gantt (Cascada)":
                     fig = create_gantt_chart(flights_data)
@@ -222,6 +215,13 @@ def render_timeline_tab(client):
             except Exception as e:
                 logger.exception(f"Error al mostrar gráfico: {e}")
                 st.error(f"Error al generar el gráfico: {str(e)}")
+
+            # Mostrar información del vuelo
+            display_flight_details(flights_data)
+
+            # Tabla de horarios
+            if len(flights_data) == 1:
+                display_flight_schedule(flights_data[0])
     except Exception as e:
         logger.exception(f"Error al renderizar la pestaña de línea de tiempo: {e}")
         st.error(f"Error en la visualización: {str(e)}")

@@ -1,6 +1,5 @@
 import streamlit as st
 from src.components.tabs.timeline_tab import render_timeline_tab
-from src.components.tabs.flight_status_tab import render_flight_status_tab
 
 def render_tabs(client):
     """
