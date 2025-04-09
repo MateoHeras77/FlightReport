@@ -11,6 +11,7 @@ CACHE_EXPIRATION = 15 * 60  # 15 minutos en segundos
 def fetch_flight_status(flight_number: str, custom_date: Optional[str] = None) -> Optional[List[Dict]]:
     """
     Consulta la API de AeroDataBox para obtener el estado actual de un vuelo.
+    Si la primera clave API falla, se intenta con la segunda clave API.
 
     Args:
         flight_number: Número de vuelo (ej: AV204)
@@ -23,6 +24,7 @@ def fetch_flight_status(flight_number: str, custom_date: Optional[str] = None) -
         # Formatear el número de vuelo eliminando espacios
         flight_number = flight_number.replace(" ", "").lower()
 
+
         # Verificar si el vuelo está en caché y no ha expirado
         current_time = time.time()
         if flight_number in cache:
@@ -34,16 +36,20 @@ def fetch_flight_status(flight_number: str, custom_date: Optional[str] = None) -
         # URL de la API con el número de vuelo
         url = f"https://aerodatabox.p.rapidapi.com/flights/number/{flight_number}"
 
-        # Parámetros de la consulta
-        today = date.today().strftime("%Y-%m-%d")
-        querystring = {"withAircraftImage": "false", "withLocation": "false", "scheduledDepartureDate": custom_date or today}
 
-        # Headers con la clave de API desde secrets.toml
-        api_key = st.secrets["aerodatabox"]["api_key"]
+        # Fecha de consulta
+        today = date.today().strftime("%Y-%m-%d")
+        flight_date = custom_date or today
+
+        # Cargar claves API desde secrets.toml
+        api_key_1 = st.secrets["aerodatabox"]["api_key"]
+        api_key_2 = st.secrets["aerodatabox"]["api_key_2"]
+
+        # Headers para la petición
         headers = {
-            "x-rapidapi-key": api_key,
-            "x-rapidapi-host": "aerodatabox.p.rapidapi.com"
+            "x-rapidapi-host": "aerodatabox.p.rapidapi.com",
         }
+
 
         # Realizar la petición a la API
         print(f"[DEBUG] Llamando a la API para obtener datos del vuelo {flight_number}.")
@@ -59,5 +65,7 @@ def fetch_flight_status(flight_number: str, custom_date: Optional[str] = None) -
         else:
             print(f"[DEBUG] Error en la respuesta de la API: {response.status_code} - {response.text}")
             return None
+
     except Exception as e:
+        print(f"Unexpected error: {e}")
         return None

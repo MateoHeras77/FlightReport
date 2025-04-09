@@ -207,7 +207,6 @@ with tab1:
     except Exception as e:
         logger.error(f"Error en Tab 1: {str(e)}", exc_info=True)
         st.error("Error al procesar los datos del formulario")
-
 # Tab 2: Visualizador (ahora solo incluye Line de Tiempo, Análisis y Resumen)
 with tab2:
     try:
@@ -235,6 +234,7 @@ with tab3:
         baggage_belt_number = "____"
 
         # Llamar a la API según el botón presionado
+        flight_data = None  # Inicializar como None para evitar llamadas automáticas
         if av254_button:
             flight_data = fetch_flight_status("AV254", date.today().strftime("%Y-%m-%d"))
         elif av626_button:
@@ -243,8 +243,6 @@ with tab3:
             logger.info(f"Datos devueltos por la API: {flight_data}")
         elif av204_button:
             flight_data = fetch_flight_status("AV204", date.today().strftime("%Y-%m-%d"))
-        else:
-            flight_data = None
 
         # Ajustar la lógica para buscar la entrada correcta en los datos devueltos por la API
         if flight_data:
@@ -257,17 +255,15 @@ with tab3:
             else:
                 logger.warning("No se encontró ninguna entrada con número de banda en los datos devueltos por la API.")
         else:
-            logger.warning("No se encontraron datos para el vuelo AV626 o la respuesta de la API está vacía.")
+            logger.warning("No se encontraron datos para el vuelo seleccionado o la respuesta de la API está vacía.")
 
         # Sección de Arrivals con el número de banda actualizado
         st.markdown(
             f"""
             <div style='background-color:#f0f8ff; padding:15px; border-radius:10px; margin-bottom:20px;'>
-                🛬 Bienvenida a la ciudad de Toronto.
                 Les damos la bienvenida a la ciudad de Toronto. Para su comodidad, les informamos que la banda asignada para recoger su equipaje es la número {baggage_belt_number}.
                 Si tiene conexión dentro de Canadá en un vuelo doméstico, deberá recoger su equipaje y llevarlo a la banda de equipaje de conexión.
                 <hr style='border:1px solid #ccc;'>
-                🛬 Welcome to Toronto.
                 Welcome to Toronto. For your convenience, the carousel assigned to pick up your luggage is number {baggage_belt_number}.
                 All passengers with a connecting domestic flight within Canada must pick up their bag and drop it off at the connection baggage belt.
             </div>
@@ -315,3 +311,21 @@ with tab3:
     except Exception as e:
         logger.error(f"Error en la pestaña de anuncios: {str(e)}", exc_info=True)
         st.error("Error al procesar los anuncios")
+
+# Tab 3: Estado de Vuelo (nueva pestaña principal)
+with tab3:
+    try:
+        # Renderizar directamente la pestaña de estado de vuelo
+        render_flight_status_tab(client)
+    except Exception as e:
+        logger.error(f"Error en Tab 3: {str(e)}", exc_info=True)
+        st.error("Error al cargar la información de estado de vuelo")
+
+# Tab 2: Visualizador (ahora solo incluye Line de Tiempo, Análisis y Resumen)
+with tab2:
+    try:
+        # Usar el sistema de pestañas modular para visualización
+        render_tabs(client)
+    except Exception as e:
+        logger.error(f"Error en Tab 2: {str(e)}", exc_info=True)
+        st.error("Error al cargar la visualización de eventos")

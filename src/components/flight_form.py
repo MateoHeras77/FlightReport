@@ -27,7 +27,7 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
         with col3:
             destination = st.selectbox("✈️ Destino", ["", "BOG", "SAL"], index=0, key="destination")
 
-        flight_number = st.selectbox("🔢 Número de vuelo", ["AV205", "AV255", "AV627"], key="flight_number")
+        flight_number = st.selectbox("🔢 Número de vuelo", ["", "AV205", "AV255", "AV627"], key="flight_number", format_func=lambda x: "Elegir vuelo" if x == "" else x)
 
         st.subheader("⏰ Tiempos")
         col3, col4 = st.columns(2)
@@ -145,7 +145,6 @@ def process_form_data(
         "Destino": destination,
         "Número de vuelo": flight_number,
         "Total Pax": total_pax,
-        "Customs In": customs_in,
         "Gate": gate,
         "Carrousel": carrousel,
         "WCHR": wchr_current_flight,

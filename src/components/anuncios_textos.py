@@ -3,14 +3,12 @@ anuncios = {
     "arrivals": {
         "es": """
         <div style='padding:10px; border-radius:5px;'>
-            <h3>🛬 Bienvenida a la ciudad de Toronto.</h3>
             <p>Les damos la bievenidad a la ciudad de Toronto, para su comodidad, les informamos que la banda asignada para recoger su equipaje es la número ____.</p>
             <p>Si tiene conexión dentro de Canadá en un vuelo doméstico, deberá recoger su equipaje y llevarlo a la banda de equipaje de conexión.</p>
         </div>
         """,
         "en": """
         <div style='padding:10px; border-radius:5px;'>
-            <h3>🛬 Welcome to Toronto.</h3>
             <p>Welcome to Toronto, for your convenience, the carousel assigned to pick up your luggage is number ____.</p>
             <p>All passengers with a connecting domestic flight within Canada must pick up their bag and drop it off at the connection baggage belt.</p>
         </div>"""
