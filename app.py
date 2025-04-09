@@ -25,6 +25,7 @@ try:
     from src.utils.form_utils import create_copy_button
     from src.services.supabase_service import send_data_to_supabase
     from src.components.anuncios_textos import anuncios  # Importar el archivo de textos de anuncios
+    from src.services.api_service import fetch_flight_status
     from datetime import date
 
     # Configurar logger
