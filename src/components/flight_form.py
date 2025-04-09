@@ -46,29 +46,29 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
         st.subheader("📋 Información de Customs")
         col_customs1, col_customs2 = st.columns(2)
         with col_customs1:
-            customs_in = st.text_input("Customs In", value="", placeholder="HH:MM", key="customs_in")
+            customs_in = st.text_input("Customs In", value="No Customs", placeholder="HH:MM", key="customs_in")
         with col_customs2:
-            customs_out = st.text_input("Customs Out", value="", placeholder="HH:MM", key="customs_out")
+            customs_out = st.text_input("Customs Out", value="No Customs", placeholder="HH:MM", key="customs_out")
 
         st.subheader("👥 Información de Pasajeros")
         col_pax1, col_pax2 = st.columns(2)
         with col_pax1:
-            total_pax = st.text_input("Total Pax", value="", placeholder="Cantidad de pasajeros a bordo",key="total_pax").strip()
-            pax_c = st.text_input("PAX C", placeholder="Cantidad de pasajeros en cabina C",value="", key="pax_c").strip()
+            total_pax = st.text_input("Total Pax", value="0", placeholder="Cantidad de pasajeros a bordo",key="total_pax").strip()
+            pax_c = st.text_input("PAX C", placeholder="Cantidad de pasajeros en cabina C",value="0", key="pax_c").strip()
         with col_pax2:
-            pax_y = st.text_input("PAX Y", placeholder="Cantidad de pasajeros en cabina Y",value="", key="pax_y").strip()
-            infants = st.text_input("Infantes", placeholder="Cantidad de infantes a bordo",value="", key="infants").strip()
+            pax_y = st.text_input("PAX Y", placeholder="Cantidad de pasajeros en cabina Y",value="0", key="pax_y").strip()
+            infants = st.text_input("Infantes", placeholder="Cantidad de infantes a bordo",value="0", key="infants").strip()
 
         st.subheader("⏳ Información por Demoras")
         col_delay1, col_delay2 = st.columns(2)
         with col_delay1:
-            delay = st.text_area("Delay (Ingresar minutos)",placeholder="Ingresar unicamente la cantidad de minutos de delay", value="", key="delay")
+            delay = st.text_area("Delay (Ingresar minutos)",placeholder="Ingresar unicamente la cantidad de minutos de delay", value="0", key="delay")
         with col_delay2:
             delay_code = st.text_area("Delay Code (Reporte)", placeholder="Ingresar el reporte y codigos del retraso",value="", key="delay_code")
 
         # Actualizar etiquetas de WCHR y Agentes eliminando "AV2**" y simplificando el código
-        wchr_current_label = "WCHR Vuelo Salida"
-        agents_current_label = "Agentes Vuelo Salida"
+        wchr_current_label = "WCHR Vuelo Salida (AV255 - AV627 - AV205)"
+        agents_current_label = "Agentes Vuelo Salida (AV255 - AV627 - AV205)"
 
         # Determinar el vuelo anterior basado en el número de vuelo seleccionado
         previous_flight_mapping = {
@@ -77,17 +77,17 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
             "AV255": "AV254"
         }
         previous_flight = previous_flight_mapping.get(flight_number, "")
-        wchr_previous_label = "WCHR Vuelo Llegada"
-        agents_previous_label = "Agentes Vuelo Llegada"
+        wchr_previous_label = "WCHR Vuelo Llegada (AV254 - AV626 - AV204)"
+        agents_previous_label = "Agentes Vuelo Llegada (AV254 - AV626 - AV204)"
 
         st.subheader("💬 WCHR")
         col_wchr1, col_wchr2 = st.columns(2)
         with col_wchr1:
-            wchr_current_flight = st.text_area(wchr_current_label, value="", placeholder="Ingresar cantidad de WCHR / WCHC / DEAF etc",key="wchr_current_flight")
-            wchr_previous_flight = st.text_area(wchr_previous_label, value="",placeholder="Ingresar cantidad de WCHR / WCHC / DEAF etc", key="wchr_previous_flight")
+            wchr_current_flight = st.text_area(wchr_current_label, value="", placeholder="(AV255 - AV627 - AV205) Cantidad de WCHR / WCHC / DEAF etc",key="wchr_current_flight")
+            wchr_previous_flight = st.text_area(wchr_previous_label, value="",placeholder="(AV254 - AV626 - AV204) Cantidad de WCHR / WCHC / DEAF etc", key="wchr_previous_flight")
         with col_wchr2:
-            agents_current_flight = st.text_area(agents_current_label, value="", key="agents_current_flight")
-            agents_previous_flight = st.text_area(agents_previous_label, value="", key="agents_previous_flight")
+            agents_current_flight = st.text_area(agents_current_label, value="0", key="agents_current_flight")
+            agents_previous_flight = st.text_area(agents_previous_label, value="0", key="agents_previous_flight")
 
         st.subheader("📍 Información de Gate y Carrusel")
         col_gate1, col_gate2 = st.columns(2)
