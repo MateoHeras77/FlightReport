@@ -83,8 +83,8 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
         st.subheader("💬 WCHR")
         col_wchr1, col_wchr2 = st.columns(2)
         with col_wchr1:
-            wchr_current_flight = st.text_area(wchr_current_label, value="-- WCHR | -- WCHC", placeholder="(AV255 - AV627 - AV205) Cantidad de WCHR / WCHC / DEAF etc",key="wchr_current_flight")
-            wchr_previous_flight = st.text_area(wchr_previous_label, value="-- WCHR | -- WCHC",placeholder="(AV254 - AV626 - AV204) Cantidad de WCHR / WCHC / DEAF etc", key="wchr_previous_flight")
+            wchr_current_flight = st.text_area(wchr_current_label, value=" 00 WCHR | 00 WCHC", placeholder="(AV255 - AV627 - AV205) Cantidad de WCHR / WCHC / DEAF etc",key="wchr_current_flight")
+            wchr_previous_flight = st.text_area(wchr_previous_label, value="00 WCHR | 00 WCHC",placeholder="(AV254 - AV626 - AV204) Cantidad de WCHR / WCHC / DEAF etc", key="wchr_previous_flight")
         with col_wchr2:
             agents_current_flight = st.text_area(agents_current_label, value="0", key="agents_current_flight")
             agents_previous_flight = st.text_area(agents_previous_label, value="0", key="agents_previous_flight")

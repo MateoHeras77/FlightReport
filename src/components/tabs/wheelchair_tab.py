@@ -60,6 +60,7 @@ def render_wheelchair_tab(client):
             query = client.table(DEFAULT_TABLE_NAME).select(
                 "flight_date", 
                 "flight_number", 
+                "gate",
                 "comments",
                 "wchr_previous_flight", 
                 "agents_previous_flight", 
@@ -85,6 +86,7 @@ def render_wheelchair_tab(client):
             column_mapping = {
                 "flight_date": "Fecha de Vuelo",
                 "flight_number": "Número de Vuelo",
+                "gate": "Puerta",
                 "comments": "Comentarios",
                 "wchr_previous_flight": "WCHR Vuelo Llegada",
                 "agents_previous_flight": "Agentes Vuelo Llegada",
