@@ -189,7 +189,8 @@ def render_timeline_tab(client):
                 st.warning("No se encontraron vuelos con los filtros seleccionados.")
                 return
 
-            # Radio para elegir el tipo de visualización
+            # Mover la selección del tipo de visualización al inicio
+            st.subheader("Visualización de Eventos")
             chart_type = st.radio(
                 "Seleccione el tipo de visualización:",
                 options=["Gráfico de Gantt (Cascada)", "Gráfico de Barras", "Gráfico de Eventos Combinados"],
@@ -197,8 +198,6 @@ def render_timeline_tab(client):
             )
 
             # Crear y mostrar el gráfico según selección
-            st.subheader("Visualización de Eventos")
-
             try:
                 if chart_type == "Gráfico de Gantt (Cascada)":
                     fig = create_gantt_chart(flights_data)

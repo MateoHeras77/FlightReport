@@ -117,7 +117,6 @@ with tab1:
             for i, (key, value) in enumerate(operation_times.items()):
                 cols[i % 3].write(f"*{key}:* {value}")
 
-
             # Mostrar información de customs
             st.subheader("📋 Información de Customs")
             cols = st.columns(2)
@@ -207,7 +206,8 @@ with tab1:
     except Exception as e:
         logger.error(f"Error en Tab 1: {str(e)}", exc_info=True)
         st.error("Error al procesar los datos del formulario")
-# Tab 2: Visualizador (ahora solo incluye Line de Tiempo, Análisis y Resumen)
+
+# Tab 2: Visualizador (pestañas internas para Línea de Tiempo, Análisis y Resumen)
 with tab2:
     try:
         # Usar el sistema de pestañas modular para visualización
@@ -215,7 +215,7 @@ with tab2:
     except Exception as e:
         logger.error(f"Error en Tab 2: {str(e)}", exc_info=True)
         st.error("Error al cargar la visualización de eventos")
-
+        
 # Tab 3: Anuncios
 with tab3:
     try:
@@ -311,21 +311,3 @@ with tab3:
     except Exception as e:
         logger.error(f"Error en la pestaña de anuncios: {str(e)}", exc_info=True)
         st.error("Error al procesar los anuncios")
-
-# Tab 3: Estado de Vuelo (nueva pestaña principal)
-with tab3:
-    try:
-        # Renderizar directamente la pestaña de estado de vuelo
-        render_flight_status_tab(client)
-    except Exception as e:
-        logger.error(f"Error en Tab 3: {str(e)}", exc_info=True)
-        st.error("Error al cargar la información de estado de vuelo")
-
-# Tab 2: Visualizador (ahora solo incluye Line de Tiempo, Análisis y Resumen)
-with tab2:
-    try:
-        # Usar el sistema de pestañas modular para visualización
-        render_tabs(client)
-    except Exception as e:
-        logger.error(f"Error en Tab 2: {str(e)}", exc_info=True)
-        st.error("Error al cargar la visualización de eventos")

@@ -29,13 +29,18 @@ def render_analytics_tab(client):
     Args:
         client: Cliente de Supabase inicializado
     """
-    st.header("Análisis de Eventos")
-    
-    # Mostrar mensaje de funcionalidad en desarrollo
-    st.info("Esta funcionalidad está en desarrollo. Pronto podrás ver análisis estadísticos de los eventos de vuelo.")
-    
-    # Aquí se pueden agregar visualizaciones y análisis estadísticos
-    st.write("Trabajando en esta sección ....")
+    try:
+        st.header("Análisis de Eventos")
+        
+        # Mostrar mensaje de funcionalidad en desarrollo
+        st.info("Esta funcionalidad está en desarrollo. Pronto podrás ver análisis estadísticos de los eventos de vuelo.")
+        
+        # Aquí se pueden agregar visualizaciones y análisis estadísticos
+        st.write("Trabajando en esta sección ....")
+    except Exception as e:
+        st.error(f"No se pudo cargar la sección de análisis: {str(e)}")
+        import traceback
+        print(f"Error en render_analytics_tab: {traceback.format_exc()}")
 
     
 def render_summary_tab(client):
@@ -45,10 +50,15 @@ def render_summary_tab(client):
     Args:
         client: Cliente de Supabase inicializado
     """
-    st.header("Resumen de Vuelos")
-    
-    # Mostrar mensaje de funcionalidad en desarrollo
-    st.info("Esta funcionalidad está en desarrollo. Pronto podrás ver un resumen general de los vuelos.")
-    
-    # Aquí se pueden agregar resúmenes y estadísticas generales
-    st.write("Trabanjando en esta sección ....")
+    try:
+        st.header("Resumen de Vuelos")
+        
+        # Mostrar mensaje de funcionalidad en desarrollo
+        st.info("Esta funcionalidad está en desarrollo. Pronto podrás ver un resumen general de los vuelos.")
+        
+        # Aquí se pueden agregar resúmenes y estadísticas generales
+        st.write("Trabajando en esta sección ....")
+    except Exception as e:
+        st.error(f"No se pudo cargar la sección de resumen: {str(e)}")
+        import traceback
+        print(f"Error en render_summary_tab: {traceback.format_exc()}")
