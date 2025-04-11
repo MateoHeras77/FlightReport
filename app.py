@@ -61,9 +61,9 @@ except Exception as e:
     logger.error(f"Error de conexión Supabase: {str(e)}", exc_info=True)
     st.stop()
 
-# Crear tabs para las diferentes funcionalidades - Ahora con tres pestañas principales
+# Crear tabs para las diferentes funcionalidades - Ahora con cuatro pestañas principales
 try:
-    tab1, tab2, tab3 = st.tabs(["🛫 Ingreso de Datos", "📊 Visualizador", "📢 Anuncios"])
+    tab1, tab2, tab3, tab4 = st.tabs(["🛫 Ingreso de Datos", "📊 Visualizador", "📢 Anuncios", "♿ Wheelchairs"])
 except Exception as e:
     logger.error(f"Error al crear tabs: {str(e)}", exc_info=True)
     st.error("Error al cargar la interfaz de usuario")
@@ -311,3 +311,13 @@ with tab3:
     except Exception as e:
         logger.error(f"Error en la pestaña de anuncios: {str(e)}", exc_info=True)
         st.error("Error al procesar los anuncios")
+
+# Tab 4: Wheelchairs
+with tab4:
+    try:
+        from src.components.tabs.wheelchair_tab import render_wheelchair_tab
+        # Usar la función de la pestaña de Wheelchairs
+        render_wheelchair_tab(client)
+    except Exception as e:
+        logger.error(f"Error en Tab 4 (Wheelchairs): {str(e)}", exc_info=True)
+        st.error("Error al cargar la visualización de servicios de sillas de ruedas")
