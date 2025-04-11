@@ -1,6 +1,5 @@
 import streamlit as st
 from src.components.tabs.timeline_tab import render_timeline_tab
-from src.components.tabs.wheelchair_tab import render_wheelchair_tab
 
 def render_tabs(client):
     """
@@ -9,8 +8,8 @@ def render_tabs(client):
     Args:
         client: Cliente de Supabase inicializado
     """
-    # Definir las pestañas disponibles - Ahora incluyendo "Wheelchairs"
-    tabs = ["Línea de Tiempo", "Análisis", "Resumen", "Wheelchairs"]
+    # Definir las pestañas disponibles - Ya sin "Wheelchairs"
+    tabs = ["Línea de Tiempo", "Análisis", "Resumen"]
     
     # Crear el contenedor de pestañas
     selected_tab = st.radio("Seleccione una vista:", tabs, horizontal=True)
@@ -22,8 +21,6 @@ def render_tabs(client):
         render_analytics_tab(client)
     elif selected_tab == "Resumen":
         render_summary_tab(client)
-    elif selected_tab == "Wheelchairs":
-        render_wheelchair_tab(client)
         
 def render_analytics_tab(client):
     """
