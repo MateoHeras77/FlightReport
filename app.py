@@ -193,15 +193,29 @@ with tab1:
                     if success:
                         st.success("Datos enviados exitosamente a la base de datos")
                         logger.info("Datos enviados exitosamente a Supabase")
+                        
+                        # Guardar en session_state que los datos fueron enviados exitosamente
+                        st.session_state.data_submitted = True
+                        
+                        # Botón para copiar el reporte generado (solo se muestra después de enviar exitosamente)
+                        st.markdown("### Copiar reporte para WhatsApp")
+                        create_copy_button(report_text)
                     else:
                         st.error(f"Error al enviar datos: {error_message}")
                         logger.error(f"Error al enviar datos a Supabase: {error_message}")
                 except Exception as e:
                     st.error("Error al procesar el envío de datos")
                     logger.error(f"Error en envío de datos: {str(e)}", exc_info=True)
-
-            # Botón para copiar el reporte generado
-            create_copy_button(report_text)
+            # Mostrar el botón de copiar solo si aún no se han enviado los datos
+            elif "data_submitted" not in st.session_state or not st.session_state.data_submitted:
+                st.warning("⚠️ Debe hacer clic en 'Enviar y Finalizar' antes de copiar el reporte")
+                st.markdown("### Copiar reporte para WhatsApp (primero debe enviar los datos)")
+                # Botón deshabilitado o con estilo diferente
+                st.info("El botón de copiar estará disponible después de enviar los datos correctamente.")
+            else:
+                # Si ya se enviaron los datos, mostrar el botón de copiar
+                st.markdown("### Copiar reporte para WhatsApp")
+                create_copy_button(report_text)
 
     except Exception as e:
         logger.error(f"Error en Tab 1: {str(e)}", exc_info=True)
