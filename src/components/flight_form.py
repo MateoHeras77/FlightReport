@@ -53,16 +53,53 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
         st.subheader("👥 Información de Pasajeros")
         col_pax1, col_pax2 = st.columns(2)
         with col_pax1:
-            total_pax = st.text_input("Total Pax", value="0", placeholder="Cantidad de pasajeros a bordo",key="total_pax").strip()
-            pax_c = st.text_input("PAX C", placeholder="Cantidad de pasajeros en cabina C",value="0", key="pax_c").strip()
+            # Lista desplegable para Total Pax (0-200)
+            total_pax_options = [str(i) for i in range(201)]
+            total_pax = st.selectbox(
+                "Total Pax", 
+                options=total_pax_options,
+                index=0,  # Valor por defecto: 0
+                key="total_pax"
+            )
+            
+            # Lista desplegable para PAX C (0-18)
+            pax_c_options = [str(i) for i in range(19)]
+            pax_c = st.selectbox(
+                "PAX C", 
+                options=pax_c_options,
+                index=0,  # Valor por defecto: 0
+                key="pax_c"
+            )
         with col_pax2:
-            pax_y = st.text_input("PAX Y", placeholder="Cantidad de pasajeros en cabina Y",value="0", key="pax_y").strip()
-            infants = st.text_input("Infantes", placeholder="Cantidad de infantes a bordo",value="0", key="infants").strip()
+            # Lista desplegable para PAX Y (0-200)
+            pax_y_options = [str(i) for i in range(201)]
+            pax_y = st.selectbox(
+                "PAX Y", 
+                options=pax_y_options,
+                index=0,  # Valor por defecto: 0
+                key="pax_y"
+            )
+            
+            # Lista desplegable para Infantes (0-200)
+            infants_options = [str(i) for i in range(201)]
+            infants = st.selectbox(
+                "Infantes", 
+                options=infants_options,
+                index=0,  # Valor por defecto: 0
+                key="infants"
+            )
 
         st.subheader("⏳ Información por Demoras")
         col_delay1, col_delay2 = st.columns(2)
         with col_delay1:
-            delay = st.text_area("Delay (Ingresar minutos de demora)",placeholder="Ingresar unicamente la cantidad de minutos de demora", value="", key="delay")
+            # Crear una lista de opciones de 0 a 200 para el selector de delay, más la opción adicional
+            delay_options = [str(i) for i in range(201)] + [">200 Escribir en comentarios"]
+            delay = st.selectbox(
+                "Delay (Ingresar minutos de demora)", 
+                options=delay_options,
+                index=0,  # Valor por defecto: 0
+                key="delay"
+            )
         with col_delay2:
             delay_code = st.text_area("Delay Code (Reporte)", placeholder="Ingresar los codigos del retraso",value="", key="delay_code")
 
@@ -86,8 +123,24 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
             wchr_current_flight = st.text_area(wchr_current_label, value=" 00 WCHR | 00 WCHC", placeholder="(AV255 - AV627 - AV205) Cantidad de WCHR / WCHC / DEAF etc",key="wchr_current_flight")
             wchr_previous_flight = st.text_area(wchr_previous_label, value="00 WCHR | 00 WCHC",placeholder="(AV254 - AV626 - AV204) Cantidad de WCHR / WCHC / DEAF etc", key="wchr_previous_flight")
         with col_wchr2:
-            agents_current_flight = st.text_area(agents_current_label, value="0", key="agents_current_flight")
-            agents_previous_flight = st.text_area(agents_previous_label, value="0", key="agents_previous_flight")
+            # Crear lista de opciones para agentes (0-20 + opción adicional)
+            agent_options = [str(i) for i in range(21)] + ["> 20 Escribir en comentarios"]
+            
+            # Selectbox para agentes de vuelo de salida
+            agents_current_flight = st.selectbox(
+                agents_current_label,
+                options=agent_options,
+                index=0,  # Valor por defecto: 0
+                key="agents_current_flight"
+            )
+            
+            # Selectbox para agentes de vuelo de llegada
+            agents_previous_flight = st.selectbox(
+                agents_previous_label,
+                options=agent_options,
+                index=0,  # Valor por defecto: 0
+                key="agents_previous_flight"
+            )
 
         st.subheader("📍 Información de Gate y Carrusel")
         col_gate1, col_gate2 = st.columns(2)
@@ -200,23 +253,9 @@ def process_form_data(
             logger.warning(f"Campo no numérico: {field_name} - Valor ingresado: {value}")
             return False, None
 
-    # Validar campo opcional y numérico para delay
-    if delay.strip() and not delay.isdigit():
-        st.error("El campo 'Delay (Ingresar minutos)' debe contener únicamente números si se completa.")
-        logger.warning(f"Campo no numérico: Delay - Valor ingresado: {delay}")
-        return False, None
-
-    # Validar campos opcionales y numéricos para agentes
-    agent_fields = {
-        "Agentes Vuelo Salida": agents_current_flight,
-        "Agentes Vuelo Llegadas": agents_previous_flight
-    }
-
-    for field_name, value in agent_fields.items():
-        if value.strip() and not value.isdigit():
-            st.error(f"El campo '{field_name}' debe contener únicamente números si se completa.")
-            logger.warning(f"Campo no numérico: {field_name} - Valor ingresado: {value}")
-            return False, None
+    # Ya no se valida que el campo delay sea numérico, ahora acepta cualquier texto
+    
+    # Ya no se validan los campos de agentes como numéricos, ahora aceptan cualquier texto
 
     # Actualizar el esquema de datos para reflejar los cambios en la base de datos
     database_data = {
