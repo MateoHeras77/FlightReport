@@ -17,6 +17,36 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
             - formulario_enviado: bool que indica si el formulario fue enviado y validado
             - datos_procesados: diccionario con los datos procesados o None
     """
+    # Inicializar variables en session_state para mantener valores entre recargas
+    if "flight_number_previous" not in st.session_state:
+        st.session_state.flight_number_previous = ""
+    
+    # Mapeo de vuelos para determinar el vuelo anterior
+    previous_flight_mapping = {
+        "AV205": "AV204",
+        "AV627": "AV626",
+        "AV255": "AV254"
+    }
+    
+    # Determinar el número de vuelo fuera del formulario para actualizar la UI
+    # Este selectbox está fuera del formulario, por lo que podemos usar callbacks aquí
+    flight_number_selected = st.selectbox(
+        "🔢 Seleccione el número de vuelo primero:",
+        ["", "AV205", "AV255", "AV627"],
+        format_func=lambda x: "Elegir vuelo" if x == "" else x,
+        key="flight_number_selector"
+    )
+    
+    # Actualizar el vuelo anterior basado en la selección
+    previous_flight = previous_flight_mapping.get(flight_number_selected, "")
+    
+    # Mostrar información sobre la selección actual
+    if flight_number_selected:
+        st.info(f"Vuelo seleccionado: {flight_number_selected} - Vuelo anterior correspondiente: {previous_flight}")
+    
+    # Guardar para usar dentro del formulario
+    st.session_state.flight_number_previous = previous_flight
+    
     with st.form("flight_form"):
         st.subheader("🚀 Datos Básicos")
         col1, col2, col3 = st.columns(3)
@@ -27,7 +57,16 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
         with col3:
             destination = st.selectbox("✈️ Destino", ["", "BOG", "SAL"], index=0, key="destination")
 
-        flight_number = st.selectbox("🔢 Número de vuelo", ["", "AV205", "AV255", "AV627"], key="flight_number", format_func=lambda x: "Elegir vuelo" if x == "" else x)
+        # Selectbox para número de vuelo dentro del formulario, pero usando el valor ya seleccionado
+        flight_number_options = ["", "AV205", "AV255", "AV627"]
+        default_index = flight_number_options.index(flight_number_selected) if flight_number_selected in flight_number_options else 0
+        
+        flight_number = st.selectbox(
+            "🔢 Confirme el número de vuelo",
+            flight_number_options,
+            index=default_index,
+            key="flight_number"
+        )
 
         st.subheader("⏰ Tiempos")
         col3, col4 = st.columns(2)
@@ -107,40 +146,93 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
         wchr_current_label = "WCHR Vuelo Salida (AV255 - AV627 - AV205)"
         agents_current_label = "Agentes Vuelo Salida (AV255 - AV627 - AV205)"
 
-        # Determinar el vuelo anterior basado en el número de vuelo seleccionado
-        previous_flight_mapping = {
-            "AV205": "AV204",
-            "AV627": "AV626",
-            "AV255": "AV254"
-        }
-        previous_flight = previous_flight_mapping.get(flight_number, "")
+        # Obtener el vuelo anterior desde session_state
+        previous_flight = st.session_state.flight_number_previous
         wchr_previous_label = "WCHR Vuelo Llegada (AV254 - AV626 - AV204)"
         agents_previous_label = "Agentes Vuelo Llegada (AV254 - AV626 - AV204)"
 
-        st.subheader("💬 WCHR")
-        col_wchr1, col_wchr2 = st.columns(2)
-        with col_wchr1:
-            wchr_current_flight = st.text_area(wchr_current_label, value=" 00 WCHR | 00 WCHC", placeholder="(AV255 - AV627 - AV205) Cantidad de WCHR / WCHC / DEAF etc",key="wchr_current_flight")
-            wchr_previous_flight = st.text_area(wchr_previous_label, value="00 WCHR | 00 WCHC",placeholder="(AV254 - AV626 - AV204) Cantidad de WCHR / WCHC / DEAF etc", key="wchr_previous_flight")
-        with col_wchr2:
-            # Crear lista de opciones para agentes (0-20 + opción adicional)
+        st.subheader("♿ Sillas de Ruedas")
+        
+        # Sección de Llegada (izquierda)
+        col_llegada, col_salida = st.columns(2)
+        
+        with col_llegada:
+            # Mostrar el vuelo anterior, usar el valor ya determinado fuera del formulario
+            if st.session_state.flight_number_previous:
+                llegada_title = f"##### 🛬 Sillas de Ruedas Llegada ({st.session_state.flight_number_previous})"
+            else:
+                llegada_title = "##### 🛬 Sillas de Ruedas Llegada (Seleccione vuelo de salida primero)"
+            
+            st.markdown(llegada_title)
+            
+            # Listas desplegables para WCHR y WCHC de llegada
+            col_wchr_prev1, col_wchr_prev2 = st.columns(2)
+            with col_wchr_prev1:
+                wchr_previous_options = [str(i).zfill(2) for i in range(51)]
+                wchr_previous_count = st.selectbox(
+                    "Cantidad WCHR",
+                    options=wchr_previous_options,
+                    index=0,
+                    key="wchr_previous_count"
+                )
+            with col_wchr_prev2:
+                wchc_previous_options = [str(i).zfill(2) for i in range(51)]
+                wchc_previous_count = st.selectbox(
+                    "Cantidad WCHC",
+                    options=wchc_previous_options,
+                    index=0,
+                    key="wchc_previous_count"
+                )
+            
+            # Agentes de llegada
             agent_options = [str(i) for i in range(21)] + ["> 20 Escribir en comentarios"]
-            
-            # Selectbox para agentes de vuelo de salida
-            agents_current_flight = st.selectbox(
-                agents_current_label,
-                options=agent_options,
-                index=0,  # Valor por defecto: 0
-                key="agents_current_flight"
-            )
-            
-            # Selectbox para agentes de vuelo de llegada
             agents_previous_flight = st.selectbox(
-                agents_previous_label,
+                "Agentes Llegada",
                 options=agent_options,
-                index=0,  # Valor por defecto: 0
+                index=0,
                 key="agents_previous_flight"
             )
+        
+        # Sección de Salida (derecha)
+        with col_salida:
+            # Mostrar el vuelo actual
+            if flight_number_selected:
+                salida_title = f"##### 🛫 Sillas de Ruedas Salida ({flight_number_selected})"
+            else:
+                salida_title = "##### 🛫 Sillas de Ruedas Salida (Seleccione vuelo primero)"
+            
+            st.markdown(salida_title)
+            
+            # Listas desplegables para WCHR y WCHC de salida
+            col_wchr_curr1, col_wchr_curr2 = st.columns(2)
+            with col_wchr_curr1:
+                wchr_current_options = [str(i).zfill(2) for i in range(51)]
+                wchr_current_count = st.selectbox(
+                    "Cantidad WCHR",
+                    options=wchr_current_options,
+                    index=0,
+                    key="wchr_current_count"
+                )
+            with col_wchr_curr2:
+                wchc_current_options = [str(i).zfill(2) for i in range(51)]
+                wchc_current_count = st.selectbox(
+                    "Cantidad WCHC",
+                    options=wchc_current_options,
+                    index=0,
+                    key="wchc_current_count"
+                )
+            
+            # Agentes de salida
+            agents_current_flight = st.selectbox(
+                "Agentes Salida",
+                options=agent_options,
+                index=0,
+                key="agents_current_flight"
+            )
+        
+        # Combinar valores seleccionados en el formato requerido para la base de datos
+        wchr_current_flight = f"{wchr_current_count} WCHR | {wchc_current_count} WCHC"
+        wchr_previous_flight = f"{wchr_previous_count} WCHR | {wchc_previous_count} WCHC"
 
         st.subheader("📍 Información de Gate y Carrusel")
         col_gate1, col_gate2 = st.columns(2)
