@@ -21,6 +21,12 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
     if "flight_number_previous" not in st.session_state:
         st.session_state.flight_number_previous = ""
     
+    # Inicializar más variables del session_state para valores predeterminados
+    if "default_destination" not in st.session_state:
+        st.session_state.default_destination = ""
+    if "default_std" not in st.session_state:
+        st.session_state.default_std = ""
+    
     # Mapeo de vuelos para determinar el vuelo anterior
     previous_flight_mapping = {
         "AV205": "AV204",
@@ -28,24 +34,53 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
         "AV255": "AV254"
     }
     
-    # Determinar el número de vuelo fuera del formulario para actualizar la UI
-    # Este selectbox está fuera del formulario, por lo que podemos usar callbacks aquí
+    # Información predeterminada para cada vuelo
+    flight_defaults = {
+        "AV255": {"destination": "BOG", "std": "09:05"},
+        "AV627": {"destination": "SAL", "std": "17:10"},
+        "AV205": {"destination": "BOG", "std": "23:50"}
+    }
+    
+    # Paso 1: Selección del vuelo antes de mostrar el formulario
+    st.markdown("### Paso 1: Seleccione el vuelo para el reporte")
+    
+    # Callback para actualizar valores predeterminados cuando cambia el vuelo
+    def update_flight_defaults():
+        selected = st.session_state.flight_number_selector
+        st.session_state.flight_number_previous = previous_flight_mapping.get(selected, "")
+        
+        # Actualizar valores predeterminados en session_state
+        if selected in flight_defaults:
+            st.session_state.default_destination = flight_defaults[selected]["destination"]
+            st.session_state.default_std = flight_defaults[selected]["std"]
+        else:
+            st.session_state.default_destination = ""
+            st.session_state.default_std = ""
+    
     flight_number_selected = st.selectbox(
         "🔢 Seleccione el número de vuelo primero:",
         ["", "AV205", "AV255", "AV627"],
         format_func=lambda x: "Elegir vuelo" if x == "" else x,
-        key="flight_number_selector"
+        key="flight_number_selector",
+        on_change=update_flight_defaults
     )
     
-    # Actualizar el vuelo anterior basado en la selección
-    previous_flight = previous_flight_mapping.get(flight_number_selected, "")
+    # Solo continuar si se ha seleccionado un vuelo
+    if not flight_number_selected:
+        st.info("⚠️ Por favor, seleccione un número de vuelo para continuar.")
+        # Devolver False, None para indicar que el formulario no se ha enviado
+        return False, None
     
     # Mostrar información sobre la selección actual
-    if flight_number_selected:
-        st.info(f"Vuelo seleccionado: {flight_number_selected} - Vuelo anterior correspondiente: {previous_flight}")
+    previous_flight = st.session_state.flight_number_previous
+    st.success(f"✅ Vuelo seleccionado: {flight_number_selected} - Vuelo anterior correspondiente: {previous_flight}")
     
-    # Guardar para usar dentro del formulario
-    st.session_state.flight_number_previous = previous_flight
+    if st.session_state.default_destination and st.session_state.default_std:
+        st.info(f"📝 Información predeterminada: Destino: {st.session_state.default_destination}, " 
+                f"Hora programada de salida (STD): {st.session_state.default_std}")
+    
+    # Paso 2: Mostrar el formulario solo después de seleccionar un vuelo
+    st.markdown("### Paso 2: Complete el formulario de reporte")
     
     with st.form("flight_form"):
         st.subheader("🚀 Datos Básicos")
@@ -55,7 +90,18 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
         with col2:
             origin = st.selectbox("🌍 Origen", ["YYZ"], index=0, key="origin")
         with col3:
-            destination = st.selectbox("✈️ Destino", ["", "BOG", "SAL"], index=0, key="destination")
+            # Usar el destino predeterminado desde session_state
+            destination_options = ["", "BOG", "SAL"]
+            default_index = 0
+            if st.session_state.default_destination in destination_options:
+                default_index = destination_options.index(st.session_state.default_destination)
+            
+            destination = st.selectbox(
+                "✈️ Destino", 
+                destination_options, 
+                index=default_index, 
+                key="destination"
+            )
 
         # Selectbox para número de vuelo dentro del formulario, pero usando el valor ya seleccionado
         flight_number_options = ["", "AV205", "AV255", "AV627"]
@@ -71,7 +117,13 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
         st.subheader("⏰ Tiempos")
         col3, col4 = st.columns(2)
         with col3:
-            std = st.text_input("STD (Salida Programada)", value="", placeholder="HH:MM", key="std")
+            # Usar el STD predeterminado desde session_state
+            std = st.text_input(
+                "STD (Salida Programada)", 
+                value=st.session_state.default_std, 
+                placeholder="HH:MM", 
+                key="std"
+            )
             atd = st.text_input("ATD (Salida Real)", value="", placeholder="HH:MM", key="atd")
             groomers_in = st.text_input("Groomers In", value="", placeholder="HH:MM", key="groomers_in")
             groomers_out = st.text_input("Groomers Out", value="", placeholder="HH:MM", key="groomers_out")
