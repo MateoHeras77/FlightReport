@@ -91,49 +91,20 @@ with tab1:
             st.subheader("📑 Revisión de Datos")
             display_data = st.session_state.form_data["data_to_display"]
 
-            # Agrupar los datos por categorías más lógicas
-            operation_times = {k: v for k, v in display_data.items() if k in [
-                'std', 'atd', 'groomers_in', 'groomers_out', 'crew_at_gate',
-                'ok_to_board', 'flight_secure', 'cierre_de_puerta', 'push_back'
-            ]}
-            flight_info = {k: v for k, v in display_data.items() if any(x in k.lower() for x in ['flight', 'route', 'aircraft']) and k not in operation_times}
-            customs_info = {k: v for k, v in display_data.items() if k in ['customs_in', 'customs_out']}
-            passenger_info = {k: v for k, v in display_data.items() if k in ['total_pax', 'pax_c', 'pax_y', 'infants']}
-            delay_info = {k: v for k, v in display_data.items() if k in ['delay', 'delay_code']}
-            wchr_info = {k: v for k, v in display_data.items() if k in ['wchr_current_flight', 'wchr_previous_flight', 'agents_current_flight', 'agents_previous_flight']}
-            gate_carrousel_info = {k: v for k, v in display_data.items() if k in ['gate', 'carrousel']}
-            other_info = {k: v for k, v in display_data.items() if k not in operation_times and k not in flight_info and k not in customs_info and k not in passenger_info and k not in delay_info and k not in wchr_info and k not in gate_carrousel_info}
+            # Ya no mostrar el recuento detallado de variables y datos ingresados
+            # Solo conservar la generación del texto del reporte y los botones
 
-            # Combinar información adicional e información del vuelo
-            st.subheader("✈️ Información del Vuelo")
-            combined_info = {**flight_info, **other_info}
-            cols = st.columns(3)
-            for i, (key, value) in enumerate(combined_info.items()):
-                cols[i % 3].write(f"*{key}:* {value}")
-
-            # Mostrar información de tiempos de operación
-            st.subheader("⏰ Tiempos de Operación")
-            cols = st.columns(3)
-            for i, (key, value) in enumerate(operation_times.items()):
-                cols[i % 3].write(f"*{key}:* {value}")
-
-            # Mostrar información de customs
-            st.subheader("📋 Información de Customs")
-            cols = st.columns(2)
-            for i, (key, value) in enumerate(customs_info.items()):
-                cols[i % 2].write(f"*{key}:* {value}")
-
-            # Mostrar información de pasajeros
-            st.subheader("👥 Información de Pasajeros")
-            cols = st.columns(2)
-            for i, (key, value) in enumerate(passenger_info.items()):
-                cols[i % 2].write(f"*{key}:* {value}")
-
-            # Mostrar información de Gate Bag
-            st.subheader("🧳 Información de Gate Bag")
-            st.write(f"*Gate Bag:* {display_data.get('gate_bag', '')}")
-
-            # Asegurar que Total Pax y Gate Bag se muestren correctamente en el reporte generado
+            # Generar el texto del reporte para copiar
+            # Obtener los números de vuelo para mostrar en el reporte
+            flight_number = display_data.get('flight_number', '')
+            # Mapeo de vuelos para determinar el vuelo anterior
+            previous_flight_mapping = {
+                "AV205": "AV204",
+                "AV627": "AV626",
+                "AV255": "AV254"
+            }
+            previous_flight = previous_flight_mapping.get(flight_number, "")
+            
             report_text = f"""
 🚀 *Datos Básicos*:
 *Fecha de vuelo:* {display_data.get('flight_date', '')}
@@ -166,11 +137,11 @@ with tab1:
 *Delay:* {display_data.get('delay', '')}
 *Delay Code:* {display_data.get('delay_code', '')}
 
-💬 *WCHR:*
-*WCHR Vuelo Llegada:* {display_data.get('wchr_previous_flight', '')}
-*Agentes Vuelo Llegada:* {display_data.get('agents_previous_flight', '')}
-*WCHR Vuelo Salida:* {display_data.get('wchr_current_flight', '')}
-*Agentes Vuelo Salida:* {display_data.get('agents_current_flight', '')}
+💬 *Silla de ruedas:*
+*Sillas Vuelo Llegada ({previous_flight}):* {display_data.get('wchr_previous_flight', '')}
+*Agentes Vuelo Llegada ({previous_flight}):* {display_data.get('agents_previous_flight', '')}
+*Sillas Vuelo Salida ({flight_number}):* {display_data.get('wchr_current_flight', '')}
+*Agentes Vuelo Salida ({flight_number}):* {display_data.get('agents_current_flight', '')}
 
 📍 *Información de Gate y Carrusel:*
 *Gate:* {display_data.get('gate', '')}
