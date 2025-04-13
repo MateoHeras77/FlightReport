@@ -5,7 +5,7 @@
 *Número de vuelo:* AV205
 
 ⏰ *Tiempos:*
-*STD:* 12:00
+*STD:* 23:50
 *ATD:* 12:00
 *Groomers In:* 12:00
 *Groomers Out:* 12:00
@@ -20,20 +20,20 @@
 *Customs Out:* No Customs
 
 👥 *Información de Pasajeros:*
-*Total Pax:* 3
+*Total Pax:* 63
 *PAX C:* 0
 *PAX Y:* 0
 *Infantes:* 0
 
 ⏳ *Información por Demoras:*
-*Delay:* 3
+*Delay:* >200 Escribir en comentarios
 *Delay Code:* 
 
-💬 *WCHR:*
-*WCHR Vuelo Llegada:* 00 WCHR | 00 WCHC
-*Agentes Vuelo Llegada:* 0
-*WCHR Vuelo Salida:*  00 WCHR | 00 WCHC
-*Agentes Vuelo Salida:* 0
+💬 *Silla de ruedas:*
+*Sillas Vuelo Llegada (AV204):* 38 WCHR | 10 WCHC
+*Agentes Vuelo Llegada (AV204):* > 20 Escribir en comentarios
+*Sillas Vuelo Salida (AV205):* 11 WCHR | 44 WCHC
+*Agentes Vuelo Salida (AV205):* > 20 Escribir en comentarios
 
 📍 *Información de Gate y Carrusel:*
 *Gate:* 12
@@ -43,4 +43,4 @@
 *Gate Bag:* 
 
 💬 *Comentarios:*
-Eliminar
+
