@@ -137,7 +137,7 @@ with tab1:
 *Delay:* {display_data.get('delay', '')}
 *Delay Code:* {display_data.get('delay_code', '')}
 
-💬 *Silla de ruedas:*
+♿ *Silla de ruedas:*
 *Sillas Vuelo Llegada ({previous_flight}):* {display_data.get('wchr_previous_flight', '')}
 *Agentes Vuelo Llegada ({previous_flight}):* {display_data.get('agents_previous_flight', '')}
 *Sillas Vuelo Salida ({flight_number}):* {display_data.get('wchr_current_flight', '')}
