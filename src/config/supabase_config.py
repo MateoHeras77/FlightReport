@@ -64,4 +64,4 @@ def initialize_supabase_client():
         return None, None, error_msg
 
 # Tabla predeterminada en Supabase
-DEFAULT_TABLE_NAME = "FlightReport"
+DEFAULT_TABLE_NAME = "flightfeportava"
