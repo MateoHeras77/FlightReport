@@ -94,7 +94,7 @@ def render_wheelchair_tab(client):
                 "agents_current_flight": "Agentes Vuelo Salida"
             }
             
-            df = df.rename(columns=column_mapping)
+            df = df.rename(columns=column_mapping).sort_values(by="Fecha de Vuelo")
             
             # Mostrar el DataFrame en una tabla
             st.subheader("Resultados")
