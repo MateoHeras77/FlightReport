@@ -86,7 +86,7 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
         st.subheader("🚀 Datos Básicos")
         col1, col2, col3 = st.columns(3)
         with col1:
-            flight_date = st.date_input("📅 Fecha de vuelo", datetime.date.today(), key="flight_date")
+            flight_date = st.date_input("📅 Fecha de vuelo", value=None, key="flight_date")
         with col2:
             origin = st.selectbox("🌍 Origen", ["YYZ"], index=0, key="origin")
         with col3:
