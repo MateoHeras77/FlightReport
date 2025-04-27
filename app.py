@@ -1,23 +1,10 @@
-import os
-import streamlit as st
 from dotenv import load_dotenv
-import sys
 from pathlib import Path
+import streamlit as st # Import streamlit
 
 # Configuración inicial
 try:
-    print("Iniciando aplicación Avianca Flight Report...")
-    
-    # Cargar credenciales desde secrets.toml
-    supabase_url = st.secrets["supabase"]["url"]
-    supabase_key = st.secrets["supabase"]["key"]
-    
-    # Configurar rutas base
-    BASE_DIR = Path(__file__).resolve().parent
-    LOGS_DIR = BASE_DIR / "logs"
-    LOGS_DIR.mkdir(exist_ok=True)
-
-    # Importar módulos propios
+    # Importar módulos propios primero para que el logger esté disponible
     from src.config.logging_config import setup_logger
     from src.config.supabase_config import initialize_supabase_client, DEFAULT_TABLE_NAME
     from src.components.flight_form import render_flight_form
@@ -30,11 +17,27 @@ try:
 
     # Configurar logger
     logger = setup_logger()
+    logger.info("Iniciando aplicación Avianca Flight Report...") # Moved and changed to logger.info
+
+    # Cargar credenciales desde secrets.toml
+    supabase_url = st.secrets["supabase"]["url"]
+    supabase_key = st.secrets["supabase"]["key"]
+    logger.info("Credenciales cargadas correctamente desde estructura anidada.") # Added log for confirmation
+
+    # Configurar rutas base
+    BASE_DIR = Path(__file__).resolve().parent
+    LOGS_DIR = BASE_DIR / "logs"
+    LOGS_DIR.mkdir(exist_ok=True)
+
     logger.info("Aplicación iniciada correctamente")
 
 except Exception as e:
+    # Log error before st.error if logger is available
+    try:
+        logger.error(f"Error de inicialización: {str(e)}", exc_info=True)
+    except NameError: # Handle case where logger setup failed
+        print(f"Error de inicialización (logger no disponible): {str(e)}")
     st.error(f"Error al iniciar la aplicación: {str(e)}")
-    logger.error(f"Error de inicialización: {str(e)}", exc_info=True)
     st.stop()
 
 # Configuración de la página de Streamlit
@@ -206,50 +209,74 @@ with tab3:
     try:
         st.title("✈️ Anuncio de Arrivals")
 
+        # Initialize session state variables if they don't exist
+        if 'announcement_flight_data' not in st.session_state:
+            st.session_state.announcement_flight_data = None
+        if 'baggage_belt_number' not in st.session_state:
+            st.session_state.baggage_belt_number = "____"
+        if 'selected_flight_for_announcement' not in st.session_state:
+            st.session_state.selected_flight_for_announcement = None
+
+        today_str = date.today().strftime("%Y-%m-%d")
+
         # Botones para seleccionar vuelo
         col1, col2, col3 = st.columns(3)
+        fetch_triggered = False
+        flight_to_fetch = None
+
         with col1:
-            av254_button = st.button("AV254")
+            if st.button("AV254"):
+                fetch_triggered = True
+                flight_to_fetch = "AV254"
+                st.session_state.selected_flight_for_announcement = flight_to_fetch
         with col2:
-            av626_button = st.button("AV626")
+            if st.button("AV626"):
+                fetch_triggered = True
+                flight_to_fetch = "AV626"
+                st.session_state.selected_flight_for_announcement = flight_to_fetch
         with col3:
-            av204_button = st.button("AV204")
+            if st.button("AV204"):
+                fetch_triggered = True
+                flight_to_fetch = "AV204"
+                st.session_state.selected_flight_for_announcement = flight_to_fetch
 
-        # Variable para almacenar el número de banda
-        baggage_belt_number = "____"
+        # Llamar a la API solo si un botón fue presionado en esta rerun
+        if fetch_triggered and flight_to_fetch:
+            logger.info(f"Consultando API para vuelo {flight_to_fetch} en la fecha {today_str}")
+            st.session_state.announcement_flight_data = fetch_flight_status(flight_to_fetch, today_str)
+            logger.info(f"Datos devueltos por la API para {flight_to_fetch}: {st.session_state.announcement_flight_data}")
+            # Reset baggage belt number before processing new data
+            st.session_state.baggage_belt_number = "____"
 
-        # Llamar a la API según el botón presionado
-        flight_data = None  # Inicializar como None para evitar llamadas automáticas
-        if av254_button:
-            flight_data = fetch_flight_status("AV254", date.today().strftime("%Y-%m-%d"))
-        elif av626_button:
-            logger.info(f"Consultando API para vuelo AV626 en la fecha {date.today().strftime('%Y-%m-%d')}")
-            flight_data = fetch_flight_status("AV626", date.today().strftime("%Y-%m-%d"))
-            logger.info(f"Datos devueltos por la API: {flight_data}")
-        elif av204_button:
-            flight_data = fetch_flight_status("AV204", date.today().strftime("%Y-%m-%d"))
-
-        # Ajustar la lógica para buscar la entrada correcta en los datos devueltos por la API
-        if flight_data:
-            for entry in flight_data:
+        # Procesar los datos almacenados en session_state
+        if st.session_state.announcement_flight_data:
+            found_belt = False
+            for entry in st.session_state.announcement_flight_data:
                 arrival_info = entry.get('arrival', {})
-                if 'baggageBelt' in arrival_info:
-                    logger.info(f"Entrada seleccionada con número de banda: {arrival_info}")
-                    baggage_belt_number = arrival_info.get('baggageBelt', "____")
-                    break
-            else:
-                logger.warning("No se encontró ninguna entrada con número de banda en los datos devueltos por la API.")
-        else:
-            logger.warning("No se encontraron datos para el vuelo seleccionado o la respuesta de la API está vacía.")
+                # Check if the arrival airport is Toronto (YYZ) and baggage belt exists
+                if arrival_info.get('airport', {}).get('iata') == 'YYZ' and 'baggageBelt' in arrival_info:
+                    logger.info(f"Entrada seleccionada con número de banda para YYZ: {arrival_info}")
+                    st.session_state.baggage_belt_number = arrival_info.get('baggageBelt', "____")
+                    found_belt = True
+                    break # Stop after finding the relevant Toronto arrival info
 
-        # Sección de Arrivals con el número de banda actualizado
+            if not found_belt:
+                 logger.warning(f"No se encontró número de banda para Toronto (YYZ) en los datos del vuelo {st.session_state.selected_flight_for_announcement}.")
+                 # Keep baggage_belt_number as "____" if not found specifically for YYZ
+                 st.session_state.baggage_belt_number = "____"
+
+        elif st.session_state.selected_flight_for_announcement is not None: # Only show warning if a flight was selected but no data found
+             logger.warning(f"No se encontraron datos para el vuelo {st.session_state.selected_flight_for_announcement} o la respuesta de la API está vacía.")
+             st.session_state.baggage_belt_number = "____" # Ensure reset if no data
+
+        # Sección de Arrivals con el número de banda actualizado desde session_state
         st.markdown(
             f"""
             <div style='background-color:#f0f8ff; padding:15px; border-radius:10px; margin-bottom:20px;'>
-                Les damos la bienvenida a la ciudad de Toronto. Para su comodidad, les informamos que la banda asignada para recoger su equipaje es la número {baggage_belt_number}.
+                Les damos la bienvenida a la ciudad de Toronto. Para su comodidad, les informamos que la banda asignada para recoger su equipaje es la número {st.session_state.baggage_belt_number}.
                 Si tiene conexión dentro de Canadá en un vuelo doméstico, deberá recoger su equipaje y llevarlo a la banda de equipaje de conexión.
                 <hr style='border:1px solid #ccc;'>
-                Welcome to Toronto. For your convenience, the carousel assigned to pick up your luggage is number {baggage_belt_number}.
+                Welcome to Toronto. For your convenience, the carousel assigned to pick up your luggage is number {st.session_state.baggage_belt_number}.
                 All passengers with a connecting domestic flight within Canada must pick up their bag and drop it off at the connection baggage belt.
             </div>
             """,
