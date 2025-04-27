@@ -58,6 +58,7 @@ def render_wheelchair_tab(client):
         if st.button("Buscar Datos"):
             # Construir la consulta base
             query = client.table(DEFAULT_TABLE_NAME).select(
+                "created_at", # Add creation timestamp
                 "flight_date", 
                 "flight_number", 
                 "gate",
@@ -65,7 +66,15 @@ def render_wheelchair_tab(client):
                 "wchr_previous_flight", 
                 "agents_previous_flight", 
                 "wchr_current_flight", 
-                "agents_current_flight"
+                "agents_current_flight",
+                # Add time columns
+                "std",
+                "atd",
+                "cierre_de_puerta",
+                "push_back",
+                # Add groomer columns
+                "groomers_in",
+                "groomers_out"
             ).gte("flight_date", start_date_str).lte("flight_date", end_date_str)
             
             # Añadir filtro de número de vuelo si se seleccionaron
@@ -82,8 +91,18 @@ def render_wheelchair_tab(client):
             # Convertir a DataFrame para mostrar
             df = pd.DataFrame(result.data)
             
+            # Convertir 'created_at' a datetime para ordenar correctamente
+            df['created_at'] = pd.to_datetime(df['created_at'])
+            
+            # Ordenar por fecha de creación para que el último sea el más reciente
+            df = df.sort_values(by='created_at')
+            
+            # Eliminar duplicados basados en fecha de vuelo y número de vuelo, manteniendo el último (más reciente)
+            df = df.drop_duplicates(subset=['std', 'cierre_de_puerta','push_back','groomers_in','groomers_out'], keep='last')
+            
             # Renombrar columnas para mejor visualización
             column_mapping = {
+                "created_at": "Fecha de Creación", # Add mapping for creation timestamp
                 "flight_date": "Fecha de Vuelo",
                 "flight_number": "Número de Vuelo",
                 "gate": "Puerta",
@@ -91,7 +110,15 @@ def render_wheelchair_tab(client):
                 "wchr_previous_flight": "WCHR Vuelo Llegada",
                 "agents_previous_flight": "Agentes Vuelo Llegada",
                 "wchr_current_flight": "WCHR Vuelo Salida",
-                "agents_current_flight": "Agentes Vuelo Salida"
+                "agents_current_flight": "Agentes Vuelo Salida",
+                # Add mappings for time columns
+                "std": "STD",
+                "atd": "ATD",
+                "cierre_de_puerta": "Cierre de Puerta",
+                "push_back": "Push Back",
+                # Add mappings for groomer columns
+                "groomers_in": "Groomers In",
+                "groomers_out": "Groomers Out"
             }
             
             df = df.rename(columns=column_mapping).sort_values(by="Fecha de Vuelo")
