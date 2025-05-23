@@ -64,13 +64,20 @@ except Exception as e:
     logger.error(f"Error de conexión Supabase: {str(e)}", exc_info=True)
     st.stop()
 
-# Crear tabs para las diferentes funcionalidades - Ahora con cuatro pestañas principales
+# Crear tabs para las diferentes funcionalidades - Ahora con cinco pestañas principales
 try:
-    tab1, tab2, tab3, tab4 = st.tabs(["🛫 Ingreso de Datos", "📊 Visualizador", "📢 Anuncios", "♿ Wheelchairs"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["🛫 Ingreso de Datos", "📊 Visualizador", "📢 Anuncios", "♿ Wheelchairs", "🔄 Shift Trades"])
 except Exception as e:
     logger.error(f"Error al crear tabs: {str(e)}", exc_info=True)
     st.error("Error al cargar la interfaz de usuario")
     st.stop()
+
+# Anuncio de nueva funcionalidad con animación
+if "balloons_shown" not in st.session_state:
+    st.balloons()
+    st.session_state.balloons_shown = True
+
+st.success("🆕 **Nueva Funcionalidad: Shift Trades** - Ve a la última pestaña para revisar (Versión Beta)")
 
 # Tab 1: Ingreso de Datos
 with tab1:
@@ -333,3 +340,23 @@ with tab4:
     except Exception as e:
         logger.error(f"Error en Tab 4 (Wheelchairs): {str(e)}", exc_info=True)
         st.error("Error al cargar la visualización de servicios de sillas de ruedas")
+
+# Tab 5: Shift Trades
+with tab5:
+    try:
+        st.title("🔄 Shift Trades")
+        st.markdown(
+            """
+            <div style='text-align: center; padding: 20px;'>
+                <p>Haz clic en el botón de abajo para acceder a la aplicación de intercambio de turnos:</p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+        
+        # Crear un enlace que se abra en una nueva pestaña
+        st.link_button("🔗 Ir a Shift Trades", "https://shifttrade.streamlit.app/")
+        
+    except Exception as e:
+        logger.error(f"Error en Tab 5 (Shift Trades): {str(e)}", exc_info=True)
+        st.error("Error al cargar la sección de intercambio de turnos")
