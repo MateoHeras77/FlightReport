@@ -2,16 +2,16 @@ import requests
 import streamlit as st
 from datetime import date
 from typing import Optional, List, Dict
+import streamlit as st # Import Streamlit
 import time
 import logging # Import logging
+from typing import Optional, List, Dict
+from datetime import date
 
 # Configurar logger
 logger = logging.getLogger(__name__)
 
-# Diccionario para almacenar el caché manualmente
-cache = {}
-CACHE_EXPIRATION = 15 * 60  # 15 minutos en segundos
-
+@st.cache_data(ttl=900) # Cache for 15 minutes
 def fetch_flight_status(flight_number: str, custom_date: Optional[str] = None) -> Optional[List[Dict]]:
     """
     Consulta la API de AeroDataBox para obtener el estado actual de un vuelo.
@@ -28,16 +28,7 @@ def fetch_flight_status(flight_number: str, custom_date: Optional[str] = None) -
         # Formatear el número de vuelo eliminando espacios
         flight_number_formatted = flight_number.replace(" ", "").lower()
         flight_date = custom_date or date.today().strftime("%Y-%m-%d")
-        logger.info(f"Iniciando consulta para vuelo: {flight_number_formatted} en fecha {flight_date}.") # Log flight number and date
-
-        # Verificar si el vuelo está en caché y no ha expirado
-        current_time = time.time()
-        cache_key = f"{flight_number_formatted}_{flight_date}" # Use formatted flight number and date in cache key
-        if cache_key in cache:
-            cached_data, timestamp = cache[cache_key]
-            if current_time - timestamp < CACHE_EXPIRATION:
-                logger.info(f"Datos obtenidos del caché para el vuelo {flight_number_formatted} en fecha {flight_date}.")
-                return cached_data
+        logger.info(f"Fetching flight status for: {flight_number_formatted} on date {flight_date}.") # Log flight number and date
 
         # URL de la API con el número de vuelo
         url = f"https://aerodatabox.p.rapidapi.com/flights/number/{flight_number_formatted}"
@@ -63,36 +54,36 @@ def fetch_flight_status(flight_number: str, custom_date: Optional[str] = None) -
             headers = base_headers.copy()
             headers["x-rapidapi-key"] = key
 
-            logger.info(f"Llamando a la API para vuelo {flight_number_formatted} con clave API {i+1}.") # Changed to INFO
+            logger.info(f"Calling API for flight {flight_number_formatted} with API key {i+1}.")
             try:
                 response = requests.get(url, headers=headers, params=querystring, timeout=10)
 
                 if response.status_code == 200:
                     flight_data = response.json()
-                    logger.info(f"Respuesta exitosa de la API para {flight_number_formatted} con clave API {i+1}.") # Changed to INFO
-                    cache[cache_key] = (flight_data, current_time)
+                    logger.info(f"API response successful for {flight_number_formatted} with API key {i+1}.")
                     return flight_data
                 else:
-                    logger.warning(f"Error en la respuesta de la API con clave {i+1}: {response.status_code} - {response.text}")
+                    logger.warning(f"API request for {flight_number_formatted} with key {i+1} failed with status {response.status_code}: {response.text}")
                     if i < len(api_keys) - 1:
-                         logger.info(f"Intentando con clave API {i+2}.") # Inform about trying next key
+                         logger.info(f"Trying with API key {i+2}.")
                     else:
-                        logger.error(f"Ambas claves API fallaron para el vuelo {flight_number_formatted}.")
+                        logger.error(f"All API keys failed for flight {flight_number_formatted}.")
                         return None
             except requests.exceptions.RequestException as req_err:
-                 logger.error(f"Error de conexión/timeout con clave {i+1} para vuelo {flight_number_formatted}: {req_err}")
+                 logger.error(f"Connection/timeout error with API key {i+1} for flight {flight_number_formatted}: {req_err}")
                  if i < len(api_keys) - 1:
-                     logger.info(f"Intentando con clave API {i+2}.") # Inform about trying next key
+                     logger.info(f"Trying with API key {i+2}.")
                  else:
-                     logger.error(f"Ambas claves API fallaron debido a errores de conexión para el vuelo {flight_number_formatted}.")
+                     logger.error(f"All API keys failed due to connection errors for flight {flight_number_formatted}.")
                      return None
-            # Esperar un poco antes de reintentar con la siguiente clave si la primera falla
+            # Wait a bit before retrying with the next key if the first one fails
             if i < len(api_keys) - 1:
-                time.sleep(1)
+                time.sleep(1) # Consider if this sleep is necessary or if rapid retries are okay
 
-        # Si el bucle termina sin retornar, significa que ambas claves fallaron
+        # If the loop finishes without returning, it means all keys failed.
+        logger.error(f"All API attempts failed for flight {flight_number_formatted}.")
         return None
 
     except Exception as e:
-        logger.error(f"Error inesperado en fetch_flight_status para vuelo {flight_number}: {e}", exc_info=True)
+        logger.error(f"Unexpected error in fetch_flight_status for flight {flight_number}: {e}", exc_info=True)
         return None

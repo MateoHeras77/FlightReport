@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+# Optional: Basic project metadata.
+# Adjust as necessary if the project were to be packaged.
+[project]
+name = "avianca_flight_report"
+version = "0.1.0"
+description = "Streamlit application for Avianca flight reporting and visualization."
+requires-python = ">=3.8" # From README
+
+# --- Tool Configurations ---
+
+[tool.black]
+# The uncompromising Python code formatter.
+line-length = 88
+# Specify target Python versions if your codebase supports multiple.
+# e.g., target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
+
+[tool.isort]
+# Sorts imports alphabetically and automatically separated into sections.
+profile = "black" # Ensures compatibility with Black formatting.
+multi_line_output = 3
+include_trailing_comma = true
+line_length = 88 # Match Black's line length.
+
+[tool.flake8]
+# Linter: checks for style (PEP8), errors (PyFlakes), and complexity (McCabe).
+max-line-length = 88 # Match Black's line length.
+# Common ignores:
+# E203: whitespace before ':' (Black handles this differently)
+# W503: line break before binary operator (PEP8 recently changed, Black prefers after)
+extend-ignore = "E203, W503"
+# Consider adding more specific ignores or plugins as needed, e.g.:
+# flake8-bugbear, flake8-comprehensions, etc.
+
+# Example for Ruff (a very fast linter/formatter, can replace many tools)
+# [tool.ruff]
+# line-length = 88
+# select = [
+#     "E",  # pycodestyle errors
+#     "F",  # pyflakes
+#     "W",  # pycodestyle warnings
+#     "I",  # isort
+#     "UP", # pyupgrade
+# ]
+# ignore = ["E203", "W503"]
+# # To use ruff for formatting, you'd also configure:
+# # [tool.ruff.format]
+# # quote-style = "double"

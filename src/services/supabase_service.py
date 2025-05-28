@@ -1,94 +1,111 @@
-from typing import Dict, Any, Tuple, Optional
+from typing import Dict, Any, List, Optional
 
 from src.config.logging_config import setup_logger
 
-# Configurar logger
+# Configure logger
 logger = setup_logger()
 
-def send_data_to_supabase(client, table_name: str, data: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
+# Custom Exceptions
+class SupabaseError(Exception):
+    """Base class for Supabase related errors."""
+    pass
+
+class SupabaseWriteError(SupabaseError):
+    """Error during Supabase write operation."""
+    pass
+
+class SupabaseReadError(SupabaseError):
+    """Error during Supabase read operation."""
+    pass
+
+def send_data_to_supabase(client, table_name: str, data: Dict[str, Any]) -> None:
     """
-    Envu00eda datos a Supabase.
+    Sends data to Supabase.
     
     Args:
-        client: Cliente de Supabase inicializado
-        table_name (str): Nombre de la tabla de Supabase
-        data (Dict[str, Any]): Datos a enviar
+        client: Initialized Supabase client
+        table_name (str): Name of the Supabase table
+        data (Dict[str, Any]): Data to send
         
-    Returns:
-        tuple: (u00e9xito, mensaje_error) donde:
-            - u00e9xito: bool indicando si la operaciu00f3n fue exitosa
-            - mensaje_error: str con el mensaje de error o None si fue exitoso
+    Raises:
+        SupabaseWriteError: If the Supabase client is not initialized or if an error occurs during the write operation.
     """
     if client is None:
-        logger.error("No se puede enviar datos: el cliente de Supabase no estu00e1 inicializado")
-        return False, "No se ha inicializado el cliente de Supabase"
+        error_msg = "Cannot send data: Supabase client is not initialized"
+        logger.error(error_msg)
+        raise SupabaseWriteError(error_msg)
         
     try:
-        logger.info(f"Enviando datos a Supabase tabla: {table_name}")
-        logger.info(f"Datos a enviar: {data}")
+        logger.info(f"Sending data to Supabase table: {table_name}")
+        logger.debug(f"Data to send: {data}") # Changed to debug for potentially large data
         
-        # Insertar datos en la tabla de Supabase
+        # Insert data into the Supabase table
         response = client.table(table_name).insert(data).execute()
         
-        # Verificar si hay errores
+        # Check for errors
         if hasattr(response, 'error') and response.error is not None:
-            error_msg = f"Errores al insertar en Supabase: {response.error}"  
+            error_msg = f"Error inserting into Supabase: {response.error}"  
             logger.error(error_msg)
-            return False, error_msg
+            raise SupabaseWriteError(error_msg)
         else:
-            logger.info("Datos enviados exitosamente a Supabase")
-            return True, None
+            logger.info("Data sent successfully to Supabase")
+            # No return needed on success, absence of exception implies success
             
     except Exception as e:
-        error_msg = f"Error al enviar datos a Supabase: {str(e)}"
-        logger.exception(error_msg)
-        return False, error_msg
+        # Catch any other exception during the process, including network errors etc.
+        # and wrap it in SupabaseWriteError for consistent error handling by the caller.
+        error_msg = f"Error sending data to Supabase: {str(e)}"
+        logger.exception(error_msg) # Log the full traceback
+        raise SupabaseWriteError(error_msg)
 
-def fetch_data_from_supabase(client, table_name: str, query_params: Dict[str, Any] = None) -> Tuple[bool, Any, Optional[str]]:
+def fetch_data_from_supabase(client, table_name: str, query_params: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
     """
-    Obtiene datos de Supabase con filtros opcionales.
+    Fetches data from Supabase with optional filters.
     
     Args:
-        client: Cliente de Supabase inicializado
-        table_name (str): Nombre de la tabla de Supabase
-        query_params (Dict[str, Any]): Paru00e1metros de consulta opcionales
+        client: Initialized Supabase client
+        table_name (str): Name of the Supabase table
+        query_params (Optional[Dict[str, Any]]): Optional query parameters (e.g., for filtering)
         
     Returns:
-        tuple: (u00e9xito, datos, mensaje_error) donde:
-            - u00e9xito: bool indicando si la operaciu00f3n fue exitosa
-            - datos: Datos obtenidos o None si hubo error
-            - mensaje_error: str con el mensaje de error o None si fue exitoso
+        List[Dict[str, Any]]: Data fetched from Supabase.
+        
+    Raises:
+        SupabaseReadError: If the Supabase client is not initialized or if an error occurs during the read operation.
     """
     if client is None:
-        logger.error("No se puede obtener datos: el cliente de Supabase no estu00e1 inicializado")
-        return False, None, "No se ha inicializado el cliente de Supabase"
+        error_msg = "Cannot fetch data: Supabase client is not initialized"
+        logger.error(error_msg)
+        raise SupabaseReadError(error_msg)
     
     try:
-        logger.info(f"Obteniendo datos de Supabase tabla: {table_name}")
+        logger.info(f"Fetching data from Supabase table: {table_name}")
         
-        # Iniciar la consulta
+        # Start the query
         query = client.table(table_name).select("*")
         
-        # Aplicar filtros si existen
+        # Apply filters if they exist
         if query_params:
+            logger.debug(f"Applying query parameters: {query_params}")
             for key, value in query_params.items():
-                if value is not None:
+                if value is not None: # Ensure value is not None before applying filter
                     query = query.eq(key, value)
         
-        # Ejecutar la consulta
+        # Execute the query
         response = query.execute()
         
-        # Verificar si hay errores
+        # Check for errors
         if hasattr(response, 'error') and response.error is not None:
-            error_msg = f"Errores al consultar Supabase: {response.error}"
+            error_msg = f"Error querying Supabase: {response.error}"
             logger.error(error_msg)
-            return False, None, error_msg
+            raise SupabaseReadError(error_msg)
         else:
-            data = response.data
-            logger.info(f"Datos obtenidos exitosamente de Supabase: {len(data)} registros")
-            return True, data, None
+            data: List[Dict[str, Any]] = response.data
+            logger.info(f"Data fetched successfully from Supabase: {len(data)} records")
+            return data
             
     except Exception as e:
-        error_msg = f"Error al obtener datos de Supabase: {str(e)}"
-        logger.exception(error_msg)
-        return False, None, error_msg
+        # Catch any other exception and wrap it
+        error_msg = f"Error fetching data from Supabase: {str(e)}"
+        logger.exception(error_msg) # Log the full traceback
+        raise SupabaseReadError(error_msg)
