@@ -5,6 +5,7 @@ from typing import Dict, List, Any, Optional
 
 from src.config.logging_config import setup_logger
 from src.config.supabase_config import DEFAULT_TABLE_NAME
+from src.services.supabase_service import fetch_data_from_supabase, SupabaseReadError
 from src.components.charts.gantt_chart import create_gantt_chart
 from src.components.charts.bar_chart import create_cascade_timeline_chart
 from src.components.charts.combined_events_chart import create_combined_events_chart
@@ -23,54 +24,45 @@ def fetch_flight_data_for_chart(client, date=None, flight_number=None, created_a
         created_at: Timestamp de creación para filtrar (opcional)
         
     Returns:
-        List[Dict]: Lista de datos de vuelos
+        List[Dict]: List of flight data.
     """
+    query_params = {}
+    if date:
+        logger.info(f"Filtering by date: {date} (type: {type(date).__name__})")
+        query_params["flight_date"] = date
+    if flight_number:
+        logger.info(f"Filtering by flight number: {flight_number}")
+        query_params["flight_number"] = flight_number
+    if created_at:
+        logger.info(f"Filtering by creation timestamp: {created_at}")
+        query_params["created_at"] = created_at
+    
+    # Note: Ordering is not directly supported by the current fetch_data_from_supabase
+    # This would need to be handled post-fetch or by enhancing fetch_data_from_supabase
+    # For now, we'll fetch and then sort if needed, or rely on default table order.
+    # query = query.order("flight_date", desc=True).order("std", desc=True)
+
     try:
-        # Iniciar consulta a Supabase
-        query = client.table(DEFAULT_TABLE_NAME).select("*")
+        logger.info(f"Fetching flight data from Supabase table: {DEFAULT_TABLE_NAME} with params: {query_params}")
+        # Assuming fetch_data_from_supabase can handle an empty query_params dict for "select all"
+        flights_data = fetch_data_from_supabase(client, DEFAULT_TABLE_NAME, query_params if query_params else None)
         
-        # Aplicar filtros si existen
-        if date:
-            # Registrar la fecha para depuración
-            logger.info(f"Filtrando por fecha: {date} (tipo: {type(date).__name__})")
-            query = query.eq("flight_date", date)
+        logger.info(f"Query successful. Results obtained: {len(flights_data)}")
+        if len(flights_data) > 0 and flights_data[0] is not None: # Check if flights_data[0] is not None
+            logger.info(f"Available keys in data: {list(flights_data[0].keys())}")
         
-        if flight_number:
-            # Registrar el número de vuelo para depuración
-            logger.info(f"Filtrando por vuelo: {flight_number}")
-            query = query.eq("flight_number", flight_number)
-        
-        if created_at:
-            # Registrar el timestamp de creación para depuración
-            logger.info(f"Filtrando por timestamp de creación: {created_at}")
-            query = query.eq("created_at", created_at)
-            
-        # Ordenar resultados
-        query = query.order("flight_date", desc=True).order("std", desc=True)
-        
-        logger.info(f"Ejecutando consulta a Supabase en tabla: {DEFAULT_TABLE_NAME}")
-        
-        # Ejecutar consulta
-        response = query.execute()
-        
-        # Verificar si hay errores
-        if hasattr(response, 'error') and response.error is not None:
-            logger.error(f"Error en la consulta a Supabase: {response.error}")
-            return []
-        
-        # Convertir resultados a lista de diccionarios
-        flights_data = response.data
-        
-        # Registrar la cantidad de resultados para depuración
-        logger.info(f"Consulta exitosa. Resultados obtenidos: {len(flights_data)}")
-        if len(flights_data) > 0:
-            # Mostrar las claves del primer resultado para depuración
-            logger.info(f"Claves disponibles en los datos: {list(flights_data[0].keys())}")
-        
+        # Implement sorting here if necessary, e.g., by flight_date and std
+        if flights_data:
+            flights_data.sort(key=lambda x: (x.get('flight_date', ''), x.get('std', '')), reverse=True)
+
         return flights_data
-    except Exception as e:
-        logger.exception(f"Error al obtener datos de vuelo: {e}")
-        st.error(f"Error al obtener datos: {str(e)}")
+    except SupabaseReadError as e:
+        logger.error(f"Error fetching flight data from Supabase: {e}", exc_info=True)
+        st.error(f"Error fetching data: {str(e)}")
+        return []
+    except Exception as e: # Catch any other unexpected errors
+        logger.exception(f"Unexpected error fetching flight data: {e}")
+        st.error(f"Unexpected error fetching data: {str(e)}")
         return []
 
 def render_timeline_tab(client):
@@ -96,28 +88,29 @@ def render_timeline_tab(client):
 
     # Obtener todas las fechas y números de vuelo disponibles para los filtros
     try:
-        # Consulta para fechas únicas
-        logger.info(f"Consultando fechas únicas en tabla: {DEFAULT_TABLE_NAME}")
-        dates_response = client.table(DEFAULT_TABLE_NAME).select("flight_date").execute()
+        logger.info(f"Fetching unique flight dates from table: {DEFAULT_TABLE_NAME}")
+        # fetch_data_from_supabase expects query_params for specific columns,
+        # but here we need distinct values. This might require a more specific utility
+        # or adjusting fetch_data_from_supabase to handle column selection.
+        # For now, let's assume we fetch all and process, or this part needs a dedicated function.
+        # This part is tricky as fetch_data_from_supabase selects ALL columns ("*")
+        # We'll fetch all data and then extract unique dates and flight numbers.
+        # This is inefficient but works with the current fetch_data_from_supabase.
+        # A better approach would be to enhance fetch_data_from_supabase or add new specific functions.
         
-        # Consulta para números de vuelo únicos
-        logger.info(f"Consultando números de vuelo únicos en tabla: {DEFAULT_TABLE_NAME}")
-        flights_response = client.table(DEFAULT_TABLE_NAME).select("flight_number").execute()
-        
-        if hasattr(dates_response, 'error') and dates_response.error is not None:
-            logger.error(f"Error al obtener fechas: {dates_response.error}")
+        all_data_for_filters = fetch_data_from_supabase(client, DEFAULT_TABLE_NAME) # Fetches all data
+
+        if not all_data_for_filters: # Check if data is empty or None
             dates = []
-        else:
-            all_dates = [item['flight_date'] for item in dates_response.data]
-            dates = sorted(list(set(all_dates)), reverse=True)
-        
-        if hasattr(flights_response, 'error') and flights_response.error is not None:
-            logger.error(f"Error al obtener números de vuelo: {flights_response.error}")
             flight_numbers = []
+            st.warning("No data available to populate filters.")
         else:
-            all_flights = [item['flight_number'] for item in flights_response.data]
+            all_dates = [item['flight_date'] for item in all_data_for_filters if item and 'flight_date' in item]
+            dates = sorted(list(set(all_dates)), reverse=True)
+            
+            all_flights = [item['flight_number'] for item in all_data_for_filters if item and 'flight_number' in item]
             flight_numbers = sorted(list(set(all_flights)))
-        
+
         # Filtros para seleccionar fecha y vuelo
         col1, col2 = st.columns(2)
         
@@ -223,7 +216,14 @@ def render_timeline_tab(client):
                 display_flight_schedule(flights_data[0])
     except Exception as e:
         logger.exception(f"Error al renderizar la pestaña de línea de tiempo: {e}")
-        st.error(f"Error en la visualización: {str(e)}")
+        st.error(f"Error in timeline visualization: {str(e)}")
+    except SupabaseReadError as e: # Catch Supabase read errors for filter data fetching
+        logger.error(f"Error fetching filter data for timeline tab: {e}", exc_info=True)
+        st.error(f"Error loading filter options: {str(e)}")
+    except Exception as e: # General error catch for the tab
+        logger.exception(f"Error rendering timeline tab: {e}")
+        st.error(f"Error in timeline visualization: {str(e)}")
+
 
 def display_flight_details(flights):
     """

@@ -91,3 +91,13 @@ config.json
 !runtime.txt
 !README.md
 example_secrets.toml
+
+# Test runner caches and reports
+.pytest_cache/
+pytest_cache/
+.coverage
+htmlcov/
+
+# More specific compiled Python files
+*.pyo
+*.pyd
