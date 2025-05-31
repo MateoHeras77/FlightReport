@@ -31,14 +31,18 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
     previous_flight_mapping = {
         "AV205": "AV204",
         "AV627": "AV626",
-        "AV255": "AV254"
+        "AV255": "AV254",
+        "AV619": "AV618", # Added new flight
+        "AV625": "AV624"  # Added new flight
     }
     
     # Información predeterminada para cada vuelo
     flight_defaults = {
         "AV255": {"destination": "BOG", "std": "09:05"},
         "AV627": {"destination": "SAL", "std": "17:10"},
-        "AV205": {"destination": "BOG", "std": "23:50"}
+        "AV205": {"destination": "BOG", "std": "23:50"},
+        "AV619": {"destination": "SAL", "std": "08:00"}, # Added new flight
+        "AV625": {"destination": "SAL", "std": "01:55"}  # Added new flight
     }
     
     # Paso 1: Selección del vuelo antes de mostrar el formulario
@@ -59,7 +63,7 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
     
     flight_number_selected = st.selectbox(
         "🔢 Seleccione el número de vuelo primero:",
-        ["", "AV205", "AV255", "AV627"],
+        ["", "AV205", "AV255", "AV627", "AV619", "AV625"], # Added new flights
         format_func=lambda x: "Elegir vuelo" if x == "" else x,
         key="flight_number_selector",
         on_change=update_flight_defaults
@@ -104,7 +108,7 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
             )
 
         # Selectbox para número de vuelo dentro del formulario, pero usando el valor ya seleccionado
-        flight_number_options = ["", "AV205", "AV255", "AV627"]
+        flight_number_options = ["", "AV205", "AV255", "AV627", "AV619", "AV625"] # Added new flights
         default_index = flight_number_options.index(flight_number_selected) if flight_number_selected in flight_number_options else 0
         
         flight_number = st.selectbox(
