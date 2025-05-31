@@ -227,25 +227,35 @@ with tab3:
         today_str = date.today().strftime("%Y-%m-%d")
 
         # Botones para seleccionar vuelo
-        col1, col2, col3 = st.columns(3)
+        col1, col2, col3, col4, col5 = st.columns(5) # Increased to 5 columns
         fetch_triggered = False
         flight_to_fetch = None
 
         with col1:
-            if st.button("AV254"):
-                fetch_triggered = True
-                flight_to_fetch = "AV254"
-                st.session_state.selected_flight_for_announcement = flight_to_fetch
-        with col2:
-            if st.button("AV626"):
-                fetch_triggered = True
-                flight_to_fetch = "AV626"
-                st.session_state.selected_flight_for_announcement = flight_to_fetch
-        with col3:
-            if st.button("AV204"):
-                fetch_triggered = True
+            if st.button("AV204", key="fetch_av204"):
+                st.session_state.selected_flight_for_announcement = "AV204"
                 flight_to_fetch = "AV204"
-                st.session_state.selected_flight_for_announcement = flight_to_fetch
+                fetch_triggered = True
+        with col2:
+            if st.button("AV254", key="fetch_av254"):
+                st.session_state.selected_flight_for_announcement = "AV254"
+                flight_to_fetch = "AV254"
+                fetch_triggered = True
+        with col3:
+            if st.button("AV626", key="fetch_av626"):
+                st.session_state.selected_flight_for_announcement = "AV626"
+                flight_to_fetch = "AV626"
+                fetch_triggered = True
+        with col4: # New column for AV618
+            if st.button("AV618", key="fetch_av618"):
+                st.session_state.selected_flight_for_announcement = "AV618"
+                flight_to_fetch = "AV618"
+                fetch_triggered = True
+        with col5: # New column for AV624
+            if st.button("AV624", key="fetch_av624"):
+                st.session_state.selected_flight_for_announcement = "AV624"
+                flight_to_fetch = "AV624"
+                fetch_triggered = True
 
         # Llamar a la API solo si un botón fue presionado en esta rerun
         if fetch_triggered and flight_to_fetch:
