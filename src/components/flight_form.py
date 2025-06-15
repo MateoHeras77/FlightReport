@@ -41,7 +41,7 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
         "AV255": {"destination": "BOG", "std": "09:05"},
         "AV627": {"destination": "SAL", "std": "17:10"},
         "AV205": {"destination": "BOG", "std": "23:50"},
-        "AV619": {"destination": "SAL", "std": "08:00"}, # Added new flight
+        "AV619": {"destination": "SAL", "std": "07:55"}, # Added new flight
         "AV625": {"destination": "SAL", "std": "01:55"}  # Added new flight
     }
     
