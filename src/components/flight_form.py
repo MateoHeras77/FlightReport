@@ -459,8 +459,13 @@ def process_form_data(
     display_data = database_data.copy()
     for key in normalized_times.keys():
         field_name = key.lower().replace(" ", "_")
-        if display_data[field_name]:
-            display_data[field_name] = normalized_times[key]
+        # Ajuste para campos cuyo nombre en la base de datos no coincide con la
+        # conversión simple de la etiqueta
+        db_field_name = field_name
+        if field_name == "salida_de_tripulacion":
+            db_field_name = "crew_departure"
+        if db_field_name in display_data and display_data[db_field_name]:
+            display_data[db_field_name] = normalized_times[key]
 
     # Asegurar que el valor de Total Pax se incluya en los datos enviados y en el reporte
     database_data["pax_ob_total"] = total_pax
@@ -470,5 +475,4 @@ def process_form_data(
 
     return True, {
         "data_to_display": display_data,
-        "data_for_database": database_data
-    }
+        "data_for_database": database_data    }
