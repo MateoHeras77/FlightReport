@@ -123,12 +123,25 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
         with col3:
             # Usar el STD predeterminado desde session_state
             std = st.text_input(
-                "STD (Salida Programada)", 
-                value=st.session_state.default_std, 
-                placeholder="HH:MM", 
+                "STD (Salida Programada)",
+                value=st.session_state.default_std,
+                placeholder="HH:MM",
                 key="std"
             )
             atd = st.text_input("ATD (Salida Real)", value="", placeholder="HH:MM", key="atd")
+            crew_departure = st.text_input(
+                "Salida de Tripulacion",
+                value="",
+                placeholder="HH:MM",
+                key="crew_departure"
+            )
+            groomers_agents_options = [str(i) for i in range(31)]
+            number_groomers_agents = st.selectbox(
+                "Cantidad de Agentes Groomers",
+                options=groomers_agents_options,
+                index=0,
+                key="number_groomers_agents"
+            )
             groomers_in = st.text_input("Groomers In", value="", placeholder="HH:MM", key="groomers_in")
             groomers_out = st.text_input("Groomers Out", value="", placeholder="HH:MM", key="groomers_out")
         with col4:
@@ -309,7 +322,8 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
     if submitted:
         return process_form_data(
                 flight_date, origin, destination, flight_number,
-                std, atd, groomers_in, groomers_out, crew_at_gate,
+                std, atd, crew_departure, number_groomers_agents,
+                groomers_in, groomers_out, crew_at_gate,
                 ok_to_board, flight_secure, cierre_de_puerta, push_back,
                 total_pax, pax_c, pax_y, infants, customs_in, customs_out,
                 delay, gate, carrousel, delay_code,
@@ -322,7 +336,8 @@ def render_flight_form() -> Tuple[bool, Dict[str, Any]]:
 
 def process_form_data(
     flight_date, origin, destination, flight_number,
-    std, atd, groomers_in, groomers_out, crew_at_gate,
+    std, atd, crew_departure, number_groomers_agents,
+    groomers_in, groomers_out, crew_at_gate,
     ok_to_board, flight_secure, cierre_de_puerta, push_back,
     total_pax, pax_c, pax_y, infants, customs_in, customs_out,
     delay, gate, carrousel, delay_code,
@@ -360,6 +375,7 @@ def process_form_data(
     time_fields = {
         "STD": std,
         "ATD": atd,
+        "Salida de Tripulacion": crew_departure,
         "Groomers In": groomers_in,
         "Groomers Out": groomers_out,
         "Crew at Gate": crew_at_gate,
@@ -413,6 +429,8 @@ def process_form_data(
         "flight_number": flight_number,
         "std": format_time_for_database(normalized_times["STD"]),
         "atd": format_time_for_database(normalized_times["ATD"]),
+        "crew_departure": format_time_for_database(normalized_times["Salida de Tripulacion"]),
+        "number_groomers_agents": number_groomers_agents,
         "groomers_in": format_time_for_database(normalized_times["Groomers In"]),
         "groomers_out": format_time_for_database(normalized_times["Groomers Out"]),
         "crew_at_gate": format_time_for_database(normalized_times["Crew at Gate"]),

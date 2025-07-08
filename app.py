@@ -125,6 +125,8 @@ with tab1:
 ⏰ *Tiempos:*
 *STD:* {display_data.get('std', '')}
 *ATD:* {display_data.get('atd', '')}
+*Salida de Tripulacion:* {display_data.get('crew_departure', '')}
+*Cantidad de Agentes Groomers:* {display_data.get('number_groomers_agents', '')}
 *Groomers In:* {display_data.get('groomers_in', '')}
 *Groomers Out:* {display_data.get('groomers_out', '')}
 *Crew at Gate:* {display_data.get('crew_at_gate', '')}
