@@ -283,6 +283,8 @@ def display_flight_details(flights):
                 st.write(f"👨‍✈️ **Crew at Gate:** {flight.get('crew_at_gate', 'N/A')}")
                 st.write(f"✅ **OK to Board:** {flight.get('ok_to_board', 'N/A')}")
             with col2:
+                st.write(f"⏰ **Salida Tripulación:** {flight.get('crew_departure', 'N/A')}")
+                st.write(f"👷 **Agentes Groomers:** {flight.get('number_groomers_agents', 'N/A')}")
                 st.write(f"🔒 **Flight Secure:** {flight.get('flight_secure', 'N/A')}")
                 st.write(f"🚪 **Cierre de Puerta:** {flight.get('cierre_de_puerta', 'N/A')}")
                 st.write(f"🚜 **Push Back:** {flight.get('push_back', 'N/A')}")
@@ -325,6 +327,7 @@ def display_flight_schedule(flight):
     time_fields = {
         "STD": flight.get('std'),
         "ATD": flight.get('atd'),
+        "Salida de Tripulación": flight.get('crew_departure'),
         "Groomers In": flight.get('groomers_in'),
         "Groomers Out": flight.get('groomers_out'),
         "Crew at Gate": flight.get('crew_at_gate'),
@@ -348,5 +351,4 @@ def display_flight_schedule(flight):
 
         time_data.append({"Evento": event, "Hora": formatted_time})
 
-    # Mostrar tabla de horarios
-    st.dataframe(time_data, hide_index=True)
+    # Mostrar tabla de horarios    st.dataframe(time_data, hide_index=True)
