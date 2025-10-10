@@ -53,6 +53,27 @@ except Exception as e:
     st.error("Error al configurar la interfaz de usuario")
     st.stop()
 
+# Banner informativo: la app ya no está disponible -> redirige a SwiftShift
+try:
+    banner_html = """
+    <div style='background:#ffefc2; padding:20px; border-radius:8px; text-align:center;'>
+        <h2 style='margin:0 0 8px 0;'>Esta aplicación ya no está disponible</h2>
+        <p style='margin:0 8px 12px 8px;'>Todo se ha movido a
+        <a href="https://www.swiftshift.digital/" target="_blank" style='font-weight:600; color:#1a73e8;'>https://www.swiftshift.digital/</a></p>
+        <p style='margin:0;'>Si desea continuar usando esta página por motivos de depuración, cierre este mensaje y desplácese hacia abajo.</p>
+        <div style='margin-top:12px;'>
+            <a href="https://www.swiftshift.digital/" target="_blank" style='text-decoration:none;'>
+                <button style='background:#1a73e8; color:white; padding:10px 18px; border:none; border-radius:6px; font-size:16px;'>Ir a SwiftShift</button>
+            </a>
+        </div>
+    </div>
+    """
+    st.markdown(banner_html, unsafe_allow_html=True)
+    # Detener ejecución para mostrar solo el banner
+    st.stop()
+except Exception as e:
+    logger.warning(f"Error mostrando banner informativo: {e}")
+
 # Inicializar cliente de Supabase con manejo de errores
 try:
     client, project_ref, error_msg = initialize_supabase_client()
